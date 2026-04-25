@@ -6,10 +6,12 @@ import com.example.FastLane.Academy.repo.LessonRepo;
 import com.example.FastLane.Academy.util.VarList;
 import org.aspectj.weaver.ast.Var;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,27 +25,27 @@ public class LessonService {
     @Autowired
     private ModelMapper modelMapper;
 
-    public String scheduleLesson(LessonDTO lessonDTO){
-        if (lessonRepo.findByInstructorIdAndDateAndTime(lessonDTO.getInstructorId(), lessonDTO.getDate(), lessonDTO.getTime()).isPresent()){
+    public String scheduleLesson(LessonDTO lessonDTO) {
+        if (lessonRepo.findByInstructorIdAndDateAndTime(lessonDTO.getInstructorId(), lessonDTO.getDate(), lessonDTO.getTime()).isPresent()) {
             return VarList.INSTRUCTOR_CONFLICT;
-        } else if (lessonRepo.findByStudentIdAndDateAndTime(lessonDTO.getStudentId(),lessonDTO.getDate(),lessonDTO.getTime()).isPresent()) {
+        } else if (lessonRepo.findByStudentIdAndDateAndTime(lessonDTO.getStudentId(), lessonDTO.getDate(), lessonDTO.getTime()).isPresent()) {
             return VarList.STUDENT_CONFLICT;
-        } else{
+        } else {
             lessonRepo.save(modelMapper.map(lessonDTO, Lesson.class));
             return VarList.LESSON_SCHEDULED_SUCCESSFULLY;
         }
 
     }
 
-    public List<LessonDTO> getAllLessons(){
+    public List<LessonDTO> getAllLessons() {
         return lessonRepo.findAll().stream()
                 .map(lesson -> modelMapper.map(lesson, LessonDTO.class))
                 .toList();
     }
 
-    public String updateLesson(LessonDTO lessonDTO){
+    public String updateLesson(LessonDTO lessonDTO) {
         Optional<Lesson> optionalLesson = lessonRepo.findById(lessonDTO.getLessonId());
-        if (optionalLesson.isEmpty()){
+        if (optionalLesson.isEmpty()) {
             return VarList.LESSON_NOT_FOUND;
         }
         // check instructor conflict
@@ -54,10 +56,9 @@ public class LessonService {
                         lessonDTO.getTime()
                 );
 
-        if(instructorConflict.isPresent() &&
+        if (instructorConflict.isPresent() &&
                 !instructorConflict.get().getLessonId()
-                        .equals(lessonDTO.getLessonId()))
-        {
+                        .equals(lessonDTO.getLessonId())) {
             return VarList.INSTRUCTOR_CONFLICT;
         }
         // check student conflict
@@ -68,9 +69,9 @@ public class LessonService {
                         lessonDTO.getTime()
                 );
 
-        if(studentConflict.isPresent() &&
+        if (studentConflict.isPresent() &&
                 !studentConflict.get().getLessonId()
-                        .equals(lessonDTO.getLessonId())){
+                        .equals(lessonDTO.getLessonId())) {
 
             return VarList.STUDENT_CONFLICT;
         }
@@ -87,12 +88,27 @@ public class LessonService {
         return VarList.UPDATED_SUCCESSFULLY;
     }
 
-    public String deleteLesson(long lessonId){
-        if (lessonRepo.existsById(lessonId)){
+    public String deleteLesson(long lessonId) {
+        if (lessonRepo.existsById(lessonId)) {
             lessonRepo.deleteById(lessonId);
             return VarList.RSP_SUCCESS;
-        }else{
+        } else {
             return VarList.RSP_NO_DATA_FOUND;
         }
     }
+    public List<LessonDTO> getLessonsByStudentId(String studentId) {
+        List<Lesson> lessons = lessonRepo.findByStudentId(studentId);
+        if (lessons.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return modelMapper.map(lessons,new TypeToken<ArrayList<LessonDTO>>(){}.getType());
+    }
+    public List<LessonDTO> getLessonsByInstructorId(String instructorId) {
+        List<Lesson> lessons = lessonRepo.findByInstructorId(instructorId);
+        if (lessons.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return modelMapper.map(lessons,new TypeToken<ArrayList<LessonDTO>>(){}.getType());
+    }
+
 }

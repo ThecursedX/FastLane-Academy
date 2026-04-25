@@ -133,4 +133,34 @@ public class LessonController {
             return new ResponseEntity(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @GetMapping(value = "/getLessonsByStudentId/{studentId}")
+    public ResponseEntity getLessonsByStudentId(@PathVariable String studentId){
+        try {
+          List<LessonDTO> lessonDTOList = lessonService.getLessonsByStudentId(studentId);
+            responseDTO.setCode(VarList.RSP_SUCCESS);
+            responseDTO.setMessage("Success");
+            responseDTO.setContent(lessonDTOList);
+            return new ResponseEntity(responseDTO, HttpStatus.ACCEPTED);
+        }catch (Exception ex){
+            responseDTO.setCode(VarList.RSP_ERROR);
+            responseDTO.setMessage(ex.getMessage());
+            responseDTO.setContent(ex);
+            return new ResponseEntity(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @GetMapping(value = "/getLessonsByInstructorId/{instructorId}")
+    public ResponseEntity getLessonsByInstructorId(@PathVariable String instructorId){
+        try {
+          List<LessonDTO> lessonDTOList = lessonService.getLessonsByInstructorId(instructorId);
+            responseDTO.setCode(VarList.RSP_SUCCESS);
+            responseDTO.setMessage("Success");
+            responseDTO.setContent(lessonDTOList);
+            return new ResponseEntity(responseDTO, HttpStatus.ACCEPTED);
+        }catch (Exception ex){
+            responseDTO.setCode(VarList.RSP_ERROR);
+            responseDTO.setMessage(ex.getMessage());
+            responseDTO.setContent(ex);
+            return new ResponseEntity(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
