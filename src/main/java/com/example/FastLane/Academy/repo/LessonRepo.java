@@ -11,18 +11,35 @@ import java.util.Optional;
 
 public interface LessonRepo extends JpaRepository<Lesson, Long> {
 
-    Optional<Lesson> findByInstructorIdAndDateAndTime(
+    boolean existsByInstructorIdAndDateAndTime(
             String instructorId,
             LocalDate date,
             LocalTime time
     );
-    Optional<Lesson> findByStudentIdAndDateAndTime(
+    boolean existsByStudentIdAndDateAndTime(
             String studentId,
             LocalDate date,
             LocalTime time
     );
 
     List<Lesson> findByStudentId(String studentId);
-
     List<Lesson> findByInstructorId(String instructorId);
+    List<Lesson> findByStatusOrderByRequestedAtAsc(String status);
+
+    // Conflict checks against already scheduled lessons only
+    boolean existsByInstructorIdAndDateAndTimeAndStatusAndLessonIdNot(
+            String instructorId,
+            LocalDate date,
+            LocalTime time,
+            String status,
+            Long lessonId
+    );
+
+    boolean existsByStudentIdAndDateAndTimeAndStatusAndLessonIdNot(
+            String studentId,
+            LocalDate date,
+            LocalTime time,
+            String status,
+            Long lessonId
+    );
 }

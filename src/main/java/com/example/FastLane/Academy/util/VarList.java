@@ -15,4 +15,7 @@ public class VarList {
     public static final String LESSON_NOT_FOUND   = "13";
     public static final String INSTRUCTOR_CONFLICT    = "20";
     public static final String STUDENT_CONFLICT    = "21";
+
+    public static final String REQUEST_ADDED ="15";
+    public static final String NO_PENDING_REQUESTS ="16";
 }

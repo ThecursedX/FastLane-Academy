@@ -22,28 +22,18 @@ public class LessonController {
     @Autowired
     public ResponseDTO responseDTO;
 
-    @PostMapping(value = "/scheduleLesson")
-    public ResponseEntity scheduleLesson(@RequestBody LessonDTO lessonDTO){
+    @PostMapping(value = "/requestLesson")
+    public ResponseEntity requestLesson(@RequestBody LessonDTO lessonDTO){
         try {
-            String res= lessonService.scheduleLesson(lessonDTO);
-        if (res.equals("00")){
-            responseDTO.setCode(VarList.RSP_SUCCESS);
-            responseDTO.setMessage("Success");
+            String res= lessonService.requestLesson(lessonDTO);
+        if (res.equals("15")){
+            responseDTO.setCode(VarList.REQUEST_ADDED);
+            responseDTO.setMessage("Lesson request added to FIFO queue");
             responseDTO.setContent(lessonDTO);
             return new ResponseEntity(responseDTO, HttpStatus.ACCEPTED);
-        }else if (res.equals("20")){
-            responseDTO.setCode(VarList.INSTRUCTOR_CONFLICT);
-            responseDTO.setMessage("Instructor Unavailable");
-            responseDTO.setContent(lessonDTO);
-            return new ResponseEntity(responseDTO, HttpStatus.BAD_REQUEST);
-        }else if (res.equals("21")){
-            responseDTO.setCode(VarList.STUDENT_CONFLICT);
-            responseDTO.setMessage("Student Unavailable");
-            responseDTO.setContent(lessonDTO);
-            return new ResponseEntity(responseDTO, HttpStatus.BAD_REQUEST);
         }else{
             responseDTO.setCode(VarList.RSP_FAIL);
-            responseDTO.setMessage("Error");
+            responseDTO.setMessage("Unable to add lesson request");
             responseDTO.setContent(null);
             return new ResponseEntity(responseDTO, HttpStatus.BAD_REQUEST);
         }
@@ -53,6 +43,38 @@ public class LessonController {
         responseDTO.setContent(null);
         return new ResponseEntity(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    }
+    @PostMapping(value = "/processNextLesson")
+    public ResponseEntity processNextLesson() {
+        try {
+            String res = lessonService.processNextLesson();
+            if (res.equals("00")) {
+                responseDTO.setCode(VarList.LESSON_SCHEDULED_SUCCESSFULLY);
+                responseDTO.setMessage("Oldest queued lesson scheduled successfully");
+                responseDTO.setContent(null);
+                return new ResponseEntity(responseDTO, HttpStatus.ACCEPTED);
+            } else if (res.equals("20")) {
+                responseDTO.setCode(VarList.INSTRUCTOR_CONFLICT);
+                responseDTO.setMessage("Instructor Unavailable");
+                responseDTO.setContent(null);
+                return new ResponseEntity(responseDTO, HttpStatus.BAD_REQUEST);
+            } else if (res.equals("21")) {
+                responseDTO.setCode(VarList.STUDENT_CONFLICT);
+                responseDTO.setMessage("Student Unavailable");
+                responseDTO.setContent(null);
+                return new ResponseEntity(responseDTO, HttpStatus.BAD_REQUEST);
+            }else{
+                responseDTO.setCode(VarList.RSP_FAIL);
+                responseDTO.setMessage("Unable to process lesson queue");
+                responseDTO.setContent(null);
+                return new ResponseEntity(responseDTO, HttpStatus.BAD_REQUEST);
+        }
+        }catch(Exception ex){
+            responseDTO.setCode(VarList.RSP_ERROR);
+            responseDTO.setMessage(ex.getMessage());
+            responseDTO.setContent(null);
+            return new ResponseEntity(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping(value = "/getAllLessons")
