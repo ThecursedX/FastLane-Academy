@@ -18,4 +18,8 @@ public class VarList {
 
     public static final String REQUEST_ADDED ="15";
     public static final String NO_PENDING_REQUESTS ="16";
+    public static final String CANCELLATION_PERIOD_EXPIRED = "17";
+    public static final String CANNOT_CANCEL = "18";
+    public static final String INVALID_DAY = "30";
+    public static final String DATE_OUT_OF_RANGE = "31";
 }

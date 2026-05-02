@@ -25,6 +25,7 @@ public interface LessonRepo extends JpaRepository<Lesson, Long> {
     List<Lesson> findByStudentId(String studentId);
     List<Lesson> findByInstructorId(String instructorId);
     List<Lesson> findByStatusOrderByRequestedAtAsc(String status);
+    Optional<Lesson> findFirstByStatusOrderByRequestedAtAsc(String status);
 
     // Conflict checks against already scheduled lessons only
     boolean existsByInstructorIdAndDateAndTimeAndStatusAndLessonIdNot(
@@ -42,4 +43,18 @@ public interface LessonRepo extends JpaRepository<Lesson, Long> {
             String status,
             Long lessonId
     );
+
+    boolean existsByInstructorIdAndDateAndTimeAndStatus(
+            String instructorId,
+            LocalDate date,
+            LocalTime time,
+            String status
+    );
+    boolean existsByStudentIdAndDateAndTimeAndStatus(
+            String studentId,
+            LocalDate date,
+            LocalTime time,
+            String status
+    );
+
 }

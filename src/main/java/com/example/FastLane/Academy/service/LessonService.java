@@ -1,6 +1,7 @@
 package com.example.FastLane.Academy.service;
 
 import com.example.FastLane.Academy.dto.LessonDTO;
+import com.example.FastLane.Academy.dto.ResponseDTO;
 import com.example.FastLane.Academy.entity.Lesson;
 import com.example.FastLane.Academy.repo.LessonRepo;
 import com.example.FastLane.Academy.util.VarList;
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +29,12 @@ public class LessonService {
     @Autowired
     private ModelMapper modelMapper;
 
-   public String requestLesson(LessonDTO lessonDTO){
+   public ResponseDTO  requestLesson(LessonDTO lessonDTO){
+       String validation = validateLessonDate(lessonDTO.getDate());
+
+       if (validation != null) {
+           return new ResponseDTO(validation, "Invalid lesson date", lessonDTO);
+       }
 
        Lesson lesson = modelMapper.map(lessonDTO, Lesson.class);
 
@@ -34,32 +42,38 @@ public class LessonService {
        lesson.setRequestedAt(LocalDateTime.now());
 
        lessonRepo.save(lesson);
-       return VarList.REQUEST_ADDED;
+       return new ResponseDTO(VarList.REQUEST_ADDED,"Lesson request added to FIFO queue",lessonDTO);
+
    }
-    public String processNextLesson(){
+    public ResponseDTO processNextLesson(){
 
-        List<Lesson> pendingQueue =
-                lessonRepo.findByStatusOrderByRequestedAtAsc("PENDING");
+        Optional<Lesson> optionalLesson =
+                lessonRepo.findFirstByStatusOrderByRequestedAtAsc("PENDING");
 
-        if(pendingQueue.isEmpty()){ return VarList.NO_PENDING_REQUESTS;}
+        if(optionalLesson.isEmpty()){
+            return new ResponseDTO(VarList.NO_PENDING_REQUESTS, "No pending lesson requests",
+                    null);}
 
-        for (Lesson lesson : pendingQueue){ //unitl the "pending" stated list stops
-        // check conflicts before scheduling
-           boolean instructorConflict = lessonRepo.existsByInstructorIdAndDateAndTimeAndStatusAndLessonIdNot(lesson.getInstructorId(), lesson.getDate(), lesson.getTime(),"SCHEDULED", lesson.getLessonId());
-           boolean studentConflict = lessonRepo.existsByStudentIdAndDateAndTimeAndStatusAndLessonIdNot(lesson.getStudentId(), lesson.getDate(), lesson.getTime(),"SCHEDULED",lesson.getLessonId());
+        Lesson lesson = optionalLesson.get();
 
-           // conflict? reject and continue to next request
-            if(instructorConflict || studentConflict){
-                lesson.setStatus("REJECTED");
-                lessonRepo.save(lesson);
-                continue;
-            }
-            lesson.setStatus("SCHEDULED");
+        String conflict = checkConflict(lesson);
+
+        if (conflict != null) {
+            lesson.setStatus("REJECTED");
             lessonRepo.save(lesson);
-            return VarList.LESSON_SCHEDULED_SUCCESSFULLY;
-            }
-        // all pending requests were rejected
-        return VarList.NO_PENDING_REQUESTS;
+            String message = conflict.equals(VarList.INSTRUCTOR_CONFLICT)
+                    ? "Instructor Unavailable"
+                    : "Student Unavailable";
+
+            return new ResponseDTO(conflict, message, lesson);
+        }
+
+        // No conflict → schedule
+        lesson.setStatus("SCHEDULED");
+        lessonRepo.save(lesson);
+
+        return new ResponseDTO(
+                VarList.LESSON_SCHEDULED_SUCCESSFULLY, "Lesson scheduled successfully", lesson);
     }
 
 
@@ -67,32 +81,41 @@ public class LessonService {
         return lessonRepo.findAll().stream()
                 .map(lesson -> modelMapper.map(lesson, LessonDTO.class))
                 .toList();
+
     }
 
-    public String updateLesson(LessonDTO lessonDTO) {
+    public ResponseDTO updateLesson(LessonDTO lessonDTO) {
+        String validation = validateLessonDate(lessonDTO.getDate());
+
+        if (validation != null) {
+            return new ResponseDTO(validation, "Invalid Date", lessonDTO);
+        }
+
         Optional<Lesson> optionalLesson = lessonRepo.findById(lessonDTO.getLessonId());
         if (optionalLesson.isEmpty()) {
-            return VarList.LESSON_NOT_FOUND;
+            return new ResponseDTO(
+                    VarList.LESSON_NOT_FOUND,
+                    "Lesson Not Found",
+                    lessonDTO);
         }
         Lesson existingLesson = optionalLesson.get();
+
         // check instructor conflict
-        if (lessonRepo.existsByInstructorIdAndDateAndTime(lessonDTO.getInstructorId(), lessonDTO.getDate(), lessonDTO.getTime())
-                &&!(existingLesson.getInstructorId().equals(lessonDTO.getInstructorId())//exclude current lesson
-                && existingLesson.getDate().equals(lessonDTO.getDate())
-                && existingLesson.getTime().equals(lessonDTO.getTime()))) {
-            return VarList.INSTRUCTOR_CONFLICT;
+        boolean instructorConflict =
+                lessonRepo.existsByInstructorIdAndDateAndTimeAndStatusAndLessonIdNot(
+                        lessonDTO.getInstructorId(), lessonDTO.getDate(), lessonDTO.getTime(), "SCHEDULED", lessonDTO.getLessonId());
+
+        if (instructorConflict) {
+            return new ResponseDTO(VarList.INSTRUCTOR_CONFLICT, "Instructor Unavailable", lessonDTO);
         }
 
         // check student conflict (exclude current lesson)
-        if (lessonRepo.existsByStudentIdAndDateAndTime(
-                lessonDTO.getStudentId(),
-                lessonDTO.getDate(),
-                lessonDTO.getTime()
-        ) && !(existingLesson.getStudentId().equals(lessonDTO.getStudentId())
-                && existingLesson.getDate().equals(lessonDTO.getDate())
-                && existingLesson.getTime().equals(lessonDTO.getTime()))) {
+        boolean studentConflict =
+                lessonRepo.existsByStudentIdAndDateAndTimeAndStatusAndLessonIdNot(
+                        lessonDTO.getStudentId(), lessonDTO.getDate(), lessonDTO.getTime(), "SCHEDULED", lessonDTO.getLessonId());
 
-            return VarList.STUDENT_CONFLICT;
+        if (studentConflict) {
+            return new ResponseDTO(VarList.STUDENT_CONFLICT, "Student Unavailable", lessonDTO);
         }
 
         // update fields
@@ -103,15 +126,19 @@ public class LessonService {
 
         lessonRepo.save(existingLesson);
 
-        return VarList.UPDATED_SUCCESSFULLY;
+        return new ResponseDTO(VarList.UPDATED_SUCCESSFULLY, "Lesson Updated", lessonDTO
+        );
+
     }
 
-    public String deleteLesson(long lessonId) {
+    public ResponseDTO deleteLesson(long lessonId) {
         if (lessonRepo.existsById(lessonId)) {
             lessonRepo.deleteById(lessonId);
-            return VarList.RSP_SUCCESS;
+            return  new ResponseDTO(
+                    VarList.RSP_SUCCESS, "Lesson deleted successfully", null);
         } else {
-            return VarList.RSP_NO_DATA_FOUND;
+            return new ResponseDTO(
+                    VarList.RSP_NO_DATA_FOUND, "Lesson not found", null);
         }
     }
     public List<LessonDTO> getLessonsByStudentId(String studentId) {
@@ -129,4 +156,42 @@ public class LessonService {
         return modelMapper.map(lessons,new TypeToken<ArrayList<LessonDTO>>(){}.getType());
     }
 
+    //Validations
+    private String checkConflict(Lesson lesson) {
+
+        if (lessonRepo.existsByInstructorIdAndDateAndTimeAndStatus(
+                lesson.getInstructorId(),
+                lesson.getDate(),
+                lesson.getTime(),
+                "SCHEDULED")) {
+            return VarList.INSTRUCTOR_CONFLICT;
+        }
+
+        if (lessonRepo.existsByStudentIdAndDateAndTimeAndStatus(
+                lesson.getStudentId(),
+                lesson.getDate(),
+                lesson.getTime(),
+                "SCHEDULED")) {
+            return VarList.STUDENT_CONFLICT;
+        }
+
+        return null;
+    }
+
+    private String validateLessonDate(LocalDate date) {
+
+        // Block Sunday
+        if (date.getDayOfWeek() == DayOfWeek.SUNDAY) {
+            return VarList.INVALID_DAY; // you define this
+        }
+
+        // Block > 4 months ahead
+        LocalDate maxDate = LocalDate.now().plusMonths(4);
+
+        if (date.isAfter(maxDate)) {
+            return VarList.DATE_OUT_OF_RANGE;
+        }
+
+        return null; // valid
+    }
 }

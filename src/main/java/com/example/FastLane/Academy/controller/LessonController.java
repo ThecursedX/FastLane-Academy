@@ -23,58 +23,26 @@ public class LessonController {
     public ResponseDTO responseDTO;
 
     @PostMapping(value = "/requestLesson")
-    public ResponseEntity requestLesson(@RequestBody LessonDTO lessonDTO){
-        try {
-            String res= lessonService.requestLesson(lessonDTO);
-        if (res.equals("15")){
-            responseDTO.setCode(VarList.REQUEST_ADDED);
-            responseDTO.setMessage("Lesson request added to FIFO queue");
-            responseDTO.setContent(lessonDTO);
-            return new ResponseEntity(responseDTO, HttpStatus.ACCEPTED);
-        }else{
-            responseDTO.setCode(VarList.RSP_FAIL);
-            responseDTO.setMessage("Unable to add lesson request");
-            responseDTO.setContent(null);
-            return new ResponseEntity(responseDTO, HttpStatus.BAD_REQUEST);
-        }
-    }catch (Exception ex){
-        responseDTO.setCode(VarList.RSP_ERROR);
-        responseDTO.setMessage(ex.getMessage());
-        responseDTO.setContent(null);
-        return new ResponseEntity(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    public ResponseEntity<ResponseDTO> requestLesson(@RequestBody LessonDTO lessonDTO){
+        ResponseDTO response = lessonService.requestLesson(lessonDTO);
+
+        HttpStatus status = response.getCode().equals(VarList.REQUEST_ADDED)
+                ? HttpStatus.ACCEPTED
+                : HttpStatus.BAD_REQUEST;
+
+        return  ResponseEntity.status(status).body(response);
     }
     @PostMapping(value = "/processNextLesson")
-    public ResponseEntity processNextLesson() {
-        try {
-            String res = lessonService.processNextLesson();
-            if (res.equals("00")) {
-                responseDTO.setCode(VarList.LESSON_SCHEDULED_SUCCESSFULLY);
-                responseDTO.setMessage("Oldest queued lesson scheduled successfully");
-                responseDTO.setContent(null);
-                return new ResponseEntity(responseDTO, HttpStatus.ACCEPTED);
-            } else if (res.equals("20")) {
-                responseDTO.setCode(VarList.INSTRUCTOR_CONFLICT);
-                responseDTO.setMessage("Instructor Unavailable");
-                responseDTO.setContent(null);
-                return new ResponseEntity(responseDTO, HttpStatus.BAD_REQUEST);
-            } else if (res.equals("21")) {
-                responseDTO.setCode(VarList.STUDENT_CONFLICT);
-                responseDTO.setMessage("Student Unavailable");
-                responseDTO.setContent(null);
-                return new ResponseEntity(responseDTO, HttpStatus.BAD_REQUEST);
-            }else{
-                responseDTO.setCode(VarList.RSP_FAIL);
-                responseDTO.setMessage("Unable to process lesson queue");
-                responseDTO.setContent(null);
-                return new ResponseEntity(responseDTO, HttpStatus.BAD_REQUEST);
-        }
-        }catch(Exception ex){
-            responseDTO.setCode(VarList.RSP_ERROR);
-            responseDTO.setMessage(ex.getMessage());
-            responseDTO.setContent(null);
-            return new ResponseEntity(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<ResponseDTO> processNextLesson() {
+
+        ResponseDTO response = lessonService.processNextLesson();
+
+        HttpStatus status = response.getCode().equals(VarList.REQUEST_ADDED)
+                ? HttpStatus.ACCEPTED
+                : HttpStatus.BAD_REQUEST;
+
+        return ResponseEntity.status(status).body(response);
+
     }
 
     @GetMapping(value = "/getAllLessons")
@@ -95,65 +63,26 @@ public class LessonController {
     }
 
     @DeleteMapping(value = "/deleteLesson/{lessonId}")
-    public ResponseEntity deleteLesson(@PathVariable long lessonId){
-        try {
-            String res= lessonService.deleteLesson(lessonId);
-            if (res.equals("00")){
-                responseDTO.setCode(VarList.RSP_SUCCESS);
-                responseDTO.setMessage("Success");
-                responseDTO.setContent(null);
-                return new ResponseEntity(responseDTO, HttpStatus.ACCEPTED);
-            }else{
-                responseDTO.setCode(VarList.RSP_NO_DATA_FOUND);
-                responseDTO.setMessage("No Lessons Available For this ID");
-                responseDTO.setContent(null);
-                return new ResponseEntity(responseDTO, HttpStatus.BAD_REQUEST);
-            }
-        }catch (Exception e){
-            responseDTO.setCode(VarList.RSP_ERROR);
-            responseDTO.setMessage(e.getMessage());
-            responseDTO.setContent(e);
-            return new ResponseEntity(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<ResponseDTO> deleteLesson(@PathVariable long lessonId){
+        ResponseDTO response =  lessonService.deleteLesson(lessonId);
+
+        HttpStatus status = response.getCode().equals(VarList.RSP_SUCCESS)
+                ? HttpStatus.ACCEPTED
+                : HttpStatus.BAD_REQUEST;
+
+        return ResponseEntity.status(status).body(response);
     }
     @PutMapping(value = "/updateLesson/{lessonId}")
-    public ResponseEntity updateLesson(@PathVariable long lessonId, @RequestBody LessonDTO lessonDTO){
-        try {
-            lessonDTO.setLessonId(lessonId);
+    public ResponseEntity<ResponseDTO> updateLesson(@PathVariable long lessonId, @RequestBody LessonDTO lessonDTO){
+        lessonDTO.setLessonId(lessonId);
+        ResponseDTO response = lessonService.updateLesson(lessonDTO);
 
-            String res= lessonService.updateLesson(lessonDTO);
-            if (res.equals("09")){
-                responseDTO.setCode(VarList.UPDATED_SUCCESSFULLY);
-                responseDTO.setMessage("Lesson Updated");
-                responseDTO.setContent(lessonDTO);
-                return new ResponseEntity(responseDTO, HttpStatus.ACCEPTED);
-            }else if (res.equals("13")){
-                responseDTO.setCode(VarList.LESSON_NOT_FOUND);
-                responseDTO.setMessage("Lesson Not Found");
-                responseDTO.setContent(lessonDTO);
-                return new ResponseEntity(responseDTO, HttpStatus.BAD_REQUEST);
-            }else if (res.equals("21")) {
-                responseDTO.setCode(VarList.STUDENT_CONFLICT);
-                responseDTO.setMessage("Student Unavailable");
-                responseDTO.setContent(lessonDTO);
-                return new ResponseEntity(responseDTO, HttpStatus.BAD_REQUEST);
-            }else if (res.equals("20")){
-                responseDTO.setCode(VarList.INSTRUCTOR_CONFLICT);
-                responseDTO.setMessage("Instructor Unavailable");
-                responseDTO.setContent(lessonDTO);
-                return new ResponseEntity(responseDTO, HttpStatus.BAD_REQUEST);
-            }else{
-                responseDTO.setCode(VarList.RSP_FAIL);
-                responseDTO.setMessage("Error");
-                responseDTO.setContent(null);
-                return new ResponseEntity(responseDTO, HttpStatus.BAD_REQUEST);
-            }
-        }catch (Exception ex){
-            responseDTO.setCode(VarList.RSP_ERROR);
-            responseDTO.setMessage(ex.getMessage());
-            responseDTO.setContent(null);
-            return new ResponseEntity(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        HttpStatus status = response.getCode().equals(VarList.UPDATED_SUCCESSFULLY)
+                ? HttpStatus.ACCEPTED
+                : HttpStatus.BAD_REQUEST;
+
+        return ResponseEntity.status(status).body(response);
+
     }
     @GetMapping(value = "/getLessonsByStudentId/{studentId}")
     public ResponseEntity getLessonsByStudentId(@PathVariable String studentId){
@@ -185,4 +114,5 @@ public class LessonController {
             return new ResponseEntity(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 }
