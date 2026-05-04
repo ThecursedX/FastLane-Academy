@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -30,11 +31,19 @@ public class LessonService {
     private ModelMapper modelMapper;
 
    public ResponseDTO  requestLesson(LessonDTO lessonDTO){
+       //date validation
        String validation = validateLessonDate(lessonDTO.getDate());
 
        if (validation != null) {
            return new ResponseDTO(validation, "Invalid lesson date", lessonDTO);
        }
+
+       //time slot validation
+       String timeValidation = validateTimeSlot(lessonDTO.getTime());
+       if (timeValidation != null) {
+           return new ResponseDTO(timeValidation, "Invalid time slot selected", lessonDTO);
+       }
+
 
        Lesson lesson = modelMapper.map(lessonDTO, Lesson.class);
 
@@ -85,10 +94,16 @@ public class LessonService {
     }
 
     public ResponseDTO updateLesson(LessonDTO lessonDTO) {
+       //date validation
         String validation = validateLessonDate(lessonDTO.getDate());
 
         if (validation != null) {
-            return new ResponseDTO(validation, "Invalid Date", lessonDTO);
+            return new ResponseDTO(validation, "Invalid Date", lessonDTO);}
+
+        //time slot validation
+        String timeValidation = validateTimeSlot(lessonDTO.getTime());
+        if (timeValidation != null) {
+            return new ResponseDTO(timeValidation, "Invalid time slot", lessonDTO);
         }
 
         Optional<Lesson> optionalLesson = lessonRepo.findById(lessonDTO.getLessonId());
@@ -155,6 +170,31 @@ public class LessonService {
         }
         return modelMapper.map(lessons,new TypeToken<ArrayList<LessonDTO>>(){}.getType());
     }
+    public ResponseDTO getAvailableTimeSlots(LocalDate date) {
+
+        // validate date first
+        String validation = validateLessonDate(date);
+        if (validation != null) {
+            return new ResponseDTO(validation, "Invalid date", null);}
+
+        // get already booked lessons
+        List<Lesson> bookedLessons =
+                lessonRepo.findByDateAndStatus(date, "SCHEDULED");
+
+        // extract booked times
+        List<LocalTime> bookedTimes = bookedLessons.stream()
+                .map(Lesson::getTime)
+                .toList();
+
+        // filter available slots
+        List<LocalTime> availableSlots = ALLOWED_TIME_SLOTS.stream()
+                .filter(slot -> !bookedTimes.contains(slot))
+                .toList();
+
+        return new ResponseDTO(
+                VarList.RSP_SUCCESS, "Available time slots", availableSlots);
+    }
+
 
     //Validations
     private String checkConflict(Lesson lesson) {
@@ -193,5 +233,20 @@ public class LessonService {
         }
 
         return null; // valid
+    }
+    private static final List<LocalTime> ALLOWED_TIME_SLOTS = List.of(
+            LocalTime.of(8, 0),
+            LocalTime.of(9, 30),
+            LocalTime.of(11, 0),
+            LocalTime.of(13, 0),
+            LocalTime.of(14, 30)
+    );
+    private String validateTimeSlot(LocalTime time) {
+
+        if (!ALLOWED_TIME_SLOTS.contains(time)) {
+            return VarList.INVALID_TIME_SLOT; // define this
+        }
+
+        return null;
     }
 }

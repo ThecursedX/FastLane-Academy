@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @CrossOrigin
@@ -113,6 +114,12 @@ public class LessonController {
             responseDTO.setContent(ex);
             return new ResponseEntity(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping(value = "/available-slots")
+    public ResponseEntity<ResponseDTO> getAvailableSlots(@RequestParam LocalDate date){
+        ResponseDTO response = lessonService.getAvailableTimeSlots(date);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 
 }

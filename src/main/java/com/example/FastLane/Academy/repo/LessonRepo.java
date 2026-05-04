@@ -57,4 +57,5 @@ public interface LessonRepo extends JpaRepository<Lesson, Long> {
             String status
     );
 
+    List<Lesson> findByDateAndStatus(LocalDate date, String status);
 }
