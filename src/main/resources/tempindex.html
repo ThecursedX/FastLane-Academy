@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DriveTrack — Student Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Bootstrap 5 utilities (grid, flex, spacing only) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════
+     APP SHELL
+══════════════════════════════════════════════════ -->
+<div class="app-shell">
+
+  <!-- ── Sidebar Overlay (mobile) ── -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- ══════════════════════════════════
+       SIDEBAR / NAV
+  ══════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+
+    <!-- Logo -->
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <div class="logo-icon">🚗</div>
+        <div class="logo-text">Drive<span>Track</span></div>
+      </div>
+    </div>
+
+    <!-- Student Mini Profile -->
+    <div class="sidebar-student">
+      <div class="student-mini">
+        <div class="avatar">AR</div>
+        <div>
+          <div class="student-name">Alex Rivera</div>
+          <div class="student-id">STU-2024-0042</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nav Links -->
+    <nav class="sidebar-nav">
+
+      <div class="nav-section-label">Overview</div>
+
+      <button class="nav-item active" data-section="dashboard">
+        <div class="nav-icon">🏠</div>
+        Dashboard
+      </button>
+
+      <button class="nav-item" data-section="progress">
+        <div class="nav-icon">📈</div>
+        Progress
+      </button>
+
+      <div class="nav-section-label">Lessons</div>
+
+      <button class="nav-item" data-section="slots">
+        <div class="nav-icon">🗓️</div>
+        Available Slots
+      </button>
+
+      <button class="nav-item" data-section="book">
+        <div class="nav-icon">➕</div>
+        Book a Lesson
+      </button>
+
+      <button class="nav-item" data-section="upcoming">
+        <div class="nav-icon">⏰</div>
+        Upcoming Lessons
+        <span class="nav-badge">3</span>
+      </button>
+
+      <div class="nav-section-label">Manage</div>
+
+      <button class="nav-item" data-section="reschedule">
+        <div class="nav-icon">✏️</div>
+        Reschedule
+      </button>
+
+      <button class="nav-item" data-section="cancel">
+        <div class="nav-icon">✕</div>
+        Cancel Lesson
+      </button>
+
+      <button class="nav-item" data-section="history">
+        <div class="nav-icon">📋</div>
+        Lesson History
+      </button>
+
+    </nav>
+
+    <!-- Sidebar Footer -->
+    <div class="sidebar-footer">
+      <button class="nav-item" data-section="dashboard" style="color:var(--text-muted)">
+        <div class="nav-icon">⚙️</div>
+        Settings
+      </button>
+    </div>
+
+  </aside><!-- /sidebar -->
+
+
+  <!-- ══════════════════════════════════
+       MAIN CONTENT AREA
+  ══════════════════════════════════ -->
+  <main class="main-content">
+
+    <!-- ── Top Bar ── -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger" id="hamburger-btn">☰</button>
+        <div class="page-title" id="page-title">Dashboard</div>
+      </div>
+      <div class="topbar-right">
+        <button class="topbar-btn notification-dot" title="Notifications">🔔</button>
+        <div class="avatar sm">AR</div>
+      </div>
+    </header>
+
+
+    <!-- ════════════════════════════════════════════
+         SECTION 1 — DASHBOARD
+    ════════════════════════════════════════════ -->
+    <section class="page-section active" id="section-dashboard">
+
+      <!-- Welcome Banner -->
+      <div class="welcome-banner mb-4">
+        <div class="welcome-label">👋 Good morning</div>
+        <div class="welcome-name">Alex Rivera</div>
+        <div class="welcome-sub">Class C License · Standard 20-Lesson Package · Instructor: Marcus Chen</div>
+        <div class="quick-actions">
+          <button class="btn btn-primary" onclick="navigateTo('book')">➕ Book Lesson</button>
+          <button class="btn btn-ghost" onclick="navigateTo('upcoming')">📅 View Schedule</button>
+          <button class="btn btn-ghost" onclick="navigateTo('progress')">📈 My Progress</button>
+        </div>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="stats-grid mb-4">
+        <div class="stat-card" style="--accent:var(--success);--icon-bg:var(--success-dim)">
+          <div class="stat-icon-wrap">✅</div>
+          <div>
+            <div class="stat-value" id="dash-completed">—</div>
+            <div class="stat-label">Lessons Completed</div>
+          </div>
+          <div class="stat-change up">↑ On track</div>
+        </div>
+        <div class="stat-card" style="--accent:var(--primary);--icon-bg:var(--primary-dim)">
+          <div class="stat-icon-wrap">⏰</div>
+          <div>
+            <div class="stat-value" id="dash-upcoming">—</div>
+            <div class="stat-label">Upcoming Lessons</div>
+          </div>
+          <div class="stat-change up">This week</div>
+        </div>
+        <div class="stat-card" style="--accent:var(--purple);--icon-bg:var(--purple-dim)">
+          <div class="stat-icon-wrap">📚</div>
+          <div>
+            <div class="stat-value" id="dash-remaining">—</div>
+            <div class="stat-label">Lessons Remaining</div>
+          </div>
+          <div class="stat-change">of 20 total</div>
+        </div>
+        <div class="stat-card" style="--accent:var(--danger);--icon-bg:var(--danger-dim)">
+          <div class="stat-icon-wrap">✕</div>
+          <div>
+            <div class="stat-value" id="dash-cancelled">—</div>
+            <div class="stat-label">Cancelled</div>
+          </div>
+          <div class="stat-change down">↓ keep it low</div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+
+        <!-- Next Lesson -->
+        <div class="card">
+          <div class="card-title"><span class="icon">📅</span>Next Lesson</div>
+          <div id="dash-next-lesson"><div class="spinner" style="margin:20px auto"></div></div>
+        </div>
+
+        <!-- Overall Progress -->
+        <div class="card">
+          <div class="card-title"><span class="icon">📈</span>Package Progress</div>
+          <div class="d-flex justify-content-between mb-2" style="font-size:13px">
+            <span style="color:var(--text-muted)">Completion</span>
+            <span id="dash-progress-pct" style="color:var(--primary);font-weight:700">—</span>
+          </div>
+          <div class="progress-bar-wrap mb-3">
+            <div class="progress-bar-fill" id="dash-progress-bar" style="width:0%"></div>
+          </div>
+          <button class="btn btn-ghost btn-sm btn-full" onclick="navigateTo('progress')">View Full Progress →</button>
+        </div>
+
+        <!-- Instructors -->
+        <div class="card" style="grid-column:1/-1">
+          <div class="card-title d-flex justify-content-between align-items-center">
+            <span><span class="icon">👨‍🏫</span>Your Instructors</span>
+            <button class="btn btn-ghost btn-sm" onclick="navigateTo('book')">Book Now</button>
+          </div>
+          <div class="instructor-grid" id="dash-instructors">
+            <div class="spinner" style="margin:20px auto"></div>
+          </div>
+        </div>
+
+      </div>
+    </section><!-- /dashboard -->
+
+
+    <!-- ════════════════════════════════════════════
+         SECTION 2 — AVAILABLE SLOTS
+    ════════════════════════════════════════════ -->
+    <section class="page-section" id="section-slots" id="slots-section">
+
+      <div class="section-header">
+        <div>
+          <div class="section-title">Available Time Slots</div>
+          <div class="section-subtitle">Select any green slot to book instantly</div>
+        </div>
+        <button class="btn btn-primary" onclick="navigateTo('book')">➕ Book Custom Lesson</button>
+      </div>
+
+      <!-- Filters -->
+      <div id="slots-section" class="slots-filters mb-4">
+        <div class="filter-chip active" data-filter="all" onclick="filterSlots('all')">All Slots</div>
+        <div class="filter-chip" data-filter="available" onclick="filterSlots('available')">✅ Available</div>
+        <div class="filter-chip" data-filter="booked" onclick="filterSlots('booked')">🚫 Booked</div>
+      </div>
+
+      <div class="slots-grid" id="slots-grid">
+        <div class="spinner" style="margin:40px auto;grid-column:1/-1"></div>
+      </div>
+
+    </section><!-- /slots -->
+
+
+    <!-- ════════════════════════════════════════════
+         SECTION 3 — BOOK A LESSON
+    ════════════════════════════════════════════ -->
+    <section class="page-section" id="section-book">
+
+      <div class="section-header">
+        <div>
+          <div class="section-title">Book a Lesson</div>
+          <div class="section-subtitle">Fill in the details below to schedule your lesson</div>
+        </div>
+      </div>
+
+      <div class="booking-layout">
+
+        <!-- Form -->
+        <div class="card">
+          <div class="card-title"><span class="icon">📝</span>Lesson Details</div>
+
+          <div class="form-group">
+            <label class="form-label">Instructor</label>
+            <select class="form-control" id="book-instructor" onchange="onInstructorChange()">
+              <option value="">Loading instructors…</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Lesson Type</label>
+            <select class="form-control" id="book-type">
+              <option value="General Practice">General Practice</option>
+              <option value="Highway Driving">Highway Driving</option>
+              <option value="Urban Streets">Urban Streets</option>
+              <option value="Parking Practice">Parking Practice</option>
+              <option value="Night Driving">Night Driving</option>
+              <option value="Defensive Driving">Defensive Driving</option>
+              <option value="Test Preparation">Test Preparation</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Date</label>
+            <input type="date" class="form-control" id="book-date" onchange="onDateChange()" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Available Time Slots</label>
+            <div class="time-slots-pick" id="book-time-slots">
+              <div style="color:var(--text-muted);font-size:13px;grid-column:1/-1">Select instructor &amp; date first</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Notes (optional)</label>
+            <textarea class="form-control" id="book-notes" rows="3" placeholder="Any special requests or focus areas…"></textarea>
+          </div>
+
+        </div>
+
+        <!-- Summary Card -->
+        <div class="booking-summary">
+          <div class="card-title"><span class="icon">📋</span>Booking Summary</div>
+
+          <div class="summary-row">
+            <span class="summary-label">Instructor</span>
+            <span class="summary-value" id="summary-instructor">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Date</span>
+            <span class="summary-value" id="summary-date">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Time</span>
+            <span class="summary-value" id="summary-time">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Duration</span>
+            <span class="summary-value" id="summary-duration">60 minutes</span>
+          </div>
+
+          <div class="divider"></div>
+
+          <div style="background:var(--primary-dim);border:1px solid rgba(255,96,68,0.2);border-radius:var(--radius-sm);padding:12px;font-size:12.5px;color:var(--text-muted);margin-bottom:18px">
+            ⚠️ Free cancellation up to 24 hours before your lesson starts.
+          </div>
+
+          <button class="btn btn-primary btn-lg btn-full" id="book-submit-btn" disabled onclick="submitBooking()">
+            Confirm Booking
+          </button>
+        </div>
+
+      </div>
+    </section><!-- /book -->
+
+
+    <!-- ════════════════════════════════════════════
+         SECTION 4 — UPCOMING LESSONS
+    ════════════════════════════════════════════ -->
+    <section class="page-section" id="section-upcoming">
+
+      <div class="section-header">
+        <div>
+          <div class="section-title">Upcoming Lessons</div>
+          <div class="section-subtitle">Your scheduled lessons — click Reschedule or Cancel to manage</div>
+        </div>
+        <button class="btn btn-primary" onclick="navigateTo('book')">➕ Book New</button>
+      </div>
+
+      <div class="lesson-cards-grid" id="upcoming-lessons">
+        <div class="spinner" style="margin:40px auto;grid-column:1/-1"></div>
+      </div>
+
+    </section><!-- /upcoming -->
+
+
+    <!-- ════════════════════════════════════════════
+         SECTION 5 — RESCHEDULE
+    ════════════════════════════════════════════ -->
+    <section class="page-section" id="section-reschedule">
+
+      <div class="section-header">
+        <div>
+          <div class="section-title">Reschedule Lesson</div>
+          <div class="section-subtitle">Select a lesson and choose a new date &amp; time</div>
+        </div>
+      </div>
+
+      <div class="reschedule-layout">
+
+        <!-- Select Lesson -->
+        <div class="card">
+          <div class="card-title"><span class="icon">✏️</span>Select Lesson to Reschedule</div>
+
+          <div class="form-group">
+            <label class="form-label">Lesson</label>
+            <select class="form-control" id="reschedule-lesson">
+              <option value="">Loading…</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">New Date</label>
+            <input type="date" class="form-control" id="reschedule-date" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">New Time</label>
+            <select class="form-control" id="reschedule-time">
+              <option value="">Select time…</option>
+              <option value="08:00">8:00 AM</option>
+              <option value="09:00">9:00 AM</option>
+              <option value="10:00">10:00 AM</option>
+              <option value="11:00">11:00 AM</option>
+              <option value="13:00">1:00 PM</option>
+              <option value="14:00">2:00 PM</option>
+              <option value="15:00">3:00 PM</option>
+              <option value="17:00">5:00 PM</option>
+              <option value="18:00">6:00 PM</option>
+              <option value="19:00">7:00 PM</option>
+            </select>
+          </div>
+
+          <div style="background:var(--warning-dim);border:1px solid rgba(251,191,36,0.2);border-radius:var(--radius-sm);padding:12px;font-size:12.5px;color:var(--text-muted);margin-bottom:18px">
+            ⚠️ Reschedule requests must be made at least 24 hours in advance. The instructor will confirm the new time.
+          </div>
+
+          <button class="btn btn-primary btn-full" id="reschedule-btn" onclick="submitReschedule()">
+            Send Reschedule Request
+          </button>
+        </div>
+
+        <!-- Info Card -->
+        <div class="card" style="align-self:start">
+          <div class="card-title"><span class="icon">ℹ️</span>Reschedule Policy</div>
+          <div style="color:var(--text-muted);font-size:13.5px;line-height:1.8">
+            <p class="mb-3">You can reschedule a lesson <strong style="color:var(--text)">up to 2 times</strong> without penalty.</p>
+            <p class="mb-3">Requests submitted <strong style="color:var(--text)">less than 24 hours</strong> before the lesson may incur a rescheduling fee.</p>
+            <p class="mb-3">Your instructor will receive your request and confirm within <strong style="color:var(--text)">2 business hours</strong>.</p>
+            <p>The lesson status will change to <span class="badge badge-pending">Pending</span> until confirmed.</p>
+          </div>
+          <div class="divider"></div>
+          <button class="btn btn-ghost btn-sm btn-full" onclick="navigateTo('upcoming')">← Back to Upcoming</button>
+        </div>
+
+      </div>
+    </section><!-- /reschedule -->
+
+
+    <!-- ════════════════════════════════════════════
+         SECTION 6 — CANCEL LESSON
+    ════════════════════════════════════════════ -->
+    <section class="page-section" id="section-cancel">
+
+      <div class="section-header">
+        <div>
+          <div class="section-title">Cancel a Lesson</div>
+          <div class="section-subtitle">Review your upcoming lessons and cancel if needed</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">📅</span>Upcoming Lessons</div>
+        <div id="cancel-lessons-list">
+          <div class="spinner" style="margin:40px auto"></div>
+        </div>
+      </div>
+
+    </section><!-- /cancel -->
+
+
+    <!-- ════════════════════════════════════════════
+         SECTION 7 — LESSON HISTORY
+    ════════════════════════════════════════════ -->
+    <section class="page-section" id="section-history">
+
+      <div class="section-header">
+        <div>
+          <div class="section-title">Lesson History</div>
+          <div class="section-subtitle">All completed &amp; cancelled lessons</div>
+        </div>
+      </div>
+
+      <!-- Filter Chips -->
+      <div id="history-section" class="history-filters">
+        <div class="filter-chip active" data-filter="all" onclick="filterHistory('all')">All</div>
+        <div class="filter-chip" data-filter="completed" onclick="filterHistory('completed')">✅ Completed</div>
+        <div class="filter-chip" data-filter="cancelled" onclick="filterHistory('cancelled')">✕ Cancelled</div>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Lesson ID</th>
+                <th>Type</th>
+                <th>Instructor</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Status</th>
+                <th>Score</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-body">
+              <tr><td colspan="7" class="text-center" style="padding:40px">
+                <div class="spinner" style="margin:auto"></div>
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section><!-- /history -->
+
+
+    <!-- ════════════════════════════════════════════
+         SECTION 8 — PROGRESS
+    ════════════════════════════════════════════ -->
+    <section class="page-section" id="section-progress">
+
+      <div class="section-header">
+        <div>
+          <div class="section-title">Progress Tracker</div>
+          <div class="section-subtitle">Your overall performance &amp; milestones</div>
+        </div>
+      </div>
+
+      <div class="progress-layout">
+
+        <!-- Left Column -->
+        <div>
+
+          <!-- Ring + Stats Card -->
+          <div class="card mb-4">
+            <div class="big-progress-ring">
+              <div class="ring-wrap">
+                <svg width="160" height="160" viewBox="0 0 160 160">
+                  <circle cx="80" cy="80" r="66" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="12"/>
+                  <circle id="progress-ring-circle" cx="80" cy="80" r="66"
+                    fill="none" stroke="#FF6044" stroke-width="12"
+                    stroke-linecap="round"
+                    stroke-dasharray="0 414"
+                    style="transition:stroke-dasharray 1s cubic-bezier(0.4,0,0.2,1)"
+                  />
+                </svg>
+                <div class="ring-center">
+                  <div class="ring-pct" id="progress-pct-text">0%</div>
+                  <div class="ring-label">Complete</div>
+                </div>
+              </div>
+
+              <div class="progress-stat-row">
+                <div class="progress-stat-item">
+                  <div class="progress-stat-val" id="prog-completed" style="color:var(--success)">—</div>
+                  <div class="progress-stat-lbl">Done</div>
+                </div>
+                <div class="progress-stat-item">
+                  <div class="progress-stat-val" id="prog-upcoming" style="color:var(--primary)">—</div>
+                  <div class="progress-stat-lbl">Upcoming</div>
+                </div>
+                <div class="progress-stat-item">
+                  <div class="progress-stat-val" id="prog-remaining" style="color:var(--purple)">—</div>
+                  <div class="progress-stat-lbl">Left</div>
+                </div>
+                <div class="progress-stat-item">
+                  <div class="progress-stat-val" id="prog-cancelled" style="color:var(--danger)">—</div>
+                  <div class="progress-stat-lbl">Cancelled</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Breakdown Bars -->
+          <div class="card mb-4">
+            <div class="card-title"><span class="icon">📊</span>Lesson Breakdown</div>
+            <div id="progress-breakdown">
+              <div class="spinner" style="margin:20px auto"></div>
+            </div>
+          </div>
+
+          <!-- Assigned Instructor -->
+          <div class="card">
+            <div class="card-title"><span class="icon">👨‍🏫</span>Assigned Instructor</div>
+            <div class="d-flex align-items-center gap-3">
+              <div class="avatar lg">MC</div>
+              <div>
+                <div style="font-family:var(--font-display);font-weight:700;font-size:17px" id="prog-instructor">—</div>
+                <div style="color:var(--text-muted);font-size:13px">Highway &amp; Freeway Specialist</div>
+                <div class="stars mt-1">★★★★★ <span class="rating-val">4.9</span></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column — Milestones -->
+        <div>
+          <div class="card">
+            <div class="card-title"><span class="icon">🏆</span>Milestones</div>
+            <div class="milestones-grid" id="milestones-grid">
+              <div class="spinner" style="margin:20px auto;grid-column:1/-1"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section><!-- /progress -->
+
+
+  </main><!-- /main-content -->
+</div><!-- /app-shell -->
+
+
+<!-- ══════════════════════════════════════════════════
+     CANCEL CONFIRMATION MODAL
+══════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="cancel-modal">
+  <div class="modal">
+    <div class="modal-icon">⚠️</div>
+    <div class="modal-title">Cancel This Lesson?</div>
+    <div class="modal-text">
+      You're about to cancel:<br>
+      <strong id="cancel-modal-info" style="color:var(--text)"></strong>
+      <br><br>
+      This action cannot be undone. A cancelled lesson counts toward your cancellation record.
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('cancel-modal')">Keep Lesson</button>
+      <button class="btn btn-danger" onclick="executeCancel()">Yes, Cancel</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════
+     TOAST CONTAINER
+══════════════════════════════════════════════════ -->
+<div class="toast-container" id="toast-container"></div>
+
+
+<!-- ══════════════════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════════════════ -->
+<script src="mock-data.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
