@@ -186,15 +186,139 @@ public class LessonService {
                 .map(Lesson::getTime)
                 .toList();
 
+        LocalDate today = LocalDate.now();
+        LocalTime now = LocalTime.now();
+
         // filter available slots
         List<LocalTime> availableSlots = ALLOWED_TIME_SLOTS.stream()
-                .filter(slot -> !bookedTimes.contains(slot))
+                .filter(slot -> !bookedTimes.contains(slot))//remove booked
+                .filter(slot ->{
+                    if (date.equals(today)){
+                return slot.isAfter(now);
+                    }return  true;
+                })
                 .toList();
 
         return new ResponseDTO(
                 VarList.RSP_SUCCESS, "Available time slots", availableSlots);
     }
 
+    public ResponseDTO requestReschedule(Long lessonId, LessonDTO newDetails) {
+
+        Optional<Lesson> optionalLesson = lessonRepo.findById(lessonId);
+
+        if (optionalLesson.isEmpty()) {
+            return new ResponseDTO(
+                    VarList.LESSON_NOT_FOUND,
+                    "Lesson not found",
+                    null
+            );
+        }
+
+        Lesson oldLesson = optionalLesson.get();
+
+        // 24-hour checking
+        LocalDateTime lessonDateTime =
+                LocalDateTime.of(oldLesson.getDate(), oldLesson.getTime());
+
+        if (lessonDateTime.isBefore(LocalDateTime.now().plusHours(12))) {
+            return new ResponseDTO(
+                    VarList.RESCHEDULE_NOT_ALLOWED,
+                    "Cannot reschedule within 24 hours of lesson",
+                    oldLesson
+            );
+        }
+
+        // validate date & time
+        String dateValidation = validateLessonDate(newDetails.getDate());
+        if (dateValidation != null) {
+            return new ResponseDTO(dateValidation, "Invalid date", newDetails);
+        }
+
+        String timeValidation = validateTimeSlot(newDetails.getTime());
+        if (timeValidation != null) {
+            return new ResponseDTO(timeValidation, "Invalid time slot", newDetails);
+        }
+
+        // mark old lesson
+        oldLesson.setStatus("RESCHEDULED"); // or CANCELLED
+        lessonRepo.save(oldLesson);
+
+        // create new request (FIFO)
+        Lesson newLesson = new Lesson();
+        newLesson.setStudentId(oldLesson.getStudentId());
+        newLesson.setInstructorId(newDetails.getInstructorId());
+        newLesson.setDate(newDetails.getDate());
+        newLesson.setTime(newDetails.getTime());
+        newLesson.setStatus("PENDING");
+        newLesson.setRequestedAt(LocalDateTime.now());
+
+        lessonRepo.save(newLesson);
+
+        return new ResponseDTO(
+                VarList.REQUEST_ADDED, "Reschedule request added to queue", newLesson);
+    }
+
+
+    public ResponseDTO cancelLesson(Long lessonId) {
+
+        Optional<Lesson> optionalLesson = lessonRepo.findById(lessonId);
+
+        if (optionalLesson.isEmpty()) {
+            return new ResponseDTO(
+                    VarList.LESSON_NOT_FOUND, "Lesson not found", null);
+        }
+
+        Lesson lesson = optionalLesson.get();
+
+        // Only allow cancelling SCHEDULED lessons
+        if (!lesson.getStatus().equals("SCHEDULED")) {
+            return new ResponseDTO(
+                    VarList.RSP_FAIL, "Only scheduled lessons can be cancelled", lesson);
+        }
+
+        // 24-hour rule
+        LocalDateTime lessonDateTime =
+                LocalDateTime.of(lesson.getDate(), lesson.getTime());
+
+        if (lessonDateTime.isBefore(LocalDateTime.now().plusHours(24))) {
+            return new ResponseDTO(
+                    VarList.CANCELLATION_NOT_ALLOWED, "Cannot cancel within 24 hours of lesson", lesson);
+        }
+
+        // Cancel lesson
+        lesson.setStatus("CANCELLED");
+        lessonRepo.save(lesson);
+
+        return new ResponseDTO(
+                VarList.RSP_SUCCESS, "Lesson cancelled successfully", lesson);
+    }
+    public ResponseDTO getUpcomingLessons(String studentId) {
+
+        List<LessonDTO> list = lessonRepo
+                .findByStudentIdAndStatusAndDateGreaterThanEqual(
+                        studentId, "SCHEDULED", LocalDate.now()
+                )
+                .stream()
+                .map(l -> modelMapper.map(l, LessonDTO.class))
+                .toList();
+
+        return new ResponseDTO(
+                VarList.RSP_SUCCESS, "Upcoming lessons", list);
+    }
+
+    public ResponseDTO getLessonHistory(String studentId) {
+
+        List<LessonDTO> list = lessonRepo
+                .findByStudentIdAndDateBefore(studentId, LocalDate.now()
+                )
+                .stream()
+                .map(l -> modelMapper.map(l, LessonDTO.class))
+                .toList();
+
+        return new ResponseDTO(
+                VarList.RSP_SUCCESS, "Lesson history", list);
+    }
 
     //Validations
     private String checkConflict(Lesson lesson) {

@@ -2,6 +2,7 @@ package com.example.FastLane.Academy.controller;
 
 import com.example.FastLane.Academy.dto.LessonDTO;
 import com.example.FastLane.Academy.dto.ResponseDTO;
+import com.example.FastLane.Academy.repo.LessonRepo;
 import com.example.FastLane.Academy.service.LessonService;
 import com.example.FastLane.Academy.util.VarList;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -122,4 +123,33 @@ public class LessonController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 
+    @PostMapping("/requestReschedule/{lessonId}")
+    public ResponseEntity<ResponseDTO> rescheduleLesson(@PathVariable Long lessonId, @RequestBody LessonDTO lessonDTO)
+    {
+        ResponseDTO response =
+                lessonService.requestReschedule(lessonId, lessonDTO);
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+    }
+
+    @PutMapping("/cancelLesson/{lessonId}")
+    public ResponseEntity<ResponseDTO> cancelLesson(@PathVariable Long lessonId) {
+
+        ResponseDTO response = lessonService.cancelLesson(lessonId);
+
+        HttpStatus status = response.getCode().equals(VarList.RSP_SUCCESS)
+                ? HttpStatus.ACCEPTED
+                : HttpStatus.BAD_REQUEST;
+
+        return ResponseEntity.status(status).body(response);
+    }
+    @GetMapping("/student/{id}/upcoming")
+    public ResponseEntity<ResponseDTO> getUpcoming(@PathVariable String id) {
+        return ResponseEntity.ok(lessonService.getUpcomingLessons(id));
+    }
+
+    @GetMapping("/student/{id}/history")
+    public ResponseEntity<ResponseDTO> getHistory(@PathVariable String id) {
+        return ResponseEntity.ok(lessonService.getLessonHistory(id));
+    }
 }

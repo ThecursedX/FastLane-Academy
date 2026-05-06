@@ -58,4 +58,15 @@ public interface LessonRepo extends JpaRepository<Lesson, Long> {
     );
 
     List<Lesson> findByDateAndStatus(LocalDate date, String status);
+
+    List<Lesson> findByStudentIdAndStatusAndDateGreaterThanEqual(
+            String studentId,
+            String status,
+            LocalDate date
+    );
+
+    List<Lesson> findByStudentIdAndDateBefore(
+            String studentId,
+            LocalDate date
+    );
 }

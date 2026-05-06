@@ -23,4 +23,6 @@ public class VarList {
     public static final String INVALID_DAY = "30";
     public static final String DATE_OUT_OF_RANGE = "31";
     public static final String INVALID_TIME_SLOT = "32";
+    public static final String RESCHEDULE_NOT_ALLOWED = "33";
+    public static final String CANCELLATION_NOT_ALLOWED = "34";
 }
