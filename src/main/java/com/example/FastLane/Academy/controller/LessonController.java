@@ -2,8 +2,8 @@ package com.example.FastLane.Academy.controller;
 
 import com.example.FastLane.Academy.dto.LessonDTO;
 import com.example.FastLane.Academy.dto.ResponseDTO;
-import com.example.FastLane.Academy.repo.LessonRepo;
 import com.example.FastLane.Academy.service.LessonService;
+import com.example.FastLane.Academy.util.LessonStatus;
 import com.example.FastLane.Academy.util.VarList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +23,8 @@ public class LessonController {
 
     @Autowired
     public ResponseDTO responseDTO;
+
+
 
     @PostMapping(value = "/requestLesson")
     public ResponseEntity<ResponseDTO> requestLesson(@RequestBody LessonDTO lessonDTO){
@@ -62,6 +64,14 @@ public class LessonController {
             responseDTO.setContent(null);
             return new ResponseEntity(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/getLesson/{lessonId}")
+    public ResponseEntity<ResponseDTO> getLessonById(@PathVariable Long lessonId) {
+
+        ResponseDTO response = lessonService.getLessonById(lessonId);
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 
     @DeleteMapping(value = "/deleteLesson/{lessonId}")
@@ -151,5 +161,17 @@ public class LessonController {
     @GetMapping("/student/{id}/history")
     public ResponseEntity<ResponseDTO> getHistory(@PathVariable String id) {
         return ResponseEntity.ok(lessonService.getLessonHistory(id));
+    }
+
+    @PutMapping("/updateStatus/{lessonId}")
+    public ResponseEntity updateStatus(@PathVariable Long lessonId, @RequestParam LessonStatus status) {
+
+        String response = lessonService.updateLessonStatus(lessonId, status);
+
+        if (response.equals(VarList.RSP_SUCCESS)) {
+            return ResponseEntity.ok("Status updated successfully");
+        } else {
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 }

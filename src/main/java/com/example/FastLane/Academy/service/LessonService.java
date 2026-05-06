@@ -4,8 +4,8 @@ import com.example.FastLane.Academy.dto.LessonDTO;
 import com.example.FastLane.Academy.dto.ResponseDTO;
 import com.example.FastLane.Academy.entity.Lesson;
 import com.example.FastLane.Academy.repo.LessonRepo;
+import com.example.FastLane.Academy.util.LessonStatus;
 import com.example.FastLane.Academy.util.VarList;
-import org.aspectj.weaver.ast.Var;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +47,7 @@ public class LessonService {
 
        Lesson lesson = modelMapper.map(lessonDTO, Lesson.class);
 
-       lesson.setStatus("PENDING");
+       lesson.setStatus(LessonStatus.PENDING);
        lesson.setRequestedAt(LocalDateTime.now());
 
        lessonRepo.save(lesson);
@@ -57,7 +57,7 @@ public class LessonService {
     public ResponseDTO processNextLesson(){
 
         Optional<Lesson> optionalLesson =
-                lessonRepo.findFirstByStatusOrderByRequestedAtAsc("PENDING");
+                lessonRepo.findFirstByStatusOrderByRequestedAtAsc(LessonStatus.PENDING);
 
         if(optionalLesson.isEmpty()){
             return new ResponseDTO(VarList.NO_PENDING_REQUESTS, "No pending lesson requests",
@@ -68,7 +68,7 @@ public class LessonService {
         String conflict = checkConflict(lesson);
 
         if (conflict != null) {
-            lesson.setStatus("REJECTED");
+            lesson.setStatus(LessonStatus.REJECTED);
             lessonRepo.save(lesson);
             String message = conflict.equals(VarList.INSTRUCTOR_CONFLICT)
                     ? "Instructor Unavailable"
@@ -78,7 +78,7 @@ public class LessonService {
         }
 
         // No conflict → schedule
-        lesson.setStatus("SCHEDULED");
+        lesson.setStatus(LessonStatus.SCHEDULED);
         lessonRepo.save(lesson);
 
         return new ResponseDTO(
@@ -118,7 +118,7 @@ public class LessonService {
         // check instructor conflict
         boolean instructorConflict =
                 lessonRepo.existsByInstructorIdAndDateAndTimeAndStatusAndLessonIdNot(
-                        lessonDTO.getInstructorId(), lessonDTO.getDate(), lessonDTO.getTime(), "SCHEDULED", lessonDTO.getLessonId());
+                        lessonDTO.getInstructorId(), lessonDTO.getDate(), lessonDTO.getTime(), LessonStatus.SCHEDULED, lessonDTO.getLessonId());
 
         if (instructorConflict) {
             return new ResponseDTO(VarList.INSTRUCTOR_CONFLICT, "Instructor Unavailable", lessonDTO);
@@ -127,7 +127,7 @@ public class LessonService {
         // check student conflict (exclude current lesson)
         boolean studentConflict =
                 lessonRepo.existsByStudentIdAndDateAndTimeAndStatusAndLessonIdNot(
-                        lessonDTO.getStudentId(), lessonDTO.getDate(), lessonDTO.getTime(), "SCHEDULED", lessonDTO.getLessonId());
+                        lessonDTO.getStudentId(), lessonDTO.getDate(), lessonDTO.getTime(), LessonStatus.SCHEDULED, lessonDTO.getLessonId());
 
         if (studentConflict) {
             return new ResponseDTO(VarList.STUDENT_CONFLICT, "Student Unavailable", lessonDTO);
@@ -179,7 +179,7 @@ public class LessonService {
 
         // get already booked lessons
         List<Lesson> bookedLessons =
-                lessonRepo.findByDateAndStatus(date, "SCHEDULED");
+                lessonRepo.findByDateAndStatus(date, LessonStatus.SCHEDULED);
 
         // extract booked times
         List<LocalTime> bookedTimes = bookedLessons.stream()
@@ -241,7 +241,7 @@ public class LessonService {
         }
 
         // mark old lesson
-        oldLesson.setStatus("RESCHEDULED"); // or CANCELLED
+        oldLesson.setStatus(LessonStatus.RESHEDULED); // or CANCELLED
         lessonRepo.save(oldLesson);
 
         // create new request (FIFO)
@@ -250,7 +250,7 @@ public class LessonService {
         newLesson.setInstructorId(newDetails.getInstructorId());
         newLesson.setDate(newDetails.getDate());
         newLesson.setTime(newDetails.getTime());
-        newLesson.setStatus("PENDING");
+        newLesson.setStatus(LessonStatus.PENDING);
         newLesson.setRequestedAt(LocalDateTime.now());
 
         lessonRepo.save(newLesson);
@@ -272,7 +272,7 @@ public class LessonService {
         Lesson lesson = optionalLesson.get();
 
         // Only allow cancelling SCHEDULED lessons
-        if (!lesson.getStatus().equals("SCHEDULED")) {
+        if (lesson.getStatus()!=LessonStatus.SCHEDULED) {
             return new ResponseDTO(
                     VarList.RSP_FAIL, "Only scheduled lessons can be cancelled", lesson);
         }
@@ -287,7 +287,7 @@ public class LessonService {
         }
 
         // Cancel lesson
-        lesson.setStatus("CANCELLED");
+        lesson.setStatus(LessonStatus.CANCELLED);
         lessonRepo.save(lesson);
 
         return new ResponseDTO(
@@ -297,7 +297,7 @@ public class LessonService {
 
         List<LessonDTO> list = lessonRepo
                 .findByStudentIdAndStatusAndDateGreaterThanEqual(
-                        studentId, "SCHEDULED", LocalDate.now()
+                        studentId, LessonStatus.SCHEDULED, LocalDate.now()
                 )
                 .stream()
                 .map(l -> modelMapper.map(l, LessonDTO.class))
@@ -319,6 +319,59 @@ public class LessonService {
         return new ResponseDTO(
                 VarList.RSP_SUCCESS, "Lesson history", list);
     }
+    public ResponseDTO getLessonById(Long lessonId) {
+
+        Optional<Lesson> optionalLesson = lessonRepo.findById(lessonId);
+
+        if (optionalLesson.isEmpty()) {
+            return new ResponseDTO(
+                    VarList.LESSON_NOT_FOUND, "Lesson not found", null);
+        }
+
+        LessonDTO lessonDTO =
+                modelMapper.map(optionalLesson.get(), LessonDTO.class);
+
+        return new ResponseDTO(
+                VarList.RSP_SUCCESS, "Lesson retrieved successfully", lessonDTO);
+    }
+    public String updateLessonStatus(Long lessonId, LessonStatus newStatus) {
+
+        Optional<Lesson> optionalLesson = lessonRepo.findById(lessonId);
+
+        if (optionalLesson.isEmpty()) {
+            return VarList.LESSON_NOT_FOUND;
+        }
+
+        Lesson lesson = optionalLesson.get();
+        LessonStatus currentStatus = lesson.getStatus();
+
+        switch (currentStatus) {
+            case PENDING:
+                if (newStatus == LessonStatus.SCHEDULED || newStatus == LessonStatus.REJECTED) {
+                    lesson.setStatus(newStatus);
+                } else {
+                    return VarList.INVALID_STATUS_CHANGE;
+                }
+                break;
+
+            case SCHEDULED:
+                if (newStatus == LessonStatus.COMPLETED || newStatus == LessonStatus.CANCELLED) {
+                    lesson.setStatus(newStatus);
+                } else {
+                    return VarList.INVALID_STATUS_CHANGE;
+                }
+                break;
+
+            case COMPLETED:
+            case CANCELLED:
+            case REJECTED:
+                return VarList.STATUS_ALREADY_FINAL;
+        }
+
+        lessonRepo.save(lesson);
+        return VarList.RSP_SUCCESS;
+    }
+
 
     //Validations
     private String checkConflict(Lesson lesson) {
@@ -327,7 +380,7 @@ public class LessonService {
                 lesson.getInstructorId(),
                 lesson.getDate(),
                 lesson.getTime(),
-                "SCHEDULED")) {
+                LessonStatus.SCHEDULED)) {
             return VarList.INSTRUCTOR_CONFLICT;
         }
 
@@ -335,7 +388,7 @@ public class LessonService {
                 lesson.getStudentId(),
                 lesson.getDate(),
                 lesson.getTime(),
-                "SCHEDULED")) {
+                LessonStatus.SCHEDULED)) {
             return VarList.STUDENT_CONFLICT;
         }
 

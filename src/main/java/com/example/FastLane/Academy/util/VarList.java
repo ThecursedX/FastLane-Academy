@@ -25,4 +25,6 @@ public class VarList {
     public static final String INVALID_TIME_SLOT = "32";
     public static final String RESCHEDULE_NOT_ALLOWED = "33";
     public static final String CANCELLATION_NOT_ALLOWED = "34";
+    public static final String INVALID_STATUS_CHANGE = "35";
+    public static final String STATUS_ALREADY_FINAL = "36";
 }

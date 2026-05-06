@@ -1,5 +1,6 @@
 package com.example.FastLane.Academy.dto;
 
+import com.example.FastLane.Academy.util.LessonStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,7 +18,8 @@ public class LessonDTO {
     private String instructorId;
     private LocalDate date;
     private LocalTime time;
-    private String status ="Scheduled"; // Scheduled, Completed, Cancelled,Pending
+
+    private LessonStatus status;
 
     private LocalDateTime requestedAt; // queue order
 

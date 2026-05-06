@@ -1,6 +1,7 @@
 package com.example.FastLane.Academy.repo;
 
 import com.example.FastLane.Academy.entity.Lesson;
+import com.example.FastLane.Academy.util.LessonStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
@@ -24,15 +25,15 @@ public interface LessonRepo extends JpaRepository<Lesson, Long> {
 
     List<Lesson> findByStudentId(String studentId);
     List<Lesson> findByInstructorId(String instructorId);
-    List<Lesson> findByStatusOrderByRequestedAtAsc(String status);
-    Optional<Lesson> findFirstByStatusOrderByRequestedAtAsc(String status);
+    List<Lesson> findByStatusOrderByRequestedAtAsc(LessonStatus status);
+    Optional<Lesson> findFirstByStatusOrderByRequestedAtAsc(LessonStatus status);
 
     // Conflict checks against already scheduled lessons only
     boolean existsByInstructorIdAndDateAndTimeAndStatusAndLessonIdNot(
             String instructorId,
             LocalDate date,
             LocalTime time,
-            String status,
+            LessonStatus  status,
             Long lessonId
     );
 
@@ -40,7 +41,7 @@ public interface LessonRepo extends JpaRepository<Lesson, Long> {
             String studentId,
             LocalDate date,
             LocalTime time,
-            String status,
+            LessonStatus  status,
             Long lessonId
     );
 
@@ -48,20 +49,20 @@ public interface LessonRepo extends JpaRepository<Lesson, Long> {
             String instructorId,
             LocalDate date,
             LocalTime time,
-            String status
+            LessonStatus  status
     );
     boolean existsByStudentIdAndDateAndTimeAndStatus(
             String studentId,
             LocalDate date,
             LocalTime time,
-            String status
+            LessonStatus  status
     );
 
-    List<Lesson> findByDateAndStatus(LocalDate date, String status);
+    List<Lesson> findByDateAndStatus(LocalDate date, LessonStatus  status);
 
     List<Lesson> findByStudentIdAndStatusAndDateGreaterThanEqual(
             String studentId,
-            String status,
+            LessonStatus  status,
             LocalDate date
     );
 

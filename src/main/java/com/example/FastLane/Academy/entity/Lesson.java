@@ -1,5 +1,6 @@
 package com.example.FastLane.Academy.entity;
 
+import com.example.FastLane.Academy.util.LessonStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,7 +23,9 @@ public class Lesson {
         private String instructorId;
         private LocalDate date;
         private  LocalTime time;
-        private String status ="Scheduled"; // Scheduled, Completed, Cancelled,Pending
+
+        @Enumerated(EnumType.STRING)
+        private LessonStatus status;
 
         private LocalDateTime requestedAt; // queue order
 
