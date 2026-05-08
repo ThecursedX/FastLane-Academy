@@ -4,7 +4,7 @@ import com.example.FastLane.Academy.dto.LessonDTO;
 import com.example.FastLane.Academy.dto.ResponseDTO;
 import com.example.FastLane.Academy.entity.Lesson;
 import com.example.FastLane.Academy.repo.LessonRepo;
-import com.example.FastLane.Academy.util.LessonStatus;
+import com.example.FastLane.Academy.enums.LessonStatus;
 import com.example.FastLane.Academy.util.VarList;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;

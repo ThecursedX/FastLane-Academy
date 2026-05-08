@@ -2,7 +2,7 @@ package com.example.FastLane.Academy.controller;
 
 import com.example.FastLane.Academy.dto.CourseDTO;
 import com.example.FastLane.Academy.dto.ResponseDTO;
-import com.example.FastLane.Academy.entity.DifficultyLevel;
+import com.example.FastLane.Academy.enums.DifficultyLevel;
 import com.example.FastLane.Academy.service.CourseService;
 import com.example.FastLane.Academy.util.VarList;
 import org.springframework.beans.factory.annotation.Autowired;

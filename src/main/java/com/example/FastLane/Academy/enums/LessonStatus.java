@@ -1,4 +1,4 @@
-package com.example.FastLane.Academy.util;
+package com.example.FastLane.Academy.enums;
 
 public enum LessonStatus {
     PENDING,

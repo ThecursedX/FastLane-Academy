@@ -3,7 +3,7 @@ package com.example.FastLane.Academy.controller;
 import com.example.FastLane.Academy.dto.LessonDTO;
 import com.example.FastLane.Academy.dto.ResponseDTO;
 import com.example.FastLane.Academy.service.LessonService;
-import com.example.FastLane.Academy.util.LessonStatus;
+import com.example.FastLane.Academy.enums.LessonStatus;
 import com.example.FastLane.Academy.util.VarList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

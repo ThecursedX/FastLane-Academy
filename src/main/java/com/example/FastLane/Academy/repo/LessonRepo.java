@@ -1,7 +1,7 @@
 package com.example.FastLane.Academy.repo;
 
 import com.example.FastLane.Academy.entity.Lesson;
-import com.example.FastLane.Academy.util.LessonStatus;
+import com.example.FastLane.Academy.enums.LessonStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;

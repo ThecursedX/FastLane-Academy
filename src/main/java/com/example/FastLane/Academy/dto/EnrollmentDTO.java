@@ -1,6 +1,6 @@
 package com.example.FastLane.Academy.dto;
 
-import com.example.FastLane.Academy.entity.EnrollmentStatus;
+import com.example.FastLane.Academy.enums.EnrollmentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

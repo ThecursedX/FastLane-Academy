@@ -1,7 +1,7 @@
 package com.example.FastLane.Academy.dto;
 
-import com.example.FastLane.Academy.entity.CourseStatus;
-import com.example.FastLane.Academy.entity.DifficultyLevel;
+import com.example.FastLane.Academy.enums.CourseStatus;
+import com.example.FastLane.Academy.enums.DifficultyLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

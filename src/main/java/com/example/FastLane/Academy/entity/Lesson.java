@@ -1,6 +1,6 @@
 package com.example.FastLane.Academy.entity;
 
-import com.example.FastLane.Academy.util.LessonStatus;
+import com.example.FastLane.Academy.enums.LessonStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -5,7 +5,7 @@ import com.example.FastLane.Academy.entity.Course;
 import com.example.FastLane.Academy.repo.CourseRepo;
 import com.example.FastLane.Academy.dto.ResponseDTO;
 import com.example.FastLane.Academy.entity.Enrollment;
-import com.example.FastLane.Academy.entity.EnrollmentStatus;
+import com.example.FastLane.Academy.enums.EnrollmentStatus;
 import com.example.FastLane.Academy.repo.EnrollmentRepo;
 import com.example.FastLane.Academy.util.VarList;
 import jakarta.transaction.Transactional;
