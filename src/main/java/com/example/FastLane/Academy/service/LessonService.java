@@ -47,6 +47,23 @@ public class LessonService {
 
        Lesson lesson = modelMapper.map(lessonDTO, Lesson.class);
 
+       //generate ID
+       String lastId = lessonRepo.findTopByOrderByLessonIdDesc()
+               .map(Lesson::getLessonId)
+               .orElse(null);
+
+       String nextId;
+
+       if (lastId == null) {
+           nextId = "L001";
+       } else {
+
+           int number = Integer.parseInt(lastId.substring(1));
+           nextId = String.format("L%03d", number + 1);
+       }
+
+       lesson.setLessonId(nextId);
+
        lesson.setStatus(LessonStatus.PENDING);
        lesson.setRequestedAt(LocalDateTime.now());
 
@@ -146,7 +163,7 @@ public class LessonService {
 
     }
 
-    public ResponseDTO deleteLesson(long lessonId) {
+    public ResponseDTO deleteLesson(String lessonId) {
         if (lessonRepo.existsById(lessonId)) {
             lessonRepo.deleteById(lessonId);
             return  new ResponseDTO(
@@ -203,7 +220,7 @@ public class LessonService {
                 VarList.RSP_SUCCESS, "Available time slots", availableSlots);
     }
 
-    public ResponseDTO requestReschedule(Long lessonId, LessonDTO newDetails) {
+    public ResponseDTO requestReschedule(String lessonId, LessonDTO newDetails) {
 
         Optional<Lesson> optionalLesson = lessonRepo.findById(lessonId);
 
@@ -260,7 +277,7 @@ public class LessonService {
     }
 
 
-    public ResponseDTO cancelLesson(Long lessonId) {
+    public ResponseDTO cancelLesson(String lessonId) {
 
         Optional<Lesson> optionalLesson = lessonRepo.findById(lessonId);
 
@@ -319,7 +336,7 @@ public class LessonService {
         return new ResponseDTO(
                 VarList.RSP_SUCCESS, "Lesson history", list);
     }
-    public ResponseDTO getLessonById(Long lessonId) {
+    public ResponseDTO getLessonById(String lessonId) {
 
         Optional<Lesson> optionalLesson = lessonRepo.findById(lessonId);
 
@@ -334,7 +351,7 @@ public class LessonService {
         return new ResponseDTO(
                 VarList.RSP_SUCCESS, "Lesson retrieved successfully", lessonDTO);
     }
-    public String updateLessonStatus(Long lessonId, LessonStatus newStatus) {
+    public String updateLessonStatus(String lessonId, LessonStatus newStatus) {
 
         Optional<Lesson> optionalLesson = lessonRepo.findById(lessonId);
 

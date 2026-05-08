@@ -13,7 +13,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @Data
 public class LessonDTO {
-    private Long lessonId;
+    private String lessonId;
     private String studentId;
     private String instructorId;
     private LocalDate date;

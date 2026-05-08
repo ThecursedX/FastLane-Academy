@@ -10,7 +10,9 @@ import java.util.List;
 import java.util.Optional;
 
 
-public interface LessonRepo extends JpaRepository<Lesson, Long> {
+public interface LessonRepo extends JpaRepository<Lesson, String> {
+
+    Optional<Lesson> findTopByOrderByLessonIdDesc();
 
     boolean existsByInstructorIdAndDateAndTime(
             String instructorId,
@@ -34,7 +36,7 @@ public interface LessonRepo extends JpaRepository<Lesson, Long> {
             LocalDate date,
             LocalTime time,
             LessonStatus  status,
-            Long lessonId
+            String lessonId
     );
 
     boolean existsByStudentIdAndDateAndTimeAndStatusAndLessonIdNot(
@@ -42,7 +44,7 @@ public interface LessonRepo extends JpaRepository<Lesson, Long> {
             LocalDate date,
             LocalTime time,
             LessonStatus  status,
-            Long lessonId
+            String lessonId
     );
 
     boolean existsByInstructorIdAndDateAndTimeAndStatus(

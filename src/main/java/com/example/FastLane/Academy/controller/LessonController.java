@@ -67,7 +67,7 @@ public class LessonController {
     }
 
     @GetMapping("/getLesson/{lessonId}")
-    public ResponseEntity<ResponseDTO> getLessonById(@PathVariable Long lessonId) {
+    public ResponseEntity<ResponseDTO> getLessonById(@PathVariable String lessonId) {
 
         ResponseDTO response = lessonService.getLessonById(lessonId);
 
@@ -75,7 +75,7 @@ public class LessonController {
     }
 
     @DeleteMapping(value = "/deleteLesson/{lessonId}")
-    public ResponseEntity<ResponseDTO> deleteLesson(@PathVariable long lessonId){
+    public ResponseEntity<ResponseDTO> deleteLesson(@PathVariable String lessonId){
         ResponseDTO response =  lessonService.deleteLesson(lessonId);
 
         HttpStatus status = response.getCode().equals(VarList.RSP_SUCCESS)
@@ -85,7 +85,7 @@ public class LessonController {
         return ResponseEntity.status(status).body(response);
     }
     @PutMapping(value = "/updateLesson/{lessonId}")
-    public ResponseEntity<ResponseDTO> updateLesson(@PathVariable long lessonId, @RequestBody LessonDTO lessonDTO){
+    public ResponseEntity<ResponseDTO> updateLesson(@PathVariable String lessonId, @RequestBody LessonDTO lessonDTO){
         lessonDTO.setLessonId(lessonId);
         ResponseDTO response = lessonService.updateLesson(lessonDTO);
 
@@ -134,7 +134,7 @@ public class LessonController {
     }
 
     @PostMapping("/requestReschedule/{lessonId}")
-    public ResponseEntity<ResponseDTO> rescheduleLesson(@PathVariable Long lessonId, @RequestBody LessonDTO lessonDTO)
+    public ResponseEntity<ResponseDTO> rescheduleLesson(@PathVariable String lessonId, @RequestBody LessonDTO lessonDTO)
     {
         ResponseDTO response =
                 lessonService.requestReschedule(lessonId, lessonDTO);
@@ -143,7 +143,7 @@ public class LessonController {
     }
 
     @PutMapping("/cancelLesson/{lessonId}")
-    public ResponseEntity<ResponseDTO> cancelLesson(@PathVariable Long lessonId) {
+    public ResponseEntity<ResponseDTO> cancelLesson(@PathVariable String lessonId) {
 
         ResponseDTO response = lessonService.cancelLesson(lessonId);
 
@@ -164,7 +164,7 @@ public class LessonController {
     }
 
     @PutMapping("/updateStatus/{lessonId}")
-    public ResponseEntity updateStatus(@PathVariable Long lessonId, @RequestParam LessonStatus status) {
+    public ResponseEntity updateStatus(@PathVariable String lessonId, @RequestParam LessonStatus status) {
 
         String response = lessonService.updateLessonStatus(lessonId, status);
 
