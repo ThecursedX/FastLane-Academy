@@ -12,9 +12,9 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class EnrollmentDTO {
 
-    private Long enrollmentId;
-    private Long studentId;
-    private Long courseId;
+    private String enrollmentId;
+    private String studentId;
+    private String courseId;
     private LocalDate enrolledDate;
     private EnrollmentStatus status;
 }

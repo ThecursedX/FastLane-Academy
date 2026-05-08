@@ -71,7 +71,7 @@ public class EnrollmentService {
     }
 
     // Get Courses By Student
-    public ResponseDTO getCoursesByStudent(Long studentId) {
+    public ResponseDTO getCoursesByStudent(String studentId) {
 
         List<EnrollmentDTO> list =
                 enrollmentRepo.findByStudentId(studentId)
@@ -86,7 +86,7 @@ public class EnrollmentService {
     }
 
     // Get Students By Course
-    public ResponseDTO getStudentsByCourse(Long courseId) {
+    public ResponseDTO getStudentsByCourse(String courseId) {
 
         List<EnrollmentDTO> list =
                 enrollmentRepo.findByCourseId(courseId)
@@ -101,7 +101,7 @@ public class EnrollmentService {
     }
 
     // Remove Enrollment
-    public ResponseDTO removeEnrollment(Long enrollmentId) {
+    public ResponseDTO removeEnrollment(String enrollmentId) {
 
         Optional<Enrollment> optionalEnrollment =
                 enrollmentRepo.findById(enrollmentId);

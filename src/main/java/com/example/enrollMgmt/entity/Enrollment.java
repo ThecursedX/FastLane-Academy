@@ -14,11 +14,10 @@ import java.time.LocalDate;
 public class Enrollment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long enrollmentId;
+    private String enrollmentId;
 
-    private Long studentId;
-    private Long courseId;
+    private String studentId;
+    private String courseId;
     private LocalDate enrolledDate;
 
     @Enumerated(EnumType.STRING)

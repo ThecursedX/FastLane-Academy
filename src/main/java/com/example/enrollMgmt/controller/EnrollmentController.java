@@ -35,7 +35,7 @@ public class EnrollmentController {
     // View Courses By Student
     @GetMapping("/student/{studentId}")
     public ResponseEntity<ResponseDTO> getCoursesByStudent(
-            @PathVariable Long studentId) {
+            @PathVariable String studentId) {
 
         ResponseDTO response =
                 enrollmentService.getCoursesByStudent(studentId);
@@ -47,7 +47,7 @@ public class EnrollmentController {
     // View Students By Course
     @GetMapping("/course/{courseId}")
     public ResponseEntity<ResponseDTO> getStudentsByCourse(
-            @PathVariable Long courseId) {
+            @PathVariable String courseId) {
 
         ResponseDTO response =
                 enrollmentService.getStudentsByCourse(courseId);
@@ -59,7 +59,7 @@ public class EnrollmentController {
     // Remove Enrollment
     @PutMapping("/remove/{enrollmentId}")
     public ResponseEntity<ResponseDTO> removeEnrollment(
-            @PathVariable Long enrollmentId) {
+            @PathVariable String enrollmentId) {
 
         ResponseDTO response =
                 enrollmentService.removeEnrollment(enrollmentId);

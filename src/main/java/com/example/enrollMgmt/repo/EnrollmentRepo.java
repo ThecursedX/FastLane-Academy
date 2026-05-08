@@ -5,13 +5,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-public interface EnrollmentRepo extends JpaRepository<Enrollment, Long> {
+public interface EnrollmentRepo extends JpaRepository<Enrollment, String> {
 
-    boolean existsByStudentIdAndCourseId(Long studentId, Long courseId);
+    Optional<Enrollment> findTopByOrderByEnrollmentIdDesc();
+    boolean existsByStudentIdAndCourseId(String studentId, String courseId);
 
-    List<Enrollment> findByStudentId(Long studentId);
+    List<Enrollment> findByStudentId(String studentId);
 
-    List<Enrollment> findByCourseId(Long courseId);
+    List<Enrollment> findByCourseId(String courseId);
 }
