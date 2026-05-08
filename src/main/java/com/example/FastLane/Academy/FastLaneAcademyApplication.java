@@ -10,6 +10,10 @@ public class FastLaneAcademyApplication {
 		SpringApplication.run(FastLaneAcademyApplication.class, args);
 	}
 
+	@Bean
+	public ModelMapper modelMapper(){
+		return new ModelMapper();
+	}
 }
 
 //initial commit
