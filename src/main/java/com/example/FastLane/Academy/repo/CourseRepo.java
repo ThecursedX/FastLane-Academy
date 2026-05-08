@@ -1,8 +1,8 @@
-package com.example.CourseMgmt.repo;
+package com.example.FastLane.Academy.repo;
 
-import com.example.CourseMgmt.entity.Course;
-import com.example.CourseMgmt.entity.CourseStatus;
-import com.example.CourseMgmt.entity.DifficultyLevel;
+import com.example.FastLane.Academy.entity.Course;
+import com.example.FastLane.Academy.entity.CourseStatus;
+import com.example.FastLane.Academy.entity.DifficultyLevel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

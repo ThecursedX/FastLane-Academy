@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 package com.example.FastLane.Academy.util;
 
 public class VarList {

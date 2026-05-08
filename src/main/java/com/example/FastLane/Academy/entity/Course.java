@@ -1,4 +1,4 @@
-package com.example.CourseMgmt.entity;
+package com.example.FastLane.Academy.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

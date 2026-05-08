@@ -1,10 +1,10 @@
-package com.example.CourseMgmt.controller;
+package com.example.FastLane.Academy.controller;
 
-import com.example.CourseMgmt.dto.CourseDTO;
-import com.example.CourseMgmt.dto.ResponseDTO;
-import com.example.CourseMgmt.entity.DifficultyLevel;
-import com.example.CourseMgmt.service.CourseService;
-import com.example.CourseMgmt.util.VarList;
+import com.example.FastLane.Academy.dto.CourseDTO;
+import com.example.FastLane.Academy.dto.ResponseDTO;
+import com.example.FastLane.Academy.entity.DifficultyLevel;
+import com.example.FastLane.Academy.service.CourseService;
+import com.example.FastLane.Academy.util.VarList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

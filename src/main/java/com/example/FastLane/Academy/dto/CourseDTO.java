@@ -1,7 +1,7 @@
-package com.example.CourseMgmt.dto;
+package com.example.FastLane.Academy.dto;
 
-import com.example.CourseMgmt.entity.CourseStatus;
-import com.example.CourseMgmt.entity.DifficultyLevel;
+import com.example.FastLane.Academy.entity.CourseStatus;
+import com.example.FastLane.Academy.entity.DifficultyLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
