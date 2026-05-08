@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 package com.example.FastLane.Academy.util;
 
 public class VarList {
@@ -20,6 +21,7 @@ public class VarList {
     public static final String NO_PENDING_REQUESTS ="16";
     public static final String CANCELLATION_PERIOD_EXPIRED = "17";
     public static final String CANNOT_CANCEL = "18";
+
     public static final String INVALID_DAY = "30";
     public static final String DATE_OUT_OF_RANGE = "31";
     public static final String INVALID_TIME_SLOT = "32";
@@ -27,4 +29,10 @@ public class VarList {
     public static final String CANCELLATION_NOT_ALLOWED = "34";
     public static final String INVALID_STATUS_CHANGE = "35";
     public static final String STATUS_ALREADY_FINAL = "36";
+
+    public static final String DUPLICATE_EMAIL = "40";
+    public static final String DUPLICATE_LICENSE = "41";
+    public static final String INSTRUCTOR_HAS_FUTURE_LESSONS = "42";
+    public static final String DUPLICATE_COURSE = "50";
+    public static final String COURSE_HAS_ENROLLMENTS = "51";
 }
