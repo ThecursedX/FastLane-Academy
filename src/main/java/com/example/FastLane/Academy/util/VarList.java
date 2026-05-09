@@ -36,4 +36,11 @@ public class VarList {
     public static final String COURSE_HAS_ENROLLMENTS = "51";
 
     public static final String ALREADY_ENROLLED = "60";
+
+
+    public static final String DUPLICATE_TRANSACTION = "70";
+    public static final String INVALID_PAYMENT_AMOUNT = "71";
+    public static final String INVALID_TRANSACTION_REFERENCE = "72";
+    public static final String INVALID_PAYMENT_STATUS = "73";
+    public static final String PAYMENT_UPDATE_NOT_ALLOWED = "74";
 }

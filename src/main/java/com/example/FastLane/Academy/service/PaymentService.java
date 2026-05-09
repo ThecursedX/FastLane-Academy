@@ -1,11 +1,11 @@
-package com.example.paymentMgmt.service;
+package com.example.FastLane.Academy.service;
 
-import com.example.paymentMgmt.dto.PaymentDTO;
-import com.example.paymentMgmt.dto.ResponseDTO;
-import com.example.paymentMgmt.entity.Payment;
-import com.example.paymentMgmt.entity.PaymentStatus;
-import com.example.paymentMgmt.repo.PaymentRepo;
-import com.example.paymentMgmt.util.VarList;
+import com.example.FastLane.Academy.dto.PaymentDTO;
+import com.example.FastLane.Academy.dto.ResponseDTO;
+import com.example.FastLane.Academy.entity.Payment;
+import com.example.FastLane.Academy.enums.PaymentStatus;
+import com.example.FastLane.Academy.repo.PaymentRepo;
+import com.example.FastLane.Academy.util.VarList;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ public class PaymentService {
     @Autowired
     private ModelMapper modelMapper;
 
-    // Submit Payment
+    // Submit Payment.java
     public ResponseDTO submitPayment( String studentId,
                                       Double amount,
                                       String paymentMethod,
@@ -117,7 +117,7 @@ public class PaymentService {
 
             return new ResponseDTO(
                     VarList.RSP_SUCCESS,
-                    "Payment submitted successfully",
+                    "Payment.java submitted successfully",
                     payment
             );
 
@@ -131,7 +131,7 @@ public class PaymentService {
         }
     }
 
-    // Student Payment History
+    // Student Payment.java History
     public ResponseDTO getStudentPayments(String studentId) {
 
         List<PaymentDTO> list =
@@ -144,7 +144,7 @@ public class PaymentService {
                         .toList();
 
         return new ResponseDTO(
-                VarList.RSP_SUCCESS, "Payment history retrieved successfully", list);
+                VarList.RSP_SUCCESS, "Payment.java history retrieved successfully", list);
     }
 
     // Admin View All Payments
@@ -178,7 +178,7 @@ public class PaymentService {
                 VarList.RSP_SUCCESS, "Filtered payments retrieved successfully", list);
     }
 
-    // Approve Payment
+    // Approve Payment.java
     public ResponseDTO approvePayment(String paymentId) {
 
         Optional<Payment> optionalPayment = paymentRepo.findById(paymentId);
@@ -186,7 +186,7 @@ public class PaymentService {
         if (optionalPayment.isEmpty()) {
 
             return new ResponseDTO(
-                    VarList.RSP_NO_DATA_FOUND, "Payment not found", null);
+                    VarList.RSP_NO_DATA_FOUND, "Payment.java not found", null);
         }
 
         Payment payment = optionalPayment.get();
@@ -202,10 +202,10 @@ public class PaymentService {
         paymentRepo.save(payment);
 
         return new ResponseDTO(
-                VarList.RSP_SUCCESS,"Payment approved successfully", payment);
+                VarList.RSP_SUCCESS,"Payment.java approved successfully", payment);
     }
 
-    // Reject Payment
+    // Reject Payment.java
     public ResponseDTO rejectPayment(String paymentId, String rejectionReason) {
 
         Optional<Payment> optionalPayment =
@@ -215,7 +215,7 @@ public class PaymentService {
 
             return new ResponseDTO(
                     VarList.RSP_NO_DATA_FOUND,
-                    "Payment not found",
+                    "Payment.java not found",
                     null
             );
         }
@@ -236,12 +236,12 @@ public class PaymentService {
 
         return new ResponseDTO(
                 VarList.RSP_SUCCESS,
-                "Payment rejected successfully",
+                "Payment.java rejected successfully",
                 payment
         );
     }
 
-    // Update Rejected Payment
+    // Update Rejected Payment.java
     public ResponseDTO updatePayment(PaymentDTO paymentDTO) {
 
         Optional<Payment> optionalPayment = paymentRepo.findById(paymentDTO.getPaymentId());
@@ -249,7 +249,7 @@ public class PaymentService {
         if (optionalPayment.isEmpty()) {
 
             return new ResponseDTO(
-                    VarList.RSP_NO_DATA_FOUND, "Payment not found", null);
+                    VarList.RSP_NO_DATA_FOUND, "Payment.java not found", null);
         }
 
         Payment payment = optionalPayment.get();
@@ -290,12 +290,12 @@ public class PaymentService {
 
         return new ResponseDTO(
                 VarList.UPDATED_SUCCESSFULLY,
-                "Payment updated successfully",
+                "Payment.java updated successfully",
                 payment
         );
     }
 
-    // Soft Delete Payment
+    // Soft Delete Payment.java
     public ResponseDTO deletePayment(String paymentId) {
 
         Optional<Payment> optionalPayment =
@@ -305,7 +305,7 @@ public class PaymentService {
 
             return new ResponseDTO(
                     VarList.RSP_NO_DATA_FOUND,
-                    "Payment not found",
+                    "Payment.java not found",
                     null
             );
         }
@@ -318,7 +318,7 @@ public class PaymentService {
 
         return new ResponseDTO(
                 VarList.RSP_SUCCESS,
-                "Payment deleted successfully",
+                "Payment.java deleted successfully",
                 payment
         );
     }

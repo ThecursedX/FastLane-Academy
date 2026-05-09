@@ -1,10 +1,10 @@
-package com.example.paymentMgmt.controller;
+package com.example.FastLane.Academy.controller;
 
-import com.example.paymentMgmt.dto.PaymentDTO;
-import com.example.paymentMgmt.dto.ResponseDTO;
-import com.example.paymentMgmt.entity.PaymentStatus;
-import com.example.paymentMgmt.service.PaymentService;
-import com.example.paymentMgmt.util.VarList;
+import com.example.FastLane.Academy.dto.PaymentDTO;
+import com.example.FastLane.Academy.dto.ResponseDTO;
+import com.example.FastLane.Academy.enums.PaymentStatus;
+import com.example.FastLane.Academy.service.PaymentService;
+import com.example.FastLane.Academy.util.VarList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ public class PaymentController {
     @Autowired
     private PaymentService paymentService;
 
-    // Submit Payment
+    // Submit Payment.java
     @PostMapping("/submit")
     public ResponseEntity<ResponseDTO> submitPayment(
             @RequestParam String studentId,
@@ -46,7 +46,7 @@ public class PaymentController {
                 .body(response);
     }
 
-    // Student Payment History
+    // Student Payment.java History
     @GetMapping("/student/{studentId}")
     public ResponseEntity<ResponseDTO> getStudentPayments(
             @PathVariable String studentId) {
@@ -81,7 +81,7 @@ public class PaymentController {
                 .body(response);
     }
 
-    // Approve Payment
+    // Approve Payment.java
     @PutMapping("/approve/{paymentId}")
     public ResponseEntity<ResponseDTO> approvePayment(
             @PathVariable String paymentId) {
@@ -93,7 +93,7 @@ public class PaymentController {
                 .body(response);
     }
 
-    // Reject Payment
+    // Reject Payment.java
     @PutMapping("/reject/{paymentId}")
     public ResponseEntity<ResponseDTO> rejectPayment(
             @PathVariable String paymentId,
@@ -109,7 +109,7 @@ public class PaymentController {
                 .body(response);
     }
 
-    // Update Payment
+    // Update Payment.java
     @PutMapping("/update/{paymentId}")
     public ResponseEntity<ResponseDTO> updatePayment(
             @PathVariable String paymentId,
@@ -124,7 +124,7 @@ public class PaymentController {
                 .body(response);
     }
 
-    // Delete Payment
+    // Delete Payment.java
     @PutMapping("/delete/{paymentId}")
     public ResponseEntity<ResponseDTO> deletePayment(
             @PathVariable String paymentId) {

@@ -1,4 +1,4 @@
-package com.example.paymentMgmt.entity;
+package com.example.FastLane.Academy.enums;
 
 public enum PaymentStatus {
     PENDING,

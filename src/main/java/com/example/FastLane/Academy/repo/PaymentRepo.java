@@ -1,7 +1,7 @@
-package com.example.paymentMgmt.repo;
+package com.example.FastLane.Academy.repo;
 
-import com.example.paymentMgmt.entity.Payment;
-import com.example.paymentMgmt.entity.PaymentStatus;
+import com.example.FastLane.Academy.entity.Payment;
+import com.example.FastLane.Academy.enums.PaymentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

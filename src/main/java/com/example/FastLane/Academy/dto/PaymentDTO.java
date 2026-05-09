@@ -1,6 +1,6 @@
-package com.example.paymentMgmt.dto;
+package com.example.FastLane.Academy.dto;
 
-import com.example.paymentMgmt.entity.PaymentStatus;
+import com.example.FastLane.Academy.enums.PaymentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

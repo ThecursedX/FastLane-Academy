@@ -1,5 +1,6 @@
-package com.example.paymentMgmt.entity;
+package com.example.FastLane.Academy.entity;
 
+import com.example.FastLane.Academy.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
