@@ -6,6 +6,7 @@ import com.example.FastLane.Academy.entity.Course;
 import com.example.FastLane.Academy.enums.CourseStatus;
 import com.example.FastLane.Academy.enums.DifficultyLevel;
 import com.example.FastLane.Academy.repo.CourseRepo;
+import com.example.FastLane.Academy.repo.EnrollmentRepo;
 import com.example.FastLane.Academy.util.VarList;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
@@ -26,8 +27,8 @@ public class CourseService {
     @Autowired
     private ModelMapper modelMapper;
 
-   /* @Autowired
-    private EnrollmentRepo enrollmentRepo;*/
+    @Autowired
+    private EnrollmentRepo enrollmentRepo;
 
     // TODO: integrate with Student module later
     /*@Autowired

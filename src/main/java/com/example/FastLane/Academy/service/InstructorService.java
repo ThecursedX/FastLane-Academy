@@ -4,13 +4,16 @@ import com.example.FastLane.Academy.dto.InstructorDTO;
 import com.example.FastLane.Academy.dto.ResponseDTO;
 import com.example.FastLane.Academy.entity.Instructor;
 import com.example.FastLane.Academy.enums.InstructorStatus;
+import com.example.FastLane.Academy.enums.LessonStatus;
 import com.example.FastLane.Academy.repo.InstructorRepo;
+import com.example.FastLane.Academy.repo.LessonRepo;
 import com.example.FastLane.Academy.util.VarList;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,8 +24,8 @@ public class InstructorService {
     @Autowired
     private InstructorRepo instructorRepo;
 
-    /*@Autowired
-    private LessonRepo lessonRepo;*/
+    @Autowired
+    private LessonRepo lessonRepo;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -178,15 +181,13 @@ public class InstructorService {
 
         Instructor instructor = optionalInstructor.get();
 
-        // Future lesson validation
-        /*boolean hasFutureLessons =
+        boolean hasFutureLessons =
                 lessonRepo.existsByInstructorIdAndDateGreaterThanEqualAndStatus(
                         instructorId.toString(),
                         LocalDate.now(),
                         LessonStatus.SCHEDULED
-                );*/
-        //TODO: Connect with Lesson Module later
-        boolean hasFutureLessons = false;
+                );
+
 
 
         if (hasFutureLessons) {
