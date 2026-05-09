@@ -72,4 +72,10 @@ public interface LessonRepo extends JpaRepository<Lesson, String> {
             String studentId,
             LocalDate date
     );
+
+    boolean existsByInstructorIdAndDateGreaterThanEqualAndStatus(
+            String instructorId,
+            LocalDate date,
+            LessonStatus status
+    );
 }

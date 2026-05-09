@@ -2,7 +2,10 @@ package com.example.FastLane.Academy.service;
 
 import com.example.FastLane.Academy.dto.LessonDTO;
 import com.example.FastLane.Academy.dto.ResponseDTO;
+import com.example.FastLane.Academy.entity.Instructor;
 import com.example.FastLane.Academy.entity.Lesson;
+import com.example.FastLane.Academy.enums.WorkingDay;
+import com.example.FastLane.Academy.repo.InstructorRepo;
 import com.example.FastLane.Academy.repo.LessonRepo;
 import com.example.FastLane.Academy.enums.LessonStatus;
 import com.example.FastLane.Academy.util.VarList;
@@ -28,12 +31,14 @@ public class LessonService {
     private LessonRepo lessonRepo;
 
     @Autowired
+    private InstructorRepo instructorRepo;
+
+    @Autowired
     private ModelMapper modelMapper;
 
    public ResponseDTO  requestLesson(LessonDTO lessonDTO){
        //date validation
        String validation = validateLessonDate(lessonDTO.getDate());
-
        if (validation != null) {
            return new ResponseDTO(validation, "Invalid lesson date", lessonDTO);
        }
@@ -44,8 +49,26 @@ public class LessonService {
            return new ResponseDTO(timeValidation, "Invalid time slot selected", lessonDTO);
        }
 
-
        Lesson lesson = modelMapper.map(lessonDTO, Lesson.class);
+
+       String conflict = checkConflict(lesson);
+
+       if (conflict != null) {
+
+           String message = switch (conflict) {
+               case VarList.INSTRUCTOR_CONFLICT -> "Instructor already booked";
+               case VarList.STUDENT_CONFLICT -> "Student already booked";
+               case VarList.INSTRUCTOR_UNAVAILABLE_DAY -> "Instructor not available on selected day";
+               case VarList.INSTRUCTOR_NOT_FOUND -> "Instructor not found";
+               default -> "Scheduling conflict";
+           };
+
+           return new ResponseDTO(
+                   conflict,
+                   message,
+                   lessonDTO
+           );
+       }
 
        //generate ID
        String lastId = lessonRepo.findTopByOrderByLessonIdDesc()
@@ -82,14 +105,19 @@ public class LessonService {
 
         Lesson lesson = optionalLesson.get();
 
+        //Conflict check (includes instructor + student + working days)
         String conflict = checkConflict(lesson);
 
         if (conflict != null) {
             lesson.setStatus(LessonStatus.REJECTED);
             lessonRepo.save(lesson);
-            String message = conflict.equals(VarList.INSTRUCTOR_CONFLICT)
-                    ? "Instructor Unavailable"
-                    : "Student Unavailable";
+            String message =  switch (conflict) {
+                case VarList.INSTRUCTOR_CONFLICT -> "Instructor already booked";
+                case VarList.STUDENT_CONFLICT -> "Student already booked";
+                case VarList.INSTRUCTOR_UNAVAILABLE_DAY -> "Instructor not available on this day";
+                case VarList.INSTRUCTOR_NOT_FOUND -> "Instructor not found";
+                default -> "Scheduling conflict";
+            };
 
             return new ResponseDTO(conflict, message, lesson);
         }
@@ -113,7 +141,6 @@ public class LessonService {
     public ResponseDTO updateLesson(LessonDTO lessonDTO) {
        //date validation
         String validation = validateLessonDate(lessonDTO.getDate());
-
         if (validation != null) {
             return new ResponseDTO(validation, "Invalid Date", lessonDTO);}
 
@@ -132,14 +159,38 @@ public class LessonService {
         }
         Lesson existingLesson = optionalLesson.get();
 
-        // check instructor conflict
+        // check instructor working day
+        Optional<Instructor> optionalInstructor =
+                instructorRepo.findById(lessonDTO.getInstructorId());
+
+        if (optionalInstructor.isEmpty()) {
+            return new ResponseDTO(
+                    VarList.INSTRUCTOR_NOT_FOUND, "Instructor Not Found", lessonDTO);
+        }
+        Instructor instructor = optionalInstructor.get();
+        DayOfWeek lessonDay = lessonDTO.getDate().getDayOfWeek();
+
+        if (!instructor.getWorkingDays().contains(
+                WorkingDay.valueOf(lessonDay.name())
+        )) {
+            return new ResponseDTO(
+                    VarList.INSTRUCTOR_UNAVAILABLE_DAY, "Instructor not available on this day", lessonDTO);
+        }
+        // Instructor conflict (exclude current lesson)
         boolean instructorConflict =
                 lessonRepo.existsByInstructorIdAndDateAndTimeAndStatusAndLessonIdNot(
-                        lessonDTO.getInstructorId(), lessonDTO.getDate(), lessonDTO.getTime(), LessonStatus.SCHEDULED, lessonDTO.getLessonId());
+                        lessonDTO.getInstructorId(),
+                        lessonDTO.getDate(),
+                        lessonDTO.getTime(),
+                        LessonStatus.SCHEDULED,
+                        lessonDTO.getLessonId()
+                );
 
         if (instructorConflict) {
-            return new ResponseDTO(VarList.INSTRUCTOR_CONFLICT, "Instructor Unavailable", lessonDTO);
+            return new ResponseDTO(
+                    VarList.INSTRUCTOR_CONFLICT, "Instructor Unavailable", lessonDTO);
         }
+
 
         // check student conflict (exclude current lesson)
         boolean studentConflict =
@@ -392,7 +443,28 @@ public class LessonService {
 
     //Validations
     private String checkConflict(Lesson lesson) {
+        // instructor exists
+        Optional<Instructor> optionalInstructor =
+                instructorRepo.findById(lesson.getInstructorId());
 
+        if (optionalInstructor.isEmpty()) {
+            return VarList.INSTRUCTOR_NOT_FOUND;
+        }
+
+        Instructor instructor = optionalInstructor.get();
+
+        // instructor working day validation
+        DayOfWeek lessonDay = lesson.getDate().getDayOfWeek();
+
+        boolean available = instructor.getWorkingDays().contains(
+                WorkingDay.valueOf(lessonDay.name())
+        );
+
+        if (!available) {
+            return VarList.INSTRUCTOR_UNAVAILABLE_DAY;
+        }
+
+        // 3. Instructor conflict
         if (lessonRepo.existsByInstructorIdAndDateAndTimeAndStatus(
                 lesson.getInstructorId(),
                 lesson.getDate(),
@@ -401,6 +473,7 @@ public class LessonService {
             return VarList.INSTRUCTOR_CONFLICT;
         }
 
+        // 4. Student conflict
         if (lessonRepo.existsByStudentIdAndDateAndTimeAndStatus(
                 lesson.getStudentId(),
                 lesson.getDate(),
@@ -417,6 +490,13 @@ public class LessonService {
         // Block Sunday
         if (date.getDayOfWeek() == DayOfWeek.SUNDAY) {
             return VarList.INVALID_DAY; // you define this
+        }
+
+        LocalDate today = LocalDate.now();
+
+        // BLOCK past dates
+        if (date.isBefore(today)) {
+            return VarList.INVALID_DAY; // or create PAST_DATE_NOT_ALLOWED
         }
 
         // Block > 4 months ahead

@@ -145,9 +145,9 @@ public class InstructorService {
                     instructorDTO.getExperienceYears());
         }
 
-        if (instructorDTO.getAvailabilitySchedule() != null) {
-            instructor.setAvailabilitySchedule(
-                    instructorDTO.getAvailabilitySchedule());
+        if (instructorDTO.getWorkingDays() != null) {
+            instructor.setWorkingDays(
+                    instructorDTO.getWorkingDays());
         }
 
         if (instructorDTO.getVehicleType() != null) {

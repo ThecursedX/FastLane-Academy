@@ -1,10 +1,13 @@
 package com.example.FastLane.Academy.entity;
 
 import com.example.FastLane.Academy.enums.InstructorStatus;
+import com.example.FastLane.Academy.enums.WorkingDay;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Data
@@ -24,8 +27,13 @@ public class Instructor {
     private String contactNumber;
     private int experienceYears;
     private String vehicleType;
-    private String availabilitySchedule;
 
     @Enumerated(EnumType.STRING)
     private InstructorStatus status;
+
+    @ElementCollection(targetClass = WorkingDay.class)
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "instructor_working_days")
+    @Column(name = "working_day")
+    private List<WorkingDay> workingDays;
 }
