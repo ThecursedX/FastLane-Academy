@@ -18,7 +18,6 @@ public interface InstructorRepo extends JpaRepository<Instructor, String> {
 
     List<Instructor> findByStatus(InstructorStatus status);
 
-    Optional<Instructor> findByInstructorId(Long instructorId);
 
     //last instructor from DB
     @Query(value =

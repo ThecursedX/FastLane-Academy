@@ -64,7 +64,28 @@ public class EnrollmentService {
 
         enrollment.setEnrolledDate(LocalDate.now());
 
-        enrollment.setStatus(EnrollmentStatus.ACTIVE);
+        enrollment.setStatus(EnrollmentStatus.PENDING);
+        enrollment.setAccessGranted(false);
+
+        String lastId = enrollmentRepo
+                .findTopByOrderByEnrollmentIdDesc()
+                .map(Enrollment::getEnrollmentId)
+                .orElse(null);
+
+        String nextId;
+
+        if(lastId == null){
+            nextId = "E001";
+        }else{
+
+            int number =
+                    Integer.parseInt(lastId.substring(1));
+
+            nextId =
+                    String.format("E%03d", number + 1);
+        }
+
+        enrollment.setEnrollmentId(nextId);
 
         enrollmentRepo.save(enrollment);
 

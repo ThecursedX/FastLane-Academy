@@ -14,6 +14,7 @@ import java.time.LocalTime;
 @Data
 public class LessonDTO {
     private String lessonId;
+    private String courseId;
     private String studentId;
     private String instructorId;
     private LocalDate date;

@@ -17,4 +17,5 @@ public class EnrollmentDTO {
     private String courseId;
     private LocalDate enrolledDate;
     private EnrollmentStatus status;
+    private Boolean accessGranted;
 }

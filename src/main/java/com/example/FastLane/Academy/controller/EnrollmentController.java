@@ -4,6 +4,7 @@ import com.example.FastLane.Academy.dto.EnrollmentDTO;
 import com.example.FastLane.Academy.dto.ResponseDTO;
 import com.example.FastLane.Academy.service.EnrollmentService;
 import com.example.FastLane.Academy.util.VarList;
+import com.example.FastLane.Academy.service.AdminApprovalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,9 @@ public class EnrollmentController {
 
     @Autowired
     private EnrollmentService enrollmentService;
+
+    @Autowired
+    private AdminApprovalService adminApprovalService;
 
     // Enroll Student
     @PostMapping("/enroll")
@@ -70,5 +74,23 @@ public class EnrollmentController {
                         : HttpStatus.BAD_REQUEST;
 
         return ResponseEntity.status(status).body(response);
+    }
+
+
+
+    // Admin: approve enrollment access manually (edge case) direct access
+    @PutMapping("/approve/{enrollmentId}")
+    public ResponseEntity<ResponseDTO> approveEnrollment(@PathVariable String enrollmentId) {
+        ResponseDTO response = adminApprovalService.approveEnrollmentById(enrollmentId);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+    }
+
+    // Admin: reject enrollment
+    @PutMapping("/reject/{enrollmentId}")
+    public ResponseEntity<ResponseDTO> rejectEnrollment(
+            @PathVariable String enrollmentId,
+            @RequestParam String reason) {
+        ResponseDTO response = adminApprovalService.rejectEnrollmentById(enrollmentId, reason);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 }

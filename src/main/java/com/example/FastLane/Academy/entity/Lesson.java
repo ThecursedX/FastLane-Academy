@@ -18,8 +18,10 @@ import java.time.LocalTime;
 public class Lesson {
         @Id
         private String lessonId;
+        private String courseId;
         private String studentId;
         private String instructorId;
+
         private LocalDate date;
         private  LocalTime time;
 

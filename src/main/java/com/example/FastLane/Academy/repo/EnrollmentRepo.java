@@ -16,4 +16,9 @@ public interface EnrollmentRepo extends JpaRepository<Enrollment, String> {
     List<Enrollment> findByStudentId(String studentId);
 
     List<Enrollment> findByCourseId(String courseId);
+
+    boolean existsByStudentIdAndCourseIdAndAccessGrantedTrue(
+            String studentId,
+            String courseId
+    );
 }

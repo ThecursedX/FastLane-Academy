@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class Payment {
     @Id
     private String paymentId;
-
+    private String enrollmentId;
     private String studentId;
     private Double amount;
     private String paymentMethod;
@@ -24,7 +24,6 @@ public class Payment {
     private String transactionReference;
 
     // Optional relation references
-    private String lessonId;
     private String courseId;
 
     // receipt image path / filename

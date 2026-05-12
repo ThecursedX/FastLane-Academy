@@ -5,6 +5,7 @@ import com.example.FastLane.Academy.dto.ResponseDTO;
 import com.example.FastLane.Academy.entity.Instructor;
 import com.example.FastLane.Academy.entity.Lesson;
 import com.example.FastLane.Academy.enums.WorkingDay;
+import com.example.FastLane.Academy.repo.EnrollmentRepo;
 import com.example.FastLane.Academy.repo.InstructorRepo;
 import com.example.FastLane.Academy.repo.LessonRepo;
 import com.example.FastLane.Academy.enums.LessonStatus;
@@ -32,11 +33,27 @@ public class LessonService {
 
     @Autowired
     private InstructorRepo instructorRepo;
+    @Autowired
+    private EnrollmentRepo enrollmentRepo;
 
     @Autowired
     private ModelMapper modelMapper;
 
    public ResponseDTO  requestLesson(LessonDTO lessonDTO){
+       boolean hasAccess = enrollmentRepo
+               .existsByStudentIdAndCourseIdAndAccessGrantedTrue(
+                       lessonDTO.getStudentId(),
+                       lessonDTO.getCourseId()   // ← LessonDTO must carry courseId (see Fix 5)
+               );
+
+       if (!hasAccess) {
+           return new ResponseDTO(
+                   VarList.RSP_FAIL,
+                   "Student does not have access. Please complete enrollment and payment first.",
+                   lessonDTO
+           );
+       }
+
        //date validation
        String validation = validateLessonDate(lessonDTO.getDate());
        if (validation != null) {
@@ -312,14 +329,27 @@ public class LessonService {
         oldLesson.setStatus(LessonStatus.RESHEDULED); // or CANCELLED
         lessonRepo.save(oldLesson);
 
-        // create new request (FIFO)
+        //New ID
+        String lastId = lessonRepo.findTopByOrderByLessonIdDesc()
+                .map(Lesson::getLessonId)
+                .orElse(null);
+
+        String nextId = (lastId == null)
+                ? "L001"
+                : String.format("L%03d", Integer.parseInt(lastId.substring(1)) + 1);
+
+
         Lesson newLesson = new Lesson();
+        newLesson.setLessonId(nextId);
         newLesson.setStudentId(oldLesson.getStudentId());
-        newLesson.setInstructorId(newDetails.getInstructorId());
+        newLesson.setInstructorId(newDetails.getInstructorId() != null
+                ? newDetails.getInstructorId()
+                : oldLesson.getInstructorId());
         newLesson.setDate(newDetails.getDate());
         newLesson.setTime(newDetails.getTime());
         newLesson.setStatus(LessonStatus.PENDING);
         newLesson.setRequestedAt(LocalDateTime.now());
+
 
         lessonRepo.save(newLesson);
 

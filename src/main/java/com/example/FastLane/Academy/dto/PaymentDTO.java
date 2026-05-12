@@ -13,11 +13,11 @@ import java.time.LocalDateTime;
 public class PaymentDTO {
 
     private String paymentId;
+    private String enrollmentId;
     private String studentId;
     private Double amount;
     private String paymentMethod;
     private String transactionReference;
-    private String lessonId;
     private String courseId;
     private String receiptUrl;
     private PaymentStatus status;

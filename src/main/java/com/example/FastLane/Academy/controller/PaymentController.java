@@ -4,9 +4,11 @@ import com.example.FastLane.Academy.dto.PaymentDTO;
 import com.example.FastLane.Academy.dto.ResponseDTO;
 import com.example.FastLane.Academy.enums.PaymentStatus;
 import com.example.FastLane.Academy.service.PaymentService;
+import com.example.FastLane.Academy.service.AdminApprovalService;
 import com.example.FastLane.Academy.util.VarList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,25 +21,28 @@ public class PaymentController {
     @Autowired
     private PaymentService paymentService;
 
+    @Autowired
+    private AdminApprovalService adminApprovalService;
+
     // Submit Payment.java
     @PostMapping("/submit")
     public ResponseEntity<ResponseDTO> submitPayment(
+            @RequestParam String enrollmentId,
             @RequestParam String studentId,
             @RequestParam Double amount,
             @RequestParam String paymentMethod,
             @RequestParam String transactionReference,
-            @RequestParam(required = false) String lessonId,
-            @RequestParam(required = false) String courseId,
+            @RequestParam String courseId,
             @RequestParam MultipartFile receiptFile
     ) {
 
         ResponseDTO response =
                 paymentService.submitPayment(
+                        enrollmentId,
                         studentId,
                         amount,
                         paymentMethod,
                         transactionReference,
-                        lessonId,
                         courseId,
                         receiptFile
                 );
@@ -87,7 +92,7 @@ public class PaymentController {
             @PathVariable String paymentId) {
 
         ResponseDTO response =
-                paymentService.approvePayment(paymentId);
+                adminApprovalService.approvePayment(paymentId);
 
         return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .body(response);
@@ -100,7 +105,7 @@ public class PaymentController {
             @RequestParam String rejectionReason) {
 
         ResponseDTO response =
-                paymentService.rejectPayment(
+                adminApprovalService.rejectPayment(
                         paymentId,
                         rejectionReason
                 );
@@ -110,18 +115,17 @@ public class PaymentController {
     }
 
     // Update Payment.java
-    @PutMapping("/update/{paymentId}")
+    @PutMapping(value = "/update/{paymentId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseDTO> updatePayment(
             @PathVariable String paymentId,
-            @RequestBody PaymentDTO paymentDTO) {
+            @RequestParam Double amount,
+            @RequestParam String paymentMethod,
+            @RequestParam String transactionReference,
+            @RequestParam MultipartFile receiptFile) {
 
-        paymentDTO.setPaymentId(paymentId);
+        ResponseDTO response = paymentService.updatePayment(paymentId, amount, paymentMethod, transactionReference, receiptFile);
 
-        ResponseDTO response =
-                paymentService.updatePayment(paymentDTO);
-
-        return ResponseEntity.status(HttpStatus.ACCEPTED)
-                .body(response);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 
     // Delete Payment.java

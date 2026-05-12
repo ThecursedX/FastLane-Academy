@@ -32,11 +32,11 @@ public class PaymentService {
     private ModelMapper modelMapper;
 
     // Submit Payment.java
-    public ResponseDTO submitPayment( String studentId,
+    public ResponseDTO submitPayment( String enrollmentId,
+                                      String studentId,
                                       Double amount,
                                       String paymentMethod,
                                       String transactionReference,
-                                      String lessonId,
                                       String courseId,
                                       MultipartFile receiptFile) {
 
@@ -81,11 +81,11 @@ public class PaymentService {
             // save payment
             Payment payment = new Payment();
 
+            payment.setEnrollmentId(enrollmentId);
             payment.setStudentId(studentId);
             payment.setAmount(amount);
             payment.setPaymentMethod(paymentMethod);
             payment.setTransactionReference(transactionReference);
-            payment.setLessonId(lessonId);
             payment.setCourseId(courseId);
 
             // saved image path
@@ -178,79 +178,25 @@ public class PaymentService {
                 VarList.RSP_SUCCESS, "Filtered payments retrieved successfully", list);
     }
 
-    // Approve Payment.java
-    public ResponseDTO approvePayment(String paymentId) {
-
-        Optional<Payment> optionalPayment = paymentRepo.findById(paymentId);
-
-        if (optionalPayment.isEmpty()) {
-
-            return new ResponseDTO(
-                    VarList.RSP_NO_DATA_FOUND, "Payment.java not found", null);
-        }
-
-        Payment payment = optionalPayment.get();
-
-        if (payment.getStatus() != PaymentStatus.PENDING) {
-
-            return new ResponseDTO(
-                    VarList.INVALID_PAYMENT_STATUS, "Only pending payments can be approved", payment);
-        }
-
-        payment.setStatus(PaymentStatus.APPROVED);
-
-        paymentRepo.save(payment);
-
-        return new ResponseDTO(
-                VarList.RSP_SUCCESS,"Payment.java approved successfully", payment);
-    }
-
-    // Reject Payment.java
-    public ResponseDTO rejectPayment(String paymentId, String rejectionReason) {
-
-        Optional<Payment> optionalPayment =
-                paymentRepo.findById(paymentId);
-
-        if (optionalPayment.isEmpty()) {
-
-            return new ResponseDTO(
-                    VarList.RSP_NO_DATA_FOUND,
-                    "Payment.java not found",
-                    null
-            );
-        }
-
-        Payment payment = optionalPayment.get();
-
-        if (payment.getStatus() != PaymentStatus.PENDING) {
-
-            return new ResponseDTO(
-                    VarList.INVALID_PAYMENT_STATUS, "Only pending payments can be rejected", payment);
-        }
-
-        payment.setStatus(PaymentStatus.REJECTED);
-
-        payment.setRejectionReason(rejectionReason);
-
-        paymentRepo.save(payment);
-
-        return new ResponseDTO(
-                VarList.RSP_SUCCESS,
-                "Payment.java rejected successfully",
-                payment
-        );
-    }
 
     // Update Rejected Payment.java
-    public ResponseDTO updatePayment(PaymentDTO paymentDTO) {
+    public ResponseDTO updatePayment(  String paymentId,
+                                       Double amount,
+                                       String paymentMethod,
+                                       String transactionReference,
+                                       MultipartFile receiptFile) {
 
-        Optional<Payment> optionalPayment = paymentRepo.findById(paymentDTO.getPaymentId());
+        try {
+            Optional<Payment> optionalPayment =
+                    paymentRepo.findById(paymentId);
 
-        if (optionalPayment.isEmpty()) {
-
-            return new ResponseDTO(
-                    VarList.RSP_NO_DATA_FOUND, "Payment.java not found", null);
-        }
+            if (optionalPayment.isEmpty()) {
+                return new ResponseDTO(
+                        VarList.RSP_NO_DATA_FOUND,
+                        "Payment not found",
+                        null
+                );
+            }
 
         Payment payment = optionalPayment.get();
 
@@ -262,37 +208,63 @@ public class PaymentService {
         }
 
         // Duplicate transaction validation
-        boolean duplicate = paymentRepo.existsByTransactionReference(paymentDTO.getTransactionReference());
+        boolean duplicate = paymentRepo.existsByTransactionReference(transactionReference);
 
-        if (duplicate &&
-                !payment.getTransactionReference().equals(
-                        paymentDTO.getTransactionReference())) {
+            if (duplicate &&
+                    !payment.getTransactionReference().equals(transactionReference)) {
 
-            return new ResponseDTO(VarList.DUPLICATE_TRANSACTION, "Duplicate transaction reference", paymentDTO);
-        }
+                return new ResponseDTO(VarList.DUPLICATE_TRANSACTION, "Duplicate transaction reference", null);
+            }
 
-        payment.setAmount(paymentDTO.getAmount());
 
-        payment.setPaymentMethod(
-                paymentDTO.getPaymentMethod());
+            String fileName =
+                    System.currentTimeMillis()
+                            + "_"
+                            + receiptFile.getOriginalFilename();
 
-        payment.setTransactionReference(
-                paymentDTO.getTransactionReference());
+            String uploadDir = "uploads/";
 
-        payment.setReceiptUrl(
-                paymentDTO.getReceiptUrl());
+            File directory = new File(uploadDir);
 
-        payment.setStatus(PaymentStatus.PENDING);
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
 
-        payment.setRejectionReason(null);
+            Path filePath =
+                    Paths.get(uploadDir, fileName);
 
-        paymentRepo.save(payment);
+            Files.copy(
+                    receiptFile.getInputStream(),
+                    filePath,
+                    StandardCopyOption.REPLACE_EXISTING
+            );
 
-        return new ResponseDTO(
+            payment.setAmount(amount);
+            payment.setPaymentMethod(paymentMethod);
+            payment.setTransactionReference(transactionReference);
+
+            // replace old receipt with new file
+            payment.setReceiptUrl(fileName);
+
+            payment.setStatus(PaymentStatus.PENDING);
+            payment.setRejectionReason(null);
+
+            paymentRepo.save(payment);
+
+
+            return new ResponseDTO(
                 VarList.UPDATED_SUCCESSFULLY,
                 "Payment.java updated successfully",
                 payment
         );
+        } catch (Exception ex) {
+
+            return new ResponseDTO(
+                    VarList.RSP_ERROR,
+                    ex.getMessage(),
+                    null
+            );
+        }
     }
 
     // Soft Delete Payment.java

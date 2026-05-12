@@ -169,8 +169,8 @@ public class CourseService {
 
         Course course = optionalCourse.get();
 
-        // TODO: enrollment validation later
-        boolean hasEnrollments = false;
+        boolean hasEnrollments = !enrollmentRepo.findByCourseId(courseId).isEmpty();
+
 
         if (hasEnrollments) {
 
