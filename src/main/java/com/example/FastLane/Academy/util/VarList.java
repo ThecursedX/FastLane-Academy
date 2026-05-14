@@ -45,4 +45,8 @@ public class VarList {
     public static final String INVALID_TRANSACTION_REFERENCE = "72";
     public static final String INVALID_PAYMENT_STATUS = "73";
     public static final String PAYMENT_UPDATE_NOT_ALLOWED = "74";
+
+    public static final String DUPLICATE_NIC = "S01";
+    public static final String INVALID_AGE = "S03";
+    public static final String STUDENT_NOT_FOUND = "S04";
 }
