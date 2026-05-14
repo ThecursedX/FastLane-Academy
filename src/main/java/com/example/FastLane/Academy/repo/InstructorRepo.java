@@ -26,4 +26,7 @@ public interface InstructorRepo extends JpaRepository<Instructor, String> {
             nativeQuery = true)
     String getLastInstructorId();
 
+    Optional<Instructor> findByEmail(String email);
+    Optional<Instructor> findTopByOrderByInstructorIdDesc();
+
 }

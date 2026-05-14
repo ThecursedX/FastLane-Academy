@@ -30,30 +30,6 @@ public class InstructorService {
     @Autowired
     private ModelMapper modelMapper;
 
-    // Register Instructor
-    public ResponseDTO addInstructor(InstructorDTO instructorDTO) {
-
-        if (instructorRepo.existsByEmail(instructorDTO.getEmail())) {
-            return new ResponseDTO(
-                    VarList.DUPLICATE_EMAIL, "Email already exists", instructorDTO);
-        }
-
-        if (instructorRepo.existsByLicenseId(instructorDTO.getLicenseId())) {
-            return new ResponseDTO(
-                    VarList.DUPLICATE_LICENSE, "License ID already exists", instructorDTO);
-        }
-
-        Instructor instructor =
-                modelMapper.map(instructorDTO, Instructor.class);
-
-        instructor.setStatus(InstructorStatus.ACTIVE);
-        instructor.setInstructorId(generateInstructorId());
-
-        instructorRepo.save(instructor);
-
-        return new ResponseDTO(
-                VarList.RSP_SUCCESS, "Instructor registered successfully", instructorDTO);
-    }
 
     // Get All Instructors
     public List<InstructorDTO> getAllInstructors() {
@@ -228,18 +204,4 @@ public class InstructorService {
         );
     }
 
-    //ID GENERATOR
-    private String generateInstructorId() {
-        String lastId = instructorRepo.getLastInstructorId();
-
-        if (lastId == null) {
-            return "I001";
-        }
-
-        int number = Integer.parseInt(lastId.substring(1));
-
-        number++;
-
-        return String.format("I%03d", number);
-    }
 }

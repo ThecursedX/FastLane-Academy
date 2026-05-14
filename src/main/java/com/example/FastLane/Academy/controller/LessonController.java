@@ -4,7 +4,9 @@ import com.example.FastLane.Academy.dto.LessonDTO;
 import com.example.FastLane.Academy.dto.ResponseDTO;
 import com.example.FastLane.Academy.service.LessonService;
 import com.example.FastLane.Academy.enums.LessonStatus;
+import com.example.FastLane.Academy.util.SessionUtil;
 import com.example.FastLane.Academy.util.VarList;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +29,17 @@ public class LessonController {
 
 
     @PostMapping(value = "/requestLesson")
-    public ResponseEntity<ResponseDTO> requestLesson(@RequestBody LessonDTO lessonDTO){
+    public ResponseEntity<ResponseDTO> requestLesson(@RequestBody LessonDTO lessonDTO, HttpSession session){
+        if (!SessionUtil.isRole(session, "ADMIN") &&
+                !SessionUtil.isRole(session, "STUDENT")) {
+
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(
+                            VarList.UNAUTHORIZED,
+                            "Access denied",
+                            null
+                    ));
+        }
         ResponseDTO response = lessonService.requestLesson(lessonDTO);
 
         HttpStatus status = response.getCode().equals(VarList.REQUEST_ADDED)
@@ -37,8 +49,12 @@ public class LessonController {
         return  ResponseEntity.status(status).body(response);
     }
     @PostMapping(value = "/processNextLesson")
-    public ResponseEntity<ResponseDTO> processNextLesson() {
-
+    public ResponseEntity<ResponseDTO> processNextLesson(HttpSession session)
+    {
+        if (!SessionUtil.isRole(session, "ADMIN")) {
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(VarList.UNAUTHORIZED, "Admin access only", null));
+        }
         ResponseDTO response = lessonService.processNextLesson();
 
         HttpStatus status = response.getCode().equals(VarList.REQUEST_ADDED)
@@ -75,7 +91,13 @@ public class LessonController {
     }
 
     @DeleteMapping(value = "/deleteLesson/{lessonId}")
-    public ResponseEntity<ResponseDTO> deleteLesson(@PathVariable String lessonId){
+    public ResponseEntity<ResponseDTO> deleteLesson(@PathVariable String lessonId, HttpSession session)
+    {
+        if (!SessionUtil.isRole(session, "ADMIN")) {
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(VarList.UNAUTHORIZED, "Admin access only", null));
+        }
+
         ResponseDTO response =  lessonService.deleteLesson(lessonId);
 
         HttpStatus status = response.getCode().equals(VarList.RSP_SUCCESS)
@@ -85,7 +107,18 @@ public class LessonController {
         return ResponseEntity.status(status).body(response);
     }
     @PutMapping(value = "/updateLesson/{lessonId}")
-    public ResponseEntity<ResponseDTO> updateLesson(@PathVariable String lessonId, @RequestBody LessonDTO lessonDTO){
+    public ResponseEntity<ResponseDTO> updateLesson(@PathVariable String lessonId, @RequestBody LessonDTO lessonDTO, HttpSession session)
+    {
+        if (!SessionUtil.isRole(session, "ADMIN") &&
+                !SessionUtil.isRole(session, "STUDENT")) {
+
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(
+                            VarList.UNAUTHORIZED,
+                            "Access denied",
+                            null
+                    ));
+        }
         lessonDTO.setLessonId(lessonId);
         ResponseDTO response = lessonService.updateLesson(lessonDTO);
 
@@ -97,7 +130,18 @@ public class LessonController {
 
     }
     @GetMapping(value = "/getLessonsByStudentId/{studentId}")
-    public ResponseEntity getLessonsByStudentId(@PathVariable String studentId){
+    public ResponseEntity getLessonsByStudentId(@PathVariable String studentId, HttpSession session){
+        if (!SessionUtil.isRole(session, "ADMIN") &&
+                !SessionUtil.isRole(session, "STUDENT")) {
+
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(
+                            VarList.UNAUTHORIZED,
+                            "Access denied",
+                            null
+                    ));
+        }
+
         try {
           List<LessonDTO> lessonDTOList = lessonService.getLessonsByStudentId(studentId);
             responseDTO.setCode(VarList.RSP_SUCCESS);
@@ -128,14 +172,34 @@ public class LessonController {
     }
 
     @GetMapping(value = "/available-slots")
-    public ResponseEntity<ResponseDTO> getAvailableSlots(@RequestParam LocalDate date){
+    public ResponseEntity<ResponseDTO> getAvailableSlots(@RequestParam LocalDate date, HttpSession session){
+        if (!SessionUtil.isRole(session, "ADMIN") &&
+                !SessionUtil.isRole(session, "STUDENT")) {
+
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(
+                            VarList.UNAUTHORIZED,
+                            "Access denied",
+                            null
+                    ));
+        }
         ResponseDTO response = lessonService.getAvailableTimeSlots(date);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 
     @PostMapping("/requestReschedule/{lessonId}")
-    public ResponseEntity<ResponseDTO> rescheduleLesson(@PathVariable String lessonId, @RequestBody LessonDTO lessonDTO)
+    public ResponseEntity<ResponseDTO> rescheduleLesson(@PathVariable String lessonId, @RequestBody LessonDTO lessonDTO, HttpSession session)
     {
+        if (!SessionUtil.isRole(session, "ADMIN") &&
+                !SessionUtil.isRole(session, "STUDENT")) {
+
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(
+                            VarList.UNAUTHORIZED,
+                            "Access denied",
+                            null
+                    ));
+        }
         ResponseDTO response =
                 lessonService.requestReschedule(lessonId, lessonDTO);
 
@@ -143,8 +207,17 @@ public class LessonController {
     }
 
     @PutMapping("/cancelLesson/{lessonId}")
-    public ResponseEntity<ResponseDTO> cancelLesson(@PathVariable String lessonId) {
+    public ResponseEntity<ResponseDTO> cancelLesson(@PathVariable String lessonId, HttpSession session) {
+        if (!SessionUtil.isRole(session, "ADMIN") &&
+                !SessionUtil.isRole(session, "STUDENT")) {
 
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(
+                            VarList.UNAUTHORIZED,
+                            "Access denied",
+                            null
+                    ));
+        }
         ResponseDTO response = lessonService.cancelLesson(lessonId);
 
         HttpStatus status = response.getCode().equals(VarList.RSP_SUCCESS)
@@ -154,18 +227,42 @@ public class LessonController {
         return ResponseEntity.status(status).body(response);
     }
     @GetMapping("/student/{id}/upcoming")
-    public ResponseEntity<ResponseDTO> getUpcoming(@PathVariable String id) {
+    public ResponseEntity<ResponseDTO> getUpcoming(@PathVariable String id, HttpSession session) {
+        if (!SessionUtil.isRole(session, "ADMIN") &&
+                !SessionUtil.isRole(session, "STUDENT")) {
+
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(
+                            VarList.UNAUTHORIZED,
+                            "Access denied",
+                            null
+                    ));
+        }
         return ResponseEntity.ok(lessonService.getUpcomingLessons(id));
     }
 
     @GetMapping("/student/{id}/history")
-    public ResponseEntity<ResponseDTO> getHistory(@PathVariable String id) {
+    public ResponseEntity<ResponseDTO> getHistory(@PathVariable String id, HttpSession session) {
+        if (!SessionUtil.isRole(session, "ADMIN") &&
+                !SessionUtil.isRole(session, "STUDENT")) {
+
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(
+                            VarList.UNAUTHORIZED,
+                            "Access denied",
+                            null
+                    ));
+        }
         return ResponseEntity.ok(lessonService.getLessonHistory(id));
     }
 
     @PutMapping("/updateStatus/{lessonId}")
-    public ResponseEntity updateStatus(@PathVariable String lessonId, @RequestParam LessonStatus status) {
-
+    public ResponseEntity updateStatus(@PathVariable String lessonId, @RequestParam LessonStatus status, HttpSession session)
+    {
+        if (!SessionUtil.isRole(session, "ADMIN")) {
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(VarList.UNAUTHORIZED, "Admin access only", null));
+        }
         String response = lessonService.updateLessonStatus(lessonId, status);
 
         if (response.equals(VarList.RSP_SUCCESS)) {

@@ -1,10 +1,7 @@
 package com.example.FastLane.Academy.entity;
 
 import com.example.FastLane.Academy.enums.UserRole;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,6 +17,7 @@ public class Admin {
 
     private String adminName;
 
+    @Column(updatable = true)
     private String email;
 
     private String password;

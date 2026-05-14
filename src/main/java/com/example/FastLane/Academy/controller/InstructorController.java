@@ -3,7 +3,9 @@ package com.example.FastLane.Academy.controller;
 import com.example.FastLane.Academy.dto.InstructorDTO;
 import com.example.FastLane.Academy.dto.ResponseDTO;
 import com.example.FastLane.Academy.service.InstructorService;
+import com.example.FastLane.Academy.util.SessionUtil;
 import com.example.FastLane.Academy.util.VarList;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,24 +24,13 @@ public class InstructorController {
     @Autowired
     private ResponseDTO responseDTO;
 
-    @PostMapping("/addInstructor")
-    public ResponseEntity<ResponseDTO> addInstructor(
-            @RequestBody InstructorDTO instructorDTO) {
-
-        ResponseDTO response =
-                instructorService.addInstructor(instructorDTO);
-
-        HttpStatus status =
-                response.getCode().equals(VarList.RSP_SUCCESS)
-                        ? HttpStatus.ACCEPTED
-                        : HttpStatus.BAD_REQUEST;
-
-        return ResponseEntity.status(status).body(response);
-    }
-
     @GetMapping("/getAllInstructors")
-    public ResponseEntity getAllInstructors() {
-
+    public ResponseEntity getAllInstructors(HttpSession session)
+    {
+        if (!SessionUtil.isRole(session, "ADMIN")) {
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(VarList.UNAUTHORIZED, "Admin access only", null));
+        }
         try {
 
             List<InstructorDTO> instructorDTOList =
@@ -68,8 +59,18 @@ public class InstructorController {
     }
 
     @GetMapping("/studentView")
-    public ResponseEntity<ResponseDTO> getActiveInstructors() {
+    public ResponseEntity<ResponseDTO> getActiveInstructors(HttpSession session)
+    {
+        if (!SessionUtil.isRole(session, "ADMIN") &&
+                !SessionUtil.isRole(session, "STUDENT")) {
 
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(
+                            VarList.UNAUTHORIZED,
+                            "Access denied",
+                            null
+                    ));
+        }
         ResponseDTO response =
                 instructorService.getActiveInstructors();
 
@@ -91,7 +92,16 @@ public class InstructorController {
     @PutMapping("/updateInstructor/{instructorId}")
     public ResponseEntity<ResponseDTO> updateInstructor(
             @PathVariable String instructorId,
-            @RequestBody InstructorDTO instructorDTO) {
+            @RequestBody InstructorDTO instructorDTO, HttpSession session) {
+        if (!SessionUtil.isRole(session, "INSTRUCTOR")) {
+
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(
+                            VarList.UNAUTHORIZED,
+                            "Instructor access only",
+                            null
+                    ));
+        }
 
         instructorDTO.setInstructorId(instructorId);
 
@@ -108,8 +118,12 @@ public class InstructorController {
 
     @PutMapping("/deactivateInstructor/{instructorId}")
     public ResponseEntity<ResponseDTO> deactivateInstructor(
-            @PathVariable String  instructorId) {
-
+            @PathVariable String  instructorId, HttpSession session)
+    {
+        if (!SessionUtil.isRole(session, "ADMIN")) {
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(VarList.UNAUTHORIZED, "Admin access only", null));
+        }
         ResponseDTO response =
                 instructorService.deactivateInstructor(instructorId);
 

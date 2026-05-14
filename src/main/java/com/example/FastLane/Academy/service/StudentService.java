@@ -4,6 +4,7 @@ import com.example.FastLane.Academy.dto.ResponseDTO;
 import com.example.FastLane.Academy.dto.StudentDTO;
 import com.example.FastLane.Academy.entity.Student;
 import com.example.FastLane.Academy.enums.StudentStatus;
+import com.example.FastLane.Academy.enums.UserRole;
 import com.example.FastLane.Academy.repo.StudentRepo;
 import com.example.FastLane.Academy.util.VarList;
 import jakarta.transaction.Transactional;
@@ -26,73 +27,6 @@ public class StudentService {
 
     @Autowired
     private ModelMapper modelMapper;
-
-    public ResponseDTO registerStudent(StudentDTO dto) {
-
-        // NIC duplicate validation
-        if (studentRepo.existsByNic(dto.getNic())) {
-            return new ResponseDTO(
-                    VarList.DUPLICATE_NIC,
-                    "NIC already exists",
-                    null
-            );
-        }
-
-        // Email duplicate validation
-        if (studentRepo.existsByEmail(dto.getEmail())) {
-            return new ResponseDTO(
-                    VarList.DUPLICATE_EMAIL,
-                    "Email already exists",
-                    null
-            );
-        }
-
-        // Age validation
-        int age = Period.between(
-                dto.getDateOfBirth(),
-                LocalDate.now()
-        ).getYears();
-
-        if (age < 18) {
-            return new ResponseDTO(
-                    VarList.INVALID_AGE,
-                    "Student must be at least 18 years old",
-                    null
-            );
-        }
-
-        Student student = modelMapper.map(dto, Student.class);
-
-        // Generate ID
-        String lastId = studentRepo
-                .findTopByOrderByStudentIdDesc()
-                .map(Student::getStudentId)
-                .orElse(null);
-
-        String nextId;
-
-        if (lastId == null) {
-            nextId = "S001";
-        } else {
-
-            int number = Integer.parseInt(lastId.substring(1));
-            nextId = String.format("S%03d", number + 1);
-        }
-
-        student.setStudentId(nextId);
-
-        student.setStatus(StudentStatus.ACTIVE);
-
-        student.setRegisteredDate(LocalDate.now());
-
-        studentRepo.save(student);
-
-        return new ResponseDTO(
-                VarList.RSP_SUCCESS,
-                "Student registered successfully",
-                student
-        );
-    }
 
     public ResponseDTO updateStudent(StudentDTO dto) {
 

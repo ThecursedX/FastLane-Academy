@@ -1,6 +1,7 @@
 package com.example.FastLane.Academy.entity;
 
 import com.example.FastLane.Academy.enums.StudentStatus;
+import com.example.FastLane.Academy.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,17 +28,16 @@ public class Student {
     private String email;
 
     private String contactNumber;
-
     private String address;
-
     private LocalDate dateOfBirth;
-
     private String emergencyContact;
 
     @Enumerated(EnumType.STRING)
     private StudentStatus status;
 
     private LocalDate registeredDate;
+    private String password;
 
-    private String password; // optional login feature
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
 }

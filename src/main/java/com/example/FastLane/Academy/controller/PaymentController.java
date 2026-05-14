@@ -5,7 +5,9 @@ import com.example.FastLane.Academy.dto.ResponseDTO;
 import com.example.FastLane.Academy.enums.PaymentStatus;
 import com.example.FastLane.Academy.service.PaymentService;
 import com.example.FastLane.Academy.service.AdminApprovalService;
+import com.example.FastLane.Academy.util.SessionUtil;
 import com.example.FastLane.Academy.util.VarList;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -33,7 +35,7 @@ public class PaymentController {
             @RequestParam String paymentMethod,
             @RequestParam String transactionReference,
             @RequestParam String courseId,
-            @RequestParam MultipartFile receiptFile
+            @RequestParam MultipartFile receiptFile, HttpSession session
     ) {
 
         ResponseDTO response =
@@ -54,8 +56,12 @@ public class PaymentController {
     // Student Payment.java History
     @GetMapping("/student/{studentId}")
     public ResponseEntity<ResponseDTO> getStudentPayments(
-            @PathVariable String studentId) {
-
+            @PathVariable String studentId, HttpSession session)
+    {
+        if (!SessionUtil.isRole(session, "ADMIN")) {
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(VarList.UNAUTHORIZED, "Admin access only", null));
+        }
         ResponseDTO response =
                 paymentService.getStudentPayments(studentId);
 
@@ -65,8 +71,12 @@ public class PaymentController {
 
     // Admin View All Payments
     @GetMapping("/all")
-    public ResponseEntity<ResponseDTO> getAllPayments() {
-
+    public ResponseEntity<ResponseDTO> getAllPayments(HttpSession session)
+    {
+        if (!SessionUtil.isRole(session, "ADMIN")) {
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(VarList.UNAUTHORIZED, "Admin access only", null));
+        }
         ResponseDTO response =
                 paymentService.getAllPayments();
 
@@ -77,8 +87,12 @@ public class PaymentController {
     // Filter By Status
     @GetMapping("/status")
     public ResponseEntity<ResponseDTO> getPaymentsByStatus(
-            @RequestParam PaymentStatus status) {
-
+            @RequestParam PaymentStatus status,HttpSession session)
+    {
+        if (!SessionUtil.isRole(session, "ADMIN")) {
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(VarList.UNAUTHORIZED, "Admin access only", null));
+        }
         ResponseDTO response =
                 paymentService.getPaymentsByStatus(status);
 
@@ -89,8 +103,12 @@ public class PaymentController {
     // Approve Payment.java
     @PutMapping("/approve/{paymentId}")
     public ResponseEntity<ResponseDTO> approvePayment(
-            @PathVariable String paymentId) {
-
+            @PathVariable String paymentId, HttpSession session)
+    {
+        if (!SessionUtil.isRole(session, "ADMIN")) {
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(VarList.UNAUTHORIZED, "Admin access only", null));
+        }
         ResponseDTO response =
                 adminApprovalService.approvePayment(paymentId);
 
@@ -102,8 +120,12 @@ public class PaymentController {
     @PutMapping("/reject/{paymentId}")
     public ResponseEntity<ResponseDTO> rejectPayment(
             @PathVariable String paymentId,
-            @RequestParam String rejectionReason) {
-
+            @RequestParam String rejectionReason, HttpSession session)
+    {
+        if (!SessionUtil.isRole(session, "ADMIN")) {
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(VarList.UNAUTHORIZED, "Admin access only", null));
+        }
         ResponseDTO response =
                 adminApprovalService.rejectPayment(
                         paymentId,
@@ -121,7 +143,18 @@ public class PaymentController {
             @RequestParam Double amount,
             @RequestParam String paymentMethod,
             @RequestParam String transactionReference,
-            @RequestParam MultipartFile receiptFile) {
+            @RequestParam MultipartFile receiptFile, HttpSession session) {
+
+        if (!SessionUtil.isRole(session, "ADMIN") &&
+                !SessionUtil.isRole(session, "STUDENT")) {
+
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(
+                            VarList.UNAUTHORIZED,
+                            "Access denied",
+                            null
+                    ));
+        }
 
         ResponseDTO response = paymentService.updatePayment(paymentId, amount, paymentMethod, transactionReference, receiptFile);
 
@@ -131,7 +164,12 @@ public class PaymentController {
     // Delete Payment.java
     @PutMapping("/delete/{paymentId}")
     public ResponseEntity<ResponseDTO> deletePayment(
-            @PathVariable String paymentId) {
+            @PathVariable String paymentId, HttpSession session)
+    {
+        if (!SessionUtil.isRole(session, "ADMIN")) {
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(VarList.UNAUTHORIZED, "Admin access only", null));
+        }
 
         ResponseDTO response =
                 paymentService.deletePayment(paymentId);

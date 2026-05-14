@@ -4,7 +4,9 @@ import com.example.FastLane.Academy.dto.CourseDTO;
 import com.example.FastLane.Academy.dto.ResponseDTO;
 import com.example.FastLane.Academy.enums.DifficultyLevel;
 import com.example.FastLane.Academy.service.CourseService;
+import com.example.FastLane.Academy.util.SessionUtil;
 import com.example.FastLane.Academy.util.VarList;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +27,11 @@ public class CourseController {
 
     @PostMapping("/addCourse")
     public ResponseEntity<ResponseDTO> addCourse(
-            @RequestBody CourseDTO courseDTO) {
+            @RequestBody CourseDTO courseDTO, HttpSession session) {
+
+        if (!SessionUtil.isRole(session, "ADMIN")) {
+            return ResponseEntity.status(403).body(new ResponseDTO(VarList.UNAUTHORIZED, "Admin access only", null));
+        }
 
         ResponseDTO response = courseService.addCourse(courseDTO);
 
@@ -80,7 +86,12 @@ public class CourseController {
     @PutMapping("/updateCourse/{courseId}")
     public ResponseEntity<ResponseDTO> updateCourse(
             @PathVariable String courseId,
-            @RequestBody CourseDTO courseDTO) {
+            @RequestBody CourseDTO courseDTO, HttpSession session)
+    {
+        if (!SessionUtil.isRole(session, "ADMIN")) {
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(VarList.UNAUTHORIZED, "Admin access only", null));
+        }
 
         courseDTO.setCourseId(courseId);
 
@@ -97,7 +108,12 @@ public class CourseController {
 
     @PutMapping("/deleteCourse/{courseId}")
     public ResponseEntity<ResponseDTO> deleteCourse(
-            @PathVariable String courseId) {
+            @PathVariable String courseId, HttpSession session)
+    {
+        if (!SessionUtil.isRole(session, "ADMIN")) {
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(VarList.UNAUTHORIZED, "Admin access only", null));
+        }
 
         ResponseDTO response = courseService.deleteCourse(courseId);
 

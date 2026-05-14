@@ -49,4 +49,6 @@ public class VarList {
     public static final String DUPLICATE_NIC = "S01";
     public static final String INVALID_AGE = "S03";
     public static final String STUDENT_NOT_FOUND = "S04";
+
+    public static final String UNAUTHORIZED = "75";
 }
