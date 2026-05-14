@@ -1,8 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.entity.Feedback;
-import com.example.demo.repository.FeedbackRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.demo.service.FeedbackService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,29 +10,29 @@ import java.util.List;
 @RequestMapping("/feedback")
 public class FeedbackController {
 
-    @Autowired
-    private FeedbackRepository repo;
+    private final FeedbackService feedbackService;
+
+    public FeedbackController(FeedbackService feedbackService) {
+        this.feedbackService = feedbackService;
+    }
 
     @PostMapping
     public Feedback create(@RequestBody Feedback feedback) {
-        return repo.save(feedback);
+        return feedbackService.createFeedback(feedback);
     }
 
     @GetMapping
     public List<Feedback> getAll() {
-        return repo.findAll();
+        return feedbackService.getAllFeedback();
     }
 
     @PutMapping("/{id}")
     public Feedback update(@PathVariable Long id, @RequestBody Feedback newData) {
-        Feedback f = repo.findById(id).orElseThrow();
-        f.setRating(newData.getRating());
-        f.setComment(newData.getComment());
-        return repo.save(f);
+        return feedbackService.updateFeedback(id, newData);
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
-        repo.deleteById(id);
+        feedbackService.deleteFeedback(id);
     }
 }
