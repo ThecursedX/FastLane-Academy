@@ -30,8 +30,7 @@ public class LessonController {
 
     @PostMapping(value = "/requestLesson")
     public ResponseEntity<ResponseDTO> requestLesson(@RequestBody LessonDTO lessonDTO, HttpSession session){
-        if (!SessionUtil.isRole(session, "ADMIN") &&
-                !SessionUtil.isRole(session, "STUDENT")) {
+        if (!SessionUtil.isRole(session, "STUDENT")) {
 
             return ResponseEntity.status(403)
                     .body(new ResponseDTO(
