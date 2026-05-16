@@ -92,6 +92,8 @@ function updateFormState() {
     toggle("termsNote", isSignUp);
     toggle("licenseField", isSignUp && isInstructor);
     toggle("forgotLink", !isSignUp);
+    toggle("studentExtraFields", isSignUp && !isInstructor);
+    toggle("instructorExtraFields", isSignUp && isInstructor);
 
     if (submitLabel) {
         submitLabel.textContent = isSignUp
@@ -138,9 +140,41 @@ async function handleAuthSubmit(e) {
                 ? "/auth/register/instructor"
                 : "/auth/register/student";
 
+            const fullName = `${firstName} ${lastName}`.trim();
+
+            const nic = document.getElementById("nic")?.value.trim();
+            const contactNumber = document.getElementById("contactNumber")?.value.trim();
+            const address = document.getElementById("address")?.value.trim();
+            const dateOfBirth = document.getElementById("dateOfBirth")?.value || null;
+            const emergencyContact = document.getElementById("emergencyContact")?.value.trim();
+
+            const instructorContactNumber = document.getElementById("instructorContactNumber")?.value.trim();
+            const experienceYears = parseInt(document.getElementById("experienceYears")?.value || "0");
+            const vehicleType = document.getElementById("vehicleType")?.value.trim();
+
             const body = currentRole === "instructor"
-                ? { firstName, lastName, email, password, licenseId }
-                : { firstName, lastName, email, password };
+                ? {
+                    instructorName: fullName,
+                    email,
+                    licenseId,
+                    contactNumber: instructorContactNumber,
+                    experienceYears,
+                    vehicleType,
+                    workingDays: [],
+                    password,
+                    role: "INSTRUCTOR"
+                }
+                : {
+                    fullName,
+                    nic,
+                    email,
+                    contactNumber,
+                    address,
+                    dateOfBirth,
+                    emergencyContact,
+                    password,
+                    role: "STUDENT"
+                };
 
             await apiJson(endpoint, {
                 method: "POST",
