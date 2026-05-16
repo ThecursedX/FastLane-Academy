@@ -1,0 +1,989 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Student dashboard — FastLane Academy</title>
+  <link rel="stylesheet" href="styles/app.css">
+  <style>
+    /* ============ overview specific ============ */
+    .progress-card {
+      background: var(--fl-ink-900); color: var(--fl-paper);
+      border-radius: var(--fl-r-xl); padding: 28px;
+      display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center;
+      position: relative; overflow: hidden;
+    }
+    .progress-card::before {
+      content:""; position: absolute; inset: 0;
+      background: radial-gradient(60% 60% at 90% 10%, rgba(151,177,84,0.25), transparent 60%);
+    }
+    .progress-card > * { position: relative; z-index: 1; }
+    .progress-card .lbl { font-family: var(--fl-font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fl-moss-400); }
+    .progress-card h2 { font-family: var(--fl-font-display); font-size: 40px; letter-spacing: -0.02em; margin: 10px 0 16px; line-height: 1.1; }
+    .progress-card .info { display: flex; gap: 32px; font-size: 13px; color: var(--fl-ink-200); }
+    .progress-card .info b { display: block; color: var(--fl-paper); font-family: var(--fl-font-display); font-size: 24px; letter-spacing: -0.01em; margin-bottom: 4px; }
+    .progress-card .info span { font-family: var(--fl-font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fl-ink-300); }
+    .progress-card .meter-wrap {
+      width: 220px;
+    }
+    .progress-card .meter {
+      width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 999px; overflow: hidden; margin: 12px 0;
+    }
+    .progress-card .meter > span { display: block; height: 100%; background: var(--fl-moss-500); border-radius: 999px; transition: width 420ms var(--fl-ease); }
+    .progress-card .pct { font-family: var(--fl-font-display); font-size: 64px; line-height: 1; letter-spacing: -0.02em; }
+
+    .next-lesson {
+      background: var(--fl-moss-500); color: var(--fl-ink-900);
+      border-radius: var(--fl-r-xl); padding: 28px;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .next-lesson .when {
+      font-family: var(--fl-font-display); font-size: 64px;
+      letter-spacing: -0.02em; line-height: 1; margin: 4px 0;
+    }
+    .next-lesson .when small { font-family: var(--fl-font-mono); font-size: 13px; letter-spacing: 0.04em; color: var(--fl-moss-800); }
+    .next-lesson .where { font-family: var(--fl-font-serif); font-size: 16px; }
+    .next-lesson .row-between .btn--ink { background: var(--fl-ink-900); }
+
+    /* course catalog inside dashboard */
+    .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    @media (max-width: 1100px) { .cat-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 700px)  { .cat-grid { grid-template-columns: 1fr; } }
+    .cat-card {
+      background: var(--fl-paper); border: 1px solid var(--fl-line-soft);
+      border-radius: var(--fl-r-lg); padding: 22px; display: flex; flex-direction: column; gap: 14px;
+      transition: all var(--fl-dur-base) var(--fl-ease);
+    }
+    .cat-card:hover { transform: translateY(-2px); box-shadow: var(--fl-shadow-md); }
+    .cat-card.enrolled { background: var(--fl-ink-900); color: var(--fl-paper); border-color: transparent; }
+    .cat-card.enrolled p { color: var(--fl-ink-200); }
+    .cat-card.enrolled .glyph { color: var(--fl-moss-400); }
+    .cat-card.enrolled .meta { color: var(--fl-ink-300); border-color: rgba(255,255,255,0.08); }
+    .cat-card .glyph { font-family: var(--fl-font-display); font-size: 64px; line-height: 0.9; letter-spacing: -0.04em; color: var(--fl-moss-400); margin-bottom: -4px; }
+    .cat-card h3 { font-family: var(--fl-font-serif); font-size: 19px; margin: 0; font-weight: 600; }
+    .cat-card p { font-size: 13px; color: var(--fl-fg-muted); line-height: 1.5; margin: 0; flex: 1; }
+    .cat-card .meta { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; border-top: 1px solid var(--fl-line-soft); font-family: var(--fl-font-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--fl-fg-muted); }
+
+    /* lesson preferences */
+    .pref-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin: 14px 0; }
+    .pref-cell {
+      padding: 14px 0; text-align: center;
+      border: 1px solid var(--fl-line); border-radius: 12px;
+      cursor: pointer; font-family: var(--fl-font-mono); font-size: 11px;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      background: var(--fl-paper); color: var(--fl-fg-muted);
+      transition: all 160ms;
+    }
+    .pref-cell.on { background: var(--fl-ink-900); color: var(--fl-paper); border-color: var(--fl-ink-900); }
+    .pref-cell:hover { border-color: var(--fl-ink-400); }
+
+    /* profile */
+    .profile-head {
+      background: var(--fl-paper); border: 1px solid var(--fl-line-soft);
+      border-radius: var(--fl-r-xl); padding: 32px;
+      display: grid; grid-template-columns: auto 1fr auto; gap: 28px; align-items: center;
+    }
+    .profile-head h2 { font-family: var(--fl-font-display); font-size: 36px; letter-spacing: -0.02em; margin: 4px 0 6px; }
+    .profile-head .meta { display: flex; gap: 18px; font-family: var(--fl-font-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fl-fg-muted); }
+    .profile-head .meta .dot { width: 4px; height: 4px; border-radius: 50%; background: currentColor; display: inline-block; align-self: center; margin: 0 2px; }
+
+    /* payment card */
+    .pay-summary { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; }
+    @media (max-width: 980px) { .pay-summary { grid-template-columns: 1fr; } }
+    .balance {
+      background: var(--fl-ink-900); color: var(--fl-paper);
+      border-radius: var(--fl-r-xl); padding: 28px;
+      position: relative; overflow: hidden;
+    }
+    .balance::before { content:""; position: absolute; inset: 0; background: radial-gradient(60% 80% at 100% 0%, rgba(151,177,84,0.18), transparent 70%); }
+    .balance > * { position: relative; z-index: 1; }
+    .balance .lbl { font-family: var(--fl-font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fl-moss-400); }
+    .balance .amount { font-family: var(--fl-font-display); font-size: 64px; line-height: 1; letter-spacing: -0.02em; margin: 12px 0 12px; }
+    .balance .meta { font-family: var(--fl-font-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--fl-ink-300); }
+    .balance .meter { height: 8px; background: rgba(255,255,255,0.1); border-radius: 999px; overflow: hidden; margin-top: 18px; }
+    .balance .meter > span { display: block; height: 100%; background: var(--fl-moss-500); }
+    .balance .legend { display: flex; gap: 24px; margin-top: 14px; font-size: 13px; color: var(--fl-ink-200); }
+    .balance .legend b { color: var(--fl-paper); font-family: var(--fl-font-display); display: block; font-size: 20px; letter-spacing: -0.01em; }
+
+    /* payment cards stack */
+    .pm-list { display: flex; flex-direction: column; gap: 10px; }
+    .pm {
+      display: grid; grid-template-columns: 40px 1fr auto; gap: 14px; align-items: center;
+      padding: 14px 16px; border: 1px solid var(--fl-line-soft); border-radius: 12px;
+      background: var(--fl-paper);
+    }
+    .pm .brand-ic { width: 40px; height: 28px; border-radius: 6px; background: var(--fl-ink-900); display: flex; align-items: center; justify-content: center; color: var(--fl-paper); font-family: var(--fl-font-mono); font-size: 10px; letter-spacing: 0.1em; }
+    .pm .brand-ic.visa { background: #1a1f71; }
+    .pm .brand-ic.mc { background: #1c1c1b; color: #f79e1b; }
+    .pm .num { font-family: var(--fl-font-mono); font-size: 14px; letter-spacing: 0.04em; }
+    .pm .exp { font-family: var(--fl-font-mono); font-size: 12px; color: var(--fl-fg-muted); }
+
+    .star-input { display: inline-flex; gap: 4px; }
+    .star-input svg { width: 24px; height: 24px; fill: var(--fl-ink-200); stroke: var(--fl-ink-200); cursor: pointer; }
+    .star-input svg.on { fill: var(--fl-moss-500); stroke: var(--fl-moss-500); }
+  </style>
+</head>
+
+
+<script src="js/api.js"></script>
+<body class="fl-body">
+
+<div class="dash">
+
+  <!-- ================== SIDE ================== -->
+  <aside class="dash__side">
+    <a href="index.html" class="brand">
+      <span class="bolt">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+      </span>
+      FastLane
+    </a>
+
+    <nav class="dash__nav">
+      <div class="group">Student</div>
+      <a href="#" data-pane="overview" class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Overview
+      </a>
+      <a href="#" data-pane="courses">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+        My courses
+      </a>
+      <a href="#" data-pane="schedule">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Schedule lessons
+        <span class="pill">3</span>
+      </a>
+      <a href="#" data-pane="payments">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><line x1="2" y1="11" x2="22" y2="11"/></svg>
+        Payments
+      </a>
+      <a href="#" data-pane="feedback">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+        Feedback
+      </a>
+      <a href="#" data-pane="profile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Profile
+      </a>
+
+      <div class="group" style="margin-top:16px;">Site</div>
+      <a href="index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3l9 9"/><path d="M5 10v10h14V10"/></svg>
+        Visit site
+      </a>
+      <a href="instructor.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
+        Instructor view
+      </a>
+    </nav>
+
+    <div class="dash__profile">
+      <span class="avatar-circle">JR</span>
+      <div class="who"><b>Jordan Reeves</b><span>C24-0042 · Cat. B</span></div>
+      <button class="icon-btn" title="Toggle dark mode" onclick="toggleThemeNav()" id="themeBtn" style="margin-right:2px;">
+        <svg id="dashMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <svg id="dashSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+      </button>
+      <a href="auth.html" class="icon-btn" title="Sign out">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ================== MAIN ================== -->
+  <main class="dash__main">
+
+    <!-- ===== top bar ===== -->
+    <div class="dash__bar">
+      <div>
+        <div class="crumbs">Cohort 24 · Cat. B</div>
+        <h1 id="pageTitle">Welcome back, Jordan.</h1>
+      </div>
+      <div class="right">
+        <div class="search" style="width:240px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="input" type="search" placeholder="Search…">
+        </div>
+        <button class="icon-btn" title="Notifications" style="position:relative;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span style="position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--fl-moss-500);border:2px solid var(--fl-paper);"></span>
+        </button>
+        <a href="#" data-pane="schedule" class="btn btn--primary pane-jump">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Book a lesson
+        </a>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         PANE: OVERVIEW
+         ========================================================= -->
+    <section class="pane active" id="pane-overview">
+
+      <div class="grid-12 mb-8">
+        <div class="progress-card">
+          <div>
+            <span class="lbl">Cat. B · Week 3 of 6</span>
+            <h2>You're halfway to the wheel.</h2>
+            <div class="info">
+              <div><b>14 / 30</b><span>Theory hours</span></div>
+              <div><b>22 / 60</b><span>Practical hours</span></div>
+              <div><b>2 / 3</b><span>Mock exams</span></div>
+            </div>
+          </div>
+          <div class="meter-wrap" style="text-align:right;">
+            <div class="pct">52<small style="font-size:24px;color:var(--fl-moss-400);">%</small></div>
+            <div class="meter"><span style="width:52%;"></span></div>
+            <span class="lbl" style="color:var(--fl-ink-300);">Course complete</span>
+          </div>
+        </div>
+
+        <div class="next-lesson">
+          <span class="eyebrow" style="color:var(--fl-moss-800);">Your next lesson</span>
+          <div class="when">Thu<br><span style="font-size:24px;letter-spacing:0;">14:00</span></div>
+          <p class="where" style="margin:0;"><b>Junctions & city driving</b><br>Pickup: Astor Pl · Instructor: Rogan Massey</p>
+          <div class="row-between mt-2">
+            <span style="font-family:var(--fl-font-mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;">In 2 days, 4 hours</span>
+            <a href="#" class="btn btn--ink btn--sm pane-jump" data-pane="schedule">View schedule</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat">
+          <div class="lbl">Lessons booked</div>
+          <div class="num">8</div>
+          <div class="delta">+3 this week</div>
+        </div>
+        <div class="stat">
+          <div class="lbl">Avg. score</div>
+          <div class="num">84<small style="font-family:var(--fl-font-mono);font-size:14px;color:var(--fl-fg-muted);">/100</small></div>
+          <div class="delta">+6 since wk 2</div>
+        </div>
+        <div class="stat">
+          <div class="lbl">Hours driven</div>
+          <div class="num">22h</div>
+          <div class="delta">36% of course</div>
+        </div>
+        <div class="stat">
+          <div class="lbl">Balance due</div>
+          <div class="num">$199</div>
+          <div class="delta">Next: 3 Jun</div>
+        </div>
+      </div>
+
+      <div class="grid-12">
+
+        <div class="card">
+          <div class="card__head">
+            <h3>Upcoming lessons</h3>
+            <a href="#" class="pane-jump" data-pane="schedule" style="font-family:var(--fl-font-mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--fl-moss-700);">View all →</a>
+          </div>
+          <div style="margin:-8px -8px;">
+            <div class="lesson-item">
+              <div class="when"><b>14</b><span>Thu</span></div>
+              <div>
+                <h4>Junctions & city driving</h4>
+                <div class="meta">
+                  <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>14:00 — 16:00</span>
+                  <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Astor Pl</span>
+                  <span>Rogan Massey</span>
+                </div>
+              </div>
+              <span class="badge badge--moss"><span class="dot"></span>Confirmed</span>
+              <div class="gap-2">
+                <button class="icon-btn" title="Reschedule"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"/></svg></button>
+                <button class="icon-btn danger" title="Cancel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+              </div>
+            </div>
+
+            <div class="lesson-item">
+              <div class="when"><b>16</b><span>Sat</span></div>
+              <div>
+                <h4>Highway practice — beginner</h4>
+                <div class="meta">
+                  <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>09:00 — 11:30</span>
+                  <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Brooklyn yard</span>
+                  <span>Rogan Massey</span>
+                </div>
+              </div>
+              <span class="badge badge--moss"><span class="dot"></span>Confirmed</span>
+              <div class="gap-2">
+                <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"/></svg></button>
+                <button class="icon-btn danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+              </div>
+            </div>
+
+            <div class="lesson-item">
+              <div class="when"><b>19</b><span>Tue</span></div>
+              <div>
+                <h4>Theory — signs review</h4>
+                <div class="meta">
+                  <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>18:30 — 20:00</span>
+                  <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>City campus</span>
+                  <span>Group · 8 students</span>
+                </div>
+              </div>
+              <span class="badge badge--neutral">Pending</span>
+              <div class="gap-2">
+                <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+                <button class="icon-btn danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+
+          <div class="card">
+            <div class="card__head">
+              <h3>Your instructor</h3>
+              <span class="badge badge--moss"><span class="dot"></span>Online now</span>
+            </div>
+            <div class="gap-4">
+              <span class="avatar-circle lg ink">RM</span>
+              <div>
+                <b style="font-family:var(--fl-font-display);font-size:22px;letter-spacing:-0.01em;">Rogan Massey</b>
+                <div class="muted mono" style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;margin-top:2px;">Practical · Cat. B, C</div>
+              </div>
+            </div>
+            <p style="font-family:var(--fl-font-serif);font-size:15px;line-height:1.5;color:var(--fl-fg-muted);margin:16px 0 0;">Booked through week 4. Reachable on WhatsApp between 7am and 9pm.</p>
+            <div class="gap-2 mt-4" style="gap:8px;">
+              <button class="btn btn--secondary btn--sm">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Message
+              </button>
+              <button class="btn btn--secondary btn--sm">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                Call
+              </button>
+            </div>
+          </div>
+
+          <div class="card card--ink">
+            <div class="card__head" style="border-color:rgba(255,255,255,0.08);">
+              <h3 style="color:var(--fl-paper);">State exam readiness</h3>
+              <span style="font-family:var(--fl-font-display);font-size:24px;color:var(--fl-moss-400);letter-spacing:-0.01em;">B+</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:14px;font-family:var(--fl-font-mono);font-size:11px;letter-spacing:0.08em;color:var(--fl-ink-300);">
+              <div>
+                <div class="row-between" style="margin-bottom:6px;"><span>Junctions</span><span>78%</span></div>
+                <div class="progress" style="background:rgba(255,255,255,0.08);"><span style="width:78%;"></span></div>
+              </div>
+              <div>
+                <div class="row-between" style="margin-bottom:6px;"><span>Manoeuvres</span><span>52%</span></div>
+                <div class="progress" style="background:rgba(255,255,255,0.08);"><span style="width:52%;"></span></div>
+              </div>
+              <div>
+                <div class="row-between" style="margin-bottom:6px;"><span>Highway</span><span>34%</span></div>
+                <div class="progress" style="background:rgba(255,255,255,0.08);"><span style="width:34%;background:var(--fl-warn);"></span></div>
+              </div>
+              <div>
+                <div class="row-between" style="margin-bottom:6px;"><span>Theory</span><span>91%</span></div>
+                <div class="progress" style="background:rgba(255,255,255,0.08);"><span style="width:91%;"></span></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =========================================================
+         PANE: COURSES
+         ========================================================= -->
+    <section class="pane" id="pane-courses">
+      <div class="row-between mb-8">
+        <div>
+          <h2 style="font-family:var(--fl-font-display);font-size:32px;letter-spacing:-0.02em;margin:0 0 6px;">Your courses</h2>
+          <p class="muted" style="margin:0;">Enrolled, completed, and tracks you might want to add.</p>
+        </div>
+        <a href="courses.html" target="_blank" class="btn btn--secondary">Browse catalogue</a>
+      </div>
+
+      <div class="mb-8">
+        <div class="card">
+          <div class="card__head">
+            <h3>Currently enrolled</h3>
+            <span class="badge badge--moss"><span class="dot"></span>Active</span>
+          </div>
+          <div class="grid-12" style="grid-template-columns:auto 1fr;align-items:center;">
+            <div style="font-family:var(--fl-font-display);font-size:104px;line-height:1;letter-spacing:-0.04em;color:var(--fl-moss-600);">B</div>
+            <div>
+              <span class="eyebrow">Cohort 24 · Started 5 May</span>
+              <h3 style="font-family:var(--fl-font-display);font-size:36px;letter-spacing:-0.02em;margin:8px 0 12px;font-weight:700;">Standard car licence</h3>
+              <div class="grid-4 mb-4">
+                <div><div class="eyebrow">Week</div><b class="display" style="font-size:24px;letter-spacing:-0.01em;">3 / 6</b></div>
+                <div><div class="eyebrow">Hours</div><b class="display" style="font-size:24px;letter-spacing:-0.01em;">36 / 90</b></div>
+                <div><div class="eyebrow">Avg. score</div><b class="display" style="font-size:24px;letter-spacing:-0.01em;">84 / 100</b></div>
+                <div><div class="eyebrow">Final exam</div><b class="display" style="font-size:24px;letter-spacing:-0.01em;">17 Jun</b></div>
+              </div>
+              <div class="progress mb-2"><span style="width:52%;"></span></div>
+              <div class="row-between" style="font-family:var(--fl-font-mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--fl-fg-muted);">
+                <span>52% complete</span>
+                <span>3 weeks remaining</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <h3 style="font-family:var(--fl-font-serif);font-size:20px;font-weight:600;margin:0 0 16px;">Add another track</h3>
+        <div class="cat-grid">
+          <div class="cat-card">
+            <div class="glyph">C</div>
+            <h3>Light truck licence</h3>
+            <p>Pair with your Cat. B for a discount. 80h practical, 20h theory.</p>
+            <div class="meta"><span>6 weeks · $599</span><a href="#" class="text-moss">Add →</a></div>
+          </div>
+          <div class="cat-card">
+            <div class="glyph">A</div>
+            <h3>Motorcycle endorsement</h3>
+            <p>Off-road yard plus on-road hours. Bikes provided.</p>
+            <div class="meta"><span>4 weeks · $479</span><a href="#" class="text-moss">Add →</a></div>
+          </div>
+          <div class="cat-card">
+            <div class="glyph">D</div>
+            <h3>Defensive driving</h3>
+            <p>One Saturday workshop with our top instructor.</p>
+            <div class="meta"><span>1 day · $129</span><a href="#" class="text-moss">Add →</a></div>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="font-family:var(--fl-font-serif);font-size:20px;font-weight:600;margin:32px 0 16px;">Completed</h3>
+      <div class="card">
+        <div class="lesson-item">
+          <div class="when"><b>T</b><span>2024</span></div>
+          <div>
+            <h4>State theory exam prep</h4>
+            <div class="meta">
+              <span>30 hours · Group session</span>
+              <span>Completed 12 Dec 2024</span>
+            </div>
+          </div>
+          <span class="badge badge--success"><span class="dot"></span>Passed · 92/100</span>
+          <button class="btn btn--ghost btn--sm">Certificate
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         PANE: SCHEDULE
+         ========================================================= -->
+    <section class="pane" id="pane-schedule">
+      <div class="row-between mb-8">
+        <div>
+          <h2 style="font-family:var(--fl-font-display);font-size:32px;letter-spacing:-0.02em;margin:0 0 6px;">Lesson schedule</h2>
+          <p class="muted" style="margin:0;">Week of 12 — 18 May, 2026. Drag lessons or hit a free slot to book.</p>
+        </div>
+        <div class="gap-2">
+          <div class="tabs">
+            <button class="active">Week</button>
+            <button>Month</button>
+            <button>List</button>
+          </div>
+          <button class="btn btn--secondary btn--sm">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <button class="btn btn--secondary btn--sm">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+          <button class="btn btn--primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Book lesson
+          </button>
+        </div>
+      </div>
+
+      <div class="week-grid mb-8">
+        <div class="hd">
+          <div class="cell head"></div>
+          <div class="cell head">Mon 12</div>
+          <div class="cell head">Tue 13</div>
+          <div class="cell head">Wed 14</div>
+          <div class="cell head">Thu 15</div>
+          <div class="cell head">Fri 16</div>
+          <div class="cell head">Sat 17</div>
+          <div class="cell head">Sun 18</div>
+        </div>
+        <!-- 8 AM -->
+        <div class="row">
+          <div class="cell time">08:00</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+          <div class="cell has-lesson"><div class="lesson moss"><b>09:00 Highway</b><div class="who">R. Massey</div></div></div>
+          <div class="cell"></div>
+        </div>
+        <div class="row">
+          <div class="cell time">10:00</div>
+          <div class="cell"></div>
+          <div class="cell has-lesson"><div class="lesson"><b>10:30 Theory</b><div class="who">Group</div></div></div>
+          <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+        </div>
+        <div class="row">
+          <div class="cell time">12:00</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+        </div>
+        <div class="row">
+          <div class="cell time">14:00</div>
+          <div class="cell"></div><div class="cell"></div>
+          <div class="cell has-lesson"><div class="lesson"><b>14:00 Junctions</b><div class="who">R. Massey</div></div></div>
+          <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+        </div>
+        <div class="row">
+          <div class="cell time">16:00</div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+          <div class="cell has-lesson"><div class="lesson outline"><b>16:30 Manoeuvres</b><div class="who">Available</div></div></div>
+          <div class="cell"></div><div class="cell"></div>
+        </div>
+        <div class="row">
+          <div class="cell time">18:00</div><div class="cell"></div>
+          <div class="cell has-lesson"><div class="lesson"><b>18:30 Signs review</b><div class="who">Group</div></div></div>
+          <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+        </div>
+      </div>
+
+      <div class="grid-12">
+
+        <div class="card">
+          <div class="card__head">
+            <h3>Quick book</h3>
+            <span class="meta">Cat. B</span>
+          </div>
+          <div class="col" style="gap:18px;">
+            <div class="field"><label>Lesson type</label>
+              <select class="select">
+                <option>Practical — junctions & city</option>
+                <option>Practical — highway</option>
+                <option>Practical — manoeuvres & parking</option>
+                <option>Practical — night driving</option>
+                <option>Theory — group</option>
+                <option>Mock exam (internal)</option>
+              </select>
+            </div>
+            <div class="grid-2">
+              <div class="field"><label>Date</label><input class="input" type="date" value="2026-05-20"></div>
+              <div class="field"><label>Time</label>
+                <select class="select"><option>09:00</option><option>11:00</option><option selected>14:00</option><option>16:00</option><option>18:00</option></select>
+              </div>
+            </div>
+            <div class="field"><label>Pickup location</label><input class="input" type="text" value="Astor Place, NYC"></div>
+            <div class="field"><label>Instructor</label>
+              <select class="select"><option selected>Rogan Massey (primary)</option><option>Any available</option><option>Elleanor Armstrong</option><option>Shayla Mathews</option></select>
+            </div>
+            <button class="btn btn--primary btn--block">Confirm booking — $0
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </button>
+            <p class="muted" style="font-size:13px;margin:0;">Lesson hours are included in your course balance. Extra hours bill at $20/hr.</p>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card">
+            <div class="card__head">
+              <h3>Lesson preferences</h3>
+              <span class="meta">Auto-fill on quick book</span>
+            </div>
+            <div class="field mb-4">
+              <label>Preferred days</label>
+              <div class="pref-grid">
+                <div class="pref-cell">Mon</div>
+                <div class="pref-cell on">Tue</div>
+                <div class="pref-cell">Wed</div>
+                <div class="pref-cell on">Thu</div>
+                <div class="pref-cell">Fri</div>
+                <div class="pref-cell on">Sat</div>
+                <div class="pref-cell">Sun</div>
+              </div>
+            </div>
+            <div class="grid-2 mb-4">
+              <div class="field"><label>Earliest start</label><input class="input" type="time" value="09:00"></div>
+              <div class="field"><label>Latest start</label><input class="input" type="time" value="18:00"></div>
+            </div>
+            <div class="field">
+              <label>Pickup point</label>
+              <input class="input" type="text" value="Astor Place, NYC">
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card__head">
+              <h3>Cancellation policy</h3>
+              <span class="badge badge--info">Heads up</span>
+            </div>
+            <p style="font-family:var(--fl-font-serif);font-size:15px;line-height:1.5;margin:0;color:var(--fl-fg-muted);">Reschedule up to <b style="color:var(--fl-fg);">12 hours before</b> the lesson without a fee. Inside that window, half the lesson rate is charged ($10/hr).</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =========================================================
+         PANE: PAYMENTS
+         ========================================================= -->
+    <section class="pane" id="pane-payments">
+      <div class="row-between mb-8">
+        <div>
+          <h2 style="font-family:var(--fl-font-display);font-size:32px;letter-spacing:-0.02em;margin:0 0 6px;">Payments</h2>
+          <p class="muted" style="margin:0;">Balance, schedule, receipts. Tax invoices auto-emailed.</p>
+        </div>
+        <button class="btn btn--primary">Pay $199 — June instalment</button>
+      </div>
+
+      <div class="pay-summary mb-8">
+        <div class="balance">
+          <span class="lbl">Outstanding balance</span>
+          <div class="amount">$199<span style="font-size:24px;color:var(--fl-ink-300);letter-spacing:0;"> / $399</span></div>
+          <div class="meta">Cat. B · Cohort 24 · 3 of 4 instalments paid</div>
+          <div class="meter"><span style="width:50%;"></span></div>
+          <div class="legend">
+            <div><b>$200</b><span>Paid to date</span></div>
+            <div><b>$199</b><span>Remaining</span></div>
+            <div><b>3 Jun</b><span>Next due</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card__head"><h3>Payment plan</h3><span class="badge badge--moss">4 instalments</span></div>
+          <div class="col" style="gap:10px;font-size:14px;">
+            <div class="row-between" style="padding:6px 0;border-bottom:1px solid var(--fl-line-soft);"><span>1. Enrolment fee</span><span><b>$100</b> · <span class="text-moss">Paid 5 May</span></span></div>
+            <div class="row-between" style="padding:6px 0;border-bottom:1px solid var(--fl-line-soft);"><span>2. Week 2 instalment</span><span><b>$100</b> · <span class="text-moss">Paid 19 May</span></span></div>
+            <div class="row-between" style="padding:6px 0;border-bottom:1px solid var(--fl-line-soft);"><span>3. Week 4 instalment</span><span><b>$100</b> · <span class="muted">Due 3 Jun</span></span></div>
+            <div class="row-between" style="padding:6px 0;"><span>4. Final instalment</span><span><b>$99</b> · <span class="muted">Due 17 Jun</span></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-12 mb-8">
+        <div class="card">
+          <div class="card__head">
+            <h3>Transactions</h3>
+            <div class="gap-2">
+              <select class="select" style="width:auto;padding:7px 12px;font-size:13px;"><option>All time</option><option>This month</option><option>2026</option></select>
+              <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+            </div>
+          </div>
+          <div class="tbl-wrap" style="border:none;">
+            <table class="tbl">
+              <thead><tr><th>Date</th><th>Description</th><th>Method</th><th>Status</th><th style="text-align:right;">Amount</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><b>19 May</b><br><span class="muted mono" style="font-size:11px;">TX-08841</span></td>
+                  <td>Week 2 instalment — Cat. B</td>
+                  <td><span class="mono" style="font-size:12px;">VISA ···2412</span></td>
+                  <td><span class="badge badge--success"><span class="dot"></span>Paid</span></td>
+                  <td style="text-align:right;"><b>$100.00</b></td>
+                </tr>
+                <tr>
+                  <td><b>05 May</b><br><span class="muted mono" style="font-size:11px;">TX-08213</span></td>
+                  <td>Enrolment fee — Cat. B</td>
+                  <td><span class="mono" style="font-size:12px;">VISA ···2412</span></td>
+                  <td><span class="badge badge--success"><span class="dot"></span>Paid</span></td>
+                  <td style="text-align:right;"><b>$100.00</b></td>
+                </tr>
+                <tr>
+                  <td><b>03 Jun</b><br><span class="muted mono" style="font-size:11px;">Pending</span></td>
+                  <td>Week 4 instalment — Cat. B</td>
+                  <td><span class="mono" style="font-size:12px;">Auto · VISA ···2412</span></td>
+                  <td><span class="badge badge--warn"><span class="dot"></span>Upcoming</span></td>
+                  <td style="text-align:right;"><b>$100.00</b></td>
+                </tr>
+                <tr>
+                  <td><b>11 Dec '24</b><br><span class="muted mono" style="font-size:11px;">TX-06104</span></td>
+                  <td>Theory exam prep — full</td>
+                  <td><span class="mono" style="font-size:12px;">MC ···9908</span></td>
+                  <td><span class="badge badge--success"><span class="dot"></span>Paid</span></td>
+                  <td style="text-align:right;"><b>$149.00</b></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card">
+            <div class="card__head"><h3>Payment methods</h3><button class="btn btn--ghost btn--sm">+ Add</button></div>
+            <div class="pm-list">
+              <div class="pm">
+                <span class="brand-ic visa">VISA</span>
+                <div><div class="num">···· ···· ···· 2412</div><div class="exp">Expires 09/28 · Primary</div></div>
+                <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>
+              </div>
+              <div class="pm">
+                <span class="brand-ic mc">MC</span>
+                <div><div class="num">···· ···· ···· 9908</div><div class="exp">Expires 03/27</div></div>
+                <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card card--ink">
+            <span class="eyebrow" style="color:var(--fl-moss-400);">Save 5% with full payment</span>
+            <h3 style="font-family:var(--fl-font-display);font-size:24px;letter-spacing:-0.02em;color:var(--fl-paper);margin:8px 0 12px;">Settle the balance early</h3>
+            <p style="font-family:var(--fl-font-serif);font-size:14px;color:var(--fl-ink-200);line-height:1.5;margin:0 0 14px;">Pay the remaining $199 today and we'll knock $10 off your final instalment.</p>
+            <button class="btn btn--primary btn--block">Pay $189 now</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         PANE: FEEDBACK
+         ========================================================= -->
+    <section class="pane" id="pane-feedback">
+      <div class="row-between mb-8">
+        <div>
+          <h2 style="font-family:var(--fl-font-display);font-size:32px;letter-spacing:-0.02em;margin:0 0 6px;">Feedback</h2>
+          <p class="muted" style="margin:0;">Rate the lessons you've taken. Your instructor sees their score within an hour.</p>
+        </div>
+        <a href="feedback.html" target="_blank" class="btn btn--secondary">View public wall →</a>
+      </div>
+
+      <div class="grid-12 mb-8">
+        <div class="card">
+          <div class="card__head"><h3>Recent lessons — please rate</h3><span class="badge badge--warn">3 pending</span></div>
+
+          <div class="lesson-item" style="padding:18px 0;border-bottom:1px solid var(--fl-line-soft);">
+            <div class="when"><b>12</b><span>May</span></div>
+            <div>
+              <h4>Highway practice — beginner</h4>
+              <div class="meta"><span>Rogan Massey</span><span>09:00 — 11:30</span></div>
+            </div>
+            <div class="star-input" data-stars>
+              <svg viewBox="0 0 24 24" class="on"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+              <svg viewBox="0 0 24 24" class="on"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+              <svg viewBox="0 0 24 24" class="on"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+              <svg viewBox="0 0 24 24" class="on"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+              <svg viewBox="0 0 24 24" class="on"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+            </div>
+            <button class="btn btn--ink btn--sm">Submit</button>
+          </div>
+
+          <div class="lesson-item" style="padding:18px 0;border-bottom:1px solid var(--fl-line-soft);">
+            <div class="when"><b>10</b><span>May</span></div>
+            <div>
+              <h4>Junctions & city driving</h4>
+              <div class="meta"><span>Rogan Massey</span><span>14:00 — 16:00</span></div>
+            </div>
+            <div class="star-input" data-stars>
+              <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+              <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+              <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+              <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+              <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+            </div>
+            <button class="btn btn--ink btn--sm">Submit</button>
+          </div>
+
+          <div class="lesson-item" style="padding:18px 0;">
+            <div class="when"><b>07</b><span>May</span></div>
+            <div>
+              <h4>Cockpit drill — first day</h4>
+              <div class="meta"><span>Rogan Massey</span><span>10:00 — 11:00</span></div>
+            </div>
+            <div class="star-input" data-stars>
+              <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+              <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+              <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+              <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+              <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+            </div>
+            <button class="btn btn--ink btn--sm">Submit</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__head"><h3>Course review</h3><span class="badge badge--neutral">After week 6</span></div>
+          <p class="muted" style="font-family:var(--fl-font-serif);font-size:15px;line-height:1.5;margin:0 0 18px;">Once you finish the course you'll be invited to leave a public review. It goes onto the wall within 24 hours and your instructor sees their score within an hour.</p>
+          <div class="col" style="gap:14px;">
+            <div class="row-between" style="font-size:14px;"><span>Public name</span><b>Jordan R.</b></div>
+            <div class="row-between" style="font-size:14px;"><span>Course displayed</span><b>Cat. B · Cohort 24</b></div>
+            <div class="row-between" style="font-size:14px;"><span>Photo</span><span class="text-moss">Avatar</span></div>
+          </div>
+          <button class="btn btn--secondary btn--block mt-4" disabled style="opacity:0.5;cursor:not-allowed;">Available 17 Jun</button>
+        </div>
+
+      </div>
+
+      <h3 style="font-family:var(--fl-font-serif);font-size:20px;font-weight:600;margin:24px 0 16px;">Your past ratings</h3>
+      <div class="card">
+        <div class="lesson-item">
+          <span class="stars">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#97B154" stroke="#97B154"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#97B154" stroke="#97B154"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#97B154" stroke="#97B154"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#97B154" stroke="#97B154"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#97B154" stroke="#97B154"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+          </span>
+          <div>
+            <h4>Theory week — signs & rules</h4>
+            <div class="meta"><span>3 May 2026</span><span>Rogan Massey</span></div>
+          </div>
+          <span class="muted" style="font-family:var(--fl-font-serif);font-size:14px;line-height:1.4;max-width:380px;font-style:italic;">"Way more engaging than I expected. Walked out with the handbook half-memorised."</span>
+          <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+        </div>
+        <div class="lesson-item">
+          <span class="stars">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#97B154" stroke="#97B154"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#97B154" stroke="#97B154"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#97B154" stroke="#97B154"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#97B154" stroke="#97B154"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d9d9d6"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+          </span>
+          <div>
+            <h4>Quiet streets — second session</h4>
+            <div class="meta"><span>28 Apr 2026</span><span>Rogan Massey</span></div>
+          </div>
+          <span class="muted" style="font-family:var(--fl-font-serif);font-size:14px;line-height:1.4;max-width:380px;font-style:italic;">"Quiet enough that I stalled three times without anyone honking. Good first day."</span>
+          <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- =========================================================
+         PANE: PROFILE
+         ========================================================= -->
+    <section class="pane" id="pane-profile">
+      <div class="profile-head mb-8">
+        <span class="avatar-circle xl">JR</span>
+        <div>
+          <span class="eyebrow">C24-0042</span>
+          <h2>Jordan Reeves</h2>
+          <div class="meta">
+            <span>Cat. B · Cohort 24</span><span class="dot"></span>
+            <span>Joined 5 May 2026</span><span class="dot"></span>
+            <span>NY licence: pending</span>
+          </div>
+        </div>
+        <div class="col" style="align-items:flex-end;gap:8px;">
+          <button class="btn btn--primary">Save changes</button>
+          <button class="btn btn--ghost btn--sm">Replace photo</button>
+        </div>
+      </div>
+
+      <div class="grid-12 mb-8">
+
+        <div class="card">
+          <div class="card__head"><h3>Personal details</h3><span class="meta">Visible to your instructor only</span></div>
+          <div class="grid-2" style="gap:18px;">
+            <div class="field"><label>First name</label><input class="input" value="Jordan"></div>
+            <div class="field"><label>Last name</label><input class="input" value="Reeves"></div>
+            <div class="field"><label>Date of birth</label><input class="input" type="date" value="2003-11-04"></div>
+            <div class="field"><label>Gender (optional)</label><select class="select"><option>Prefer not to say</option><option>Female</option><option>Male</option><option>Non-binary</option></select></div>
+            <div class="field"><label>Email</label><input class="input" type="email" value="jordan.r@email.com"></div>
+            <div class="field"><label>Phone</label><input class="input" type="tel" value="+1 (555) 010 2466"></div>
+            <div class="field"><label>Address</label><input class="input" value="412 W 14th St, NY"></div>
+            <div class="field"><label>Emergency contact</label><input class="input" value="Maya Reeves · +1 555 010 9882"></div>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card">
+            <div class="card__head"><h3>Driving record</h3><span class="meta">Self-declared</span></div>
+            <div class="col" style="gap:14px;font-size:14px;">
+              <div class="row-between"><span class="muted">Existing licence</span><b>None</b></div>
+              <div class="row-between"><span class="muted">Permit number</span><b class="mono" style="font-size:13px;">LP-244-118-022</b></div>
+              <div class="row-between"><span class="muted">Permit issued</span><b>2 May 2026</b></div>
+              <div class="row-between"><span class="muted">Permit expires</span><b>2 May 2028</b></div>
+              <div class="row-between"><span class="muted">Vision check</span><b class="text-moss">Passed · 5 May</b></div>
+              <div class="row-between"><span class="muted">Medical clearance</span><b class="text-moss">Cleared · 5 May</b></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card__head"><h3>Notifications</h3></div>
+            <div class="col" style="gap:14px;">
+              <label class="row-between" style="font-size:14px;"><span>Lesson reminders (24h before)</span><input type="checkbox" checked></label>
+              <label class="row-between" style="font-size:14px;"><span>Payment reminders</span><input type="checkbox" checked></label>
+              <label class="row-between" style="font-size:14px;"><span>Instructor messages</span><input type="checkbox" checked></label>
+              <label class="row-between" style="font-size:14px;"><span>Cohort newsletter</span><input type="checkbox"></label>
+              <label class="row-between" style="font-size:14px;"><span>Marketing emails</span><input type="checkbox"></label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="card">
+        <div class="card__head"><h3>Account</h3></div>
+        <div class="grid-3" style="gap:18px;">
+          <button class="btn btn--secondary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Change password
+          </button>
+          <button class="btn btn--secondary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download my data
+          </button>
+          <button class="btn btn--danger">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+            Close account
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // pane switching
+  const paneTitles = {
+    overview: { crumbs: 'Cohort 24 · Cat. B', title: 'Welcome back, Jordan.' },
+    courses: { crumbs: 'My enrolment', title: 'Your courses' },
+    schedule: { crumbs: 'May 2026 · Cat. B', title: 'Lesson schedule' },
+    payments: { crumbs: 'Billing & invoices', title: 'Payments & balance' },
+    feedback: { crumbs: 'Lesson ratings', title: 'Feedback' },
+    profile: { crumbs: 'Account & settings', title: 'Your profile' }
+  };
+  function switchPane(name) {
+    document.querySelectorAll('.dash__nav a[data-pane], .pane-jump').forEach(a => a.classList.toggle('active', a.dataset.pane === name));
+    document.querySelectorAll('.pane').forEach(p => p.classList.toggle('active', p.id === 'pane-' + name));
+    const t = paneTitles[name];
+    if (t) {
+      document.querySelector('.dash__bar .crumbs').textContent = t.crumbs;
+      document.getElementById('pageTitle').textContent = t.title;
+    }
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+  document.querySelectorAll('[data-pane]').forEach(a => {
+    a.addEventListener('click', e => { e.preventDefault(); switchPane(a.dataset.pane); });
+  });
+
+  // star input
+  document.querySelectorAll('[data-stars]').forEach(group => {
+    const stars = group.querySelectorAll('svg');
+    stars.forEach((s, i) => s.addEventListener('click', () => {
+      stars.forEach((x, j) => {
+        const on = j <= i;
+        x.classList.toggle('on', on);
+        x.setAttribute('fill', on ? '#97B154' : '#d9d9d6');
+        x.setAttribute('stroke', on ? '#97B154' : '#d9d9d6');
+      });
+    }));
+  });
+</script>
+<script>
+  (function(){
+    const t = localStorage.getItem('fl-theme') || 'light';
+    document.documentElement.dataset.theme = t;
+    if(t==='dark'){
+      document.getElementById('dashMoon').style.display='none';
+      document.getElementById('dashSun').style.display='block';
+    }
+  })();
+  function toggleThemeNav(){
+    const html = document.documentElement;
+    const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
+    html.dataset.theme = next;
+    localStorage.setItem('fl-theme', next);
+    document.getElementById('dashMoon').style.display = next==='dark'?'none':'block';
+    document.getElementById('dashSun').style.display  = next==='dark'?'block':'none';
+  }
+  document.addEventListener('keydown', e => { if(e.altKey && e.key==='d') toggleThemeNav(); });
+</script>
+</body>
+</html>

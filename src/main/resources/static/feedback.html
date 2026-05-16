@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Feedback — FastLane Academy</title>
+  <link rel="stylesheet" href="styles/app.css">
+  <style>
+    .ph {
+      padding: 152px 0 64px;
+      background: var(--fl-paper);
+    }
+    .ph .grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 56px; align-items: end; }
+    @media (max-width: 980px) { .ph .grid { grid-template-columns: 1fr; } }
+    .ph h1 { font-family: var(--fl-font-display); font-size: clamp(48px, 6vw, 88px); letter-spacing: -0.025em; line-height: 1.04; margin: 16px 0 16px; max-width: 14ch; }
+    .ph h1 em { font-style: normal; color: var(--fl-moss-700); }
+    .ph .lede { font-family: var(--fl-font-serif); font-size: 20px; color: var(--fl-fg-muted); max-width: 540px; margin: 0; line-height: 1.45; }
+    .rating-card {
+      background: var(--fl-ink-900); color: var(--fl-paper);
+      border-radius: var(--fl-r-xl);
+      padding: 32px;
+      display: flex; flex-direction: column; gap: 18px;
+    }
+    .rating-card .big {
+      font-family: var(--fl-font-display);
+      font-size: 96px; line-height: 1; letter-spacing: -0.04em;
+    }
+    .rating-card .big small { font-family: var(--fl-font-mono); font-size: 14px; letter-spacing: 0.08em; color: var(--fl-ink-300); margin-left: 4px; }
+    .rating-card .bars { display: flex; flex-direction: column; gap: 8px; font-family: var(--fl-font-mono); font-size: 11px; color: var(--fl-ink-300); letter-spacing: 0.08em; }
+    .rating-card .bar { display: grid; grid-template-columns: 30px 1fr 30px; gap: 12px; align-items: center; }
+    .rating-card .track {
+      height: 6px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden;
+    }
+    .rating-card .track > span { display: block; height: 100%; background: var(--fl-moss-500); border-radius: 999px; }
+
+    .stats-band { background: var(--fl-ink-50); padding: 48px 0; border-top: 1px solid var(--fl-line-soft); border-bottom: 1px solid var(--fl-line-soft); }
+    .stats-band .row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
+    @media (max-width: 820px) { .stats-band .row { grid-template-columns: repeat(2, 1fr); } }
+    .stats-band .s b { font-family: var(--fl-font-display); font-size: 44px; line-height: 1.1; letter-spacing: -0.02em; display: block; }
+    .stats-band .s span { font-family: var(--fl-font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fl-fg-muted); }
+
+    /* feedback wall */
+    .wall { padding: 80px 0; }
+    .wall__bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 32px; }
+    .wall__bar .chip {
+      font-size: 13px; padding: 8px 14px; border-radius: 999px;
+      border: 1px solid var(--fl-line); background: var(--fl-paper); cursor: pointer;
+      transition: all 220ms var(--fl-ease);
+    }
+    .wall__bar .chip.active { background: var(--fl-ink-900); color: var(--fl-paper); border-color: var(--fl-ink-900); }
+    .wall__bar .right { margin-left: auto; display: flex; gap: 10px; }
+
+    .masonry {
+      column-count: 3;
+      column-gap: 20px;
+    }
+    @media (max-width: 980px) { .masonry { column-count: 2; } }
+    @media (max-width: 640px) { .masonry { column-count: 1; } }
+    .review {
+      break-inside: avoid;
+      background: var(--fl-paper);
+      border: 1px solid var(--fl-line-soft);
+      border-radius: var(--fl-r-lg);
+      padding: 24px;
+      margin: 0 0 20px;
+      box-shadow: var(--fl-shadow-xs);
+      display: flex; flex-direction: column; gap: 14px;
+      transition: all var(--fl-dur-base) var(--fl-ease);
+    }
+    .review:hover { transform: translateY(-2px); box-shadow: var(--fl-shadow-md); }
+    .review.featured { background: var(--fl-ink-900); color: var(--fl-paper); border-color: transparent; }
+    .review.featured .meta { color: var(--fl-ink-300); }
+    .review.featured .who b { color: var(--fl-paper); }
+    .review.featured .who span { color: var(--fl-ink-300); }
+    .review.featured .body { color: var(--fl-paper); }
+    .review.moss { background: var(--fl-moss-100); border-color: transparent; }
+    .review .row-between { width: 100%; }
+    .review .who { display: flex; gap: 12px; align-items: center; }
+    .review .who b { font-size: 14px; display: block; font-weight: 600; }
+    .review .who span { font-family: var(--fl-font-mono); font-size: 11px; color: var(--fl-fg-muted); letter-spacing: 0.06em; text-transform: uppercase; }
+    .review .body { font-family: var(--fl-font-serif); font-size: 16px; line-height: 1.5; margin: 0; }
+    .review .meta { font-family: var(--fl-font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fl-fg-muted); display: flex; gap: 12px; align-items: center; padding-top: 12px; border-top: 1px solid var(--fl-line-soft); }
+    .review.featured .meta { border-top-color: rgba(255,255,255,0.08); }
+    .review .meta .dot { width: 4px; height: 4px; border-radius: 50%; background: currentColor; display: inline-block; }
+    .review .vid {
+      aspect-ratio: 16/10;
+      border-radius: 14px;
+      background:
+        radial-gradient(60% 50% at 30% 30%, rgba(151,177,84,0.3), transparent 60%),
+        linear-gradient(135deg, var(--fl-ink-800), var(--fl-ink-900));
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .review .vid .play {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--fl-glass-bg);
+      backdrop-filter: var(--fl-glass-blur);
+      -webkit-backdrop-filter: var(--fl-glass-blur);
+      border: 1px solid rgba(255,255,255,0.25);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--fl-paper);
+    }
+
+    /* submit form */
+    .submit-band {
+      background:
+        radial-gradient(80% 60% at 80% 20%, rgba(151,177,84,0.15), transparent 60%),
+        var(--fl-ink-900);
+      color: var(--fl-paper);
+      padding: 80px 0;
+    }
+    .submit-band .wrap { display: grid; grid-template-columns: 1fr 1.4fr; gap: 56px; }
+    @media (max-width: 980px) { .submit-band .wrap { grid-template-columns: 1fr; } }
+    .submit-band h2 { font-family: var(--fl-font-display); font-size: clamp(36px, 4vw, 56px); letter-spacing: -0.02em; line-height: 1.1; margin: 14px 0 16px; }
+    .submit-band p { font-family: var(--fl-font-serif); color: var(--fl-ink-200); font-size: 17px; line-height: 1.5; margin: 0; max-width: 380px; }
+    .submit-band .lbl { font-family: var(--fl-font-mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--fl-moss-400); }
+    .submit-form {
+      background: var(--fl-paper);
+      color: var(--fl-fg);
+      border-radius: var(--fl-r-xl);
+      padding: 36px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+    }
+    .submit-form .full { grid-column: span 2; }
+    @media (max-width: 720px) { .submit-form { grid-template-columns: 1fr; } .submit-form .full { grid-column: auto; } }
+    .rating-input { display: flex; gap: 6px; align-items: center; padding: 4px 0; }
+    .rating-input button {
+      background: transparent; border: none; cursor: pointer;
+      color: var(--fl-ink-200);
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .rating-input button.on { color: var(--fl-moss-600); }
+    .rating-input button svg { width: 28px; height: 28px; fill: currentColor; }
+  </style>
+</head>
+
+<script src="js/api.js"></script>
+
+<body class="fl-body">
+
+  <!-- ================= TOP NAV ================= -->
+  <div class="app-topnav-wrap">
+    <nav class="app-topnav">
+      <a href="index.html" class="brand">
+        <span class="bolt">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+        </span>
+        FastLane Academy
+        <span class="sub">Driving school</span>
+      </a>
+      <div class="links">
+        <a href="index.html">Home</a>
+        <a href="courses.html">Courses</a>
+        <a href="index.html#instructors">Instructors</a>
+        <a href="feedback.html" class="active">Feedback</a>
+        <a href="index.html#contact">Contact</a>
+      </div>
+      <div class="right">
+        <a href="student.html" class="btn btn--ghost btn--sm">Sign in</a>
+        <a href="#submit" class="btn btn--primary btn--sm">Leave feedback</a>
+      </div>
+    </nav>
+  </div>
+
+  <main>
+
+    <!-- ================= PAGE HEADER ================= -->
+    <section class="ph">
+      <div class="container">
+        <div class="grid">
+          <div>
+            <span class="eyebrow">Feedback wall · Updated daily</span>
+            <h1>The opinions of <em>our students</em> confirm our work.</h1>
+            <p class="lede">Every review on this wall comes from a verified FastLane student who finished a full course in the last twelve months. We don't filter — we just publish.</p>
+          </div>
+          <div class="rating-card">
+            <div class="row-between">
+              <span class="eyebrow" style="color:var(--fl-moss-400);">Overall rating</span>
+              <span class="stars">
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+              </span>
+            </div>
+            <div class="big">4.9<small>/ 5</small></div>
+            <p class="muted" style="font-family:var(--fl-font-serif);font-size:15px;line-height:1.45;color:var(--fl-ink-200);margin:0;">From 1,284 verified reviews across all cohorts since 2018.</p>
+            <div class="bars">
+              <div class="bar"><span>5★</span><div class="track"><span style="width:84%;"></span></div><span>84%</span></div>
+              <div class="bar"><span>4★</span><div class="track"><span style="width:11%;"></span></div><span>11%</span></div>
+              <div class="bar"><span>3★</span><div class="track"><span style="width:3%;"></span></div><span>3%</span></div>
+              <div class="bar"><span>2★</span><div class="track"><span style="width:1%;"></span></div><span>1%</span></div>
+              <div class="bar"><span>1★</span><div class="track"><span style="width:1%;"></span></div><span>1%</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= STATS BAND ================= -->
+    <section class="stats-band">
+      <div class="container">
+        <div class="row">
+          <div class="s"><b>1,284</b><span>Verified reviews</span></div>
+          <div class="s"><b>96%</b><span>Would recommend us</span></div>
+          <div class="s"><b>92</b><span>Reviews this month</span></div>
+          <div class="s"><b>< 2h</b><span>Response time on issues</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= FEEDBACK WALL ================= -->
+    <section class="wall">
+      <div class="container">
+
+        <div class="wall__bar">
+          <button class="chip active">All reviews</button>
+          <button class="chip">Cat. B</button>
+          <button class="chip">Cat. C</button>
+          <button class="chip">Cat. C+E</button>
+          <button class="chip">Refresher</button>
+          <button class="chip">Featured</button>
+          <div class="right">
+            <select class="select" style="max-width:200px;font-size:14px;padding:10px 14px;">
+              <option>Most recent</option>
+              <option>Highest rated</option>
+              <option>Most helpful</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="masonry">
+
+          <article class="review featured">
+            <div class="row-between">
+              <div class="who">
+                <span class="avatar-circle ink">JR</span>
+                <div><b>Jemma Russo</b><span>Cohort 21 · Cat. B</span></div>
+              </div>
+              <span class="stars">
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+              </span>
+            </div>
+            <p class="body">Only with FastLane was I able to pass my dream driving licence. The instructor's calm, the way Elleanor explained every detail, and the cars — they were the real reason I made it through. I've recommended them to four friends already.</p>
+            <div class="meta"><span>14 May 2026</span><span class="dot"></span><span>Featured</span><span class="dot"></span><span>Instructor: Elleanor A.</span></div>
+          </article>
+
+          <article class="review">
+            <div class="row-between">
+              <div class="who">
+                <span class="avatar-circle tone-c">DK</span>
+                <div><b>Devon Khoury</b><span>Cohort 22 · Cat. C</span></div>
+              </div>
+              <span class="stars">
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+              </span>
+            </div>
+            <p class="body">Booked the light truck course on a whim — turned into the most useful eight weeks of my year. Shayla is patient enough to wait through your second attempt at a hill start and direct enough that you only do it twice.</p>
+            <div class="meta"><span>09 May 2026</span><span class="dot"></span><span>Instructor: Shayla M.</span></div>
+          </article>
+
+          <article class="review">
+            <div class="row-between">
+              <div class="who">
+                <span class="avatar-circle">AL</span>
+                <div><b>Alex Liang</b><span>Cohort 23 · Cat. B</span></div>
+              </div>
+              <span class="stars">
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+              </span>
+            </div>
+            <p class="body">First-time pass on the state exam, which I genuinely did not expect. The mock-exam week is the real value — by the time I sat the actual one, the format was muscle memory.</p>
+            <div class="meta"><span>06 May 2026</span><span class="dot"></span><span>Instructor: Rogan M.</span></div>
+          </article>
+
+          <article class="review moss">
+            <div class="row-between">
+              <div class="who">
+                <span class="avatar-circle tone-e">PT</span>
+                <div><b>Priya Tandon</b><span>Refresher · 2025</span></div>
+              </div>
+              <span class="stars">
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+              </span>
+            </div>
+            <p class="body">Hadn't driven in eleven years. Was terrified the first morning. By the third lesson I was on a two-lane highway. The refresher course is short but every minute is teaching.</p>
+            <div class="meta"><span>28 Apr 2026</span><span class="dot"></span><span>Instructor: Rogan M.</span></div>
+          </article>
+
+          <article class="review">
+            <div class="row-between">
+              <div class="who">
+                <span class="avatar-circle tone-b">MN</span>
+                <div><b>Marcus Nguyen</b><span>Cohort 20 · Cat. C+E</span></div>
+              </div>
+              <span class="stars">
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24" class="muted"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+              </span>
+            </div>
+            <p class="body">Heavy combination is no joke and FastLane treats it that way. Off-road yard was excellent. Lost one star only because rescheduling around weather meant the course ran nine weeks for me, not eight.</p>
+            <div class="meta"><span>22 Apr 2026</span><span class="dot"></span><span>Instructor: Shayla M.</span></div>
+          </article>
+
+          <article class="review">
+            <div>
+              <div class="vid">
+                <span class="play"><svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><polygon points="6 4 20 12 6 20"/></svg></span>
+              </div>
+            </div>
+            <div class="row-between">
+              <div class="who">
+                <span class="avatar-circle tone-d">SO</span>
+                <div><b>Sarah O'Connell</b><span>Cohort 22 · Cat. B · Video</span></div>
+              </div>
+              <span class="stars">
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+              </span>
+            </div>
+            <p class="body">"Six weeks ago I'd never driven. I just renewed my insurance as a fully-licensed driver. Watch the full story above."</p>
+            <div class="meta"><span>18 Apr 2026</span><span class="dot"></span><span>2:14</span></div>
+          </article>
+
+          <article class="review">
+            <div class="row-between">
+              <div class="who">
+                <span class="avatar-circle">EH</span>
+                <div><b>Erin Halpern</b><span>Cohort 23 · Cat. B</span></div>
+              </div>
+              <span class="stars">
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+              </span>
+            </div>
+            <p class="body">Booking system is genuinely good. Reschedule a lesson at 6am, get a confirmation back from your instructor before 7am. That part alone is worth the money.</p>
+            <div class="meta"><span>11 Apr 2026</span><span class="dot"></span><span>Instructor: Elleanor A.</span></div>
+          </article>
+
+          <article class="review">
+            <div class="row-between">
+              <div class="who">
+                <span class="avatar-circle tone-c">RJ</span>
+                <div><b>Rina Joffe</b><span>Cohort 21 · Cat. B</span></div>
+              </div>
+              <span class="stars">
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+              </span>
+            </div>
+            <p class="body">My anxiety made me put this off for years. Rogan was matter-of-fact about it on day one and the rest of the cohort never knew. That's the highest compliment I can give.</p>
+            <div class="meta"><span>04 Apr 2026</span><span class="dot"></span><span>Instructor: Rogan M.</span></div>
+          </article>
+
+          <article class="review">
+            <div class="row-between">
+              <div class="who">
+                <span class="avatar-circle tone-d">BS</span>
+                <div><b>Ben Stiles</b><span>Cohort 24 · Theory only</span></div>
+              </div>
+              <span class="stars">
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
+              </span>
+            </div>
+            <p class="body">Took the theory-only track. Honestly worth twice the price — the textbook they gave me had every state exam question I saw in some form.</p>
+            <div class="meta"><span>30 Mar 2026</span></div>
+          </article>
+
+        </div>
+
+        <div style="text-align:center;margin-top:32px;">
+          <button class="btn btn--secondary btn--lg">Load more reviews
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SUBMIT FEEDBACK ================= -->
+    <section class="submit-band" id="submit">
+      <div class="container">
+        <div class="wrap">
+          <div>
+            <span class="lbl">Leave feedback</span>
+            <h2>Tell us how it went.</h2>
+            <p>You'll need your cohort code (we sent it the day you enrolled). The review goes live within 24 hours.</p>
+            <ul style="list-style:none;padding:0;margin:24px 0 0;display:flex;flex-direction:column;gap:10px;color:var(--fl-ink-200);font-family:var(--fl-font-serif);font-size:15px;">
+              <li style="display:flex;gap:10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#97B154" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:4px;"><polyline points="20 6 9 17 4 12"></polyline></svg> We publish every review — five-star or one.</li>
+              <li style="display:flex;gap:10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#97B154" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:4px;"><polyline points="20 6 9 17 4 12"></polyline></svg> Your instructor sees their score within an hour.</li>
+              <li style="display:flex;gap:10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#97B154" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:4px;"><polyline points="20 6 9 17 4 12"></polyline></svg> Three stars or fewer? We'll call you.</li>
+            </ul>
+          </div>
+          <form class="submit-form" onsubmit="event.preventDefault(); this.querySelector('button[type=submit]').textContent='Thanks — we\\'ll publish within 24h.';">
+            <div class="field full">
+              <label>Your overall rating</label>
+              <div class="rating-input" id="ratingInput">
+                <button type="button" class="on"><svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg></button>
+                <button type="button" class="on"><svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg></button>
+                <button type="button" class="on"><svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg></button>
+                <button type="button" class="on"><svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg></button>
+                <button type="button" class="on"><svg viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg></button>
+                <span class="muted" style="margin-left:12px;font-size:14px;" id="ratingLabel">Excellent</span>
+              </div>
+            </div>
+            <div class="field"><label>Full name</label><input class="input" type="text" placeholder="Jordan Reeves"></div>
+            <div class="field"><label>Cohort code</label><input class="input" type="text" placeholder="C24-0042"></div>
+            <div class="field"><label>Course</label>
+              <select class="select">
+                <option>Cat. B — Standard car</option>
+                <option>Cat. C — Light truck</option>
+                <option>Cat. C+E — Heavy combination</option>
+                <option>Refresher</option>
+                <option>Theory only</option>
+              </select>
+            </div>
+            <div class="field"><label>Instructor</label>
+              <select class="select">
+                <option>Rogan Massey</option>
+                <option>Elleanor Armstrong</option>
+                <option>Shayla Mathews</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="field full"><label>Your review</label><textarea class="textarea" placeholder="What was the cohort like? What did your instructor do well? What could we do better?"></textarea></div>
+            <div class="full row-between mt-2">
+              <label style="font-size:13px;color:var(--fl-fg-muted);display:flex;gap:8px;align-items:center;">
+                <input type="checkbox" checked> Publish my first name and cohort with the review.
+              </label>
+              <button class="btn btn--primary" type="submit">Publish review
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="site-foot">
+    <div class="container">
+      <div class="row">
+        <div>
+          <a href="index.html" class="brand">
+            <span class="bolt">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            </span>
+            FastLane Academy
+          </a>
+          <p class="blurb">The truest drive comes from doing what you love. Six-week tracks, real road time, a cohort that ships.</p>
+        </div>
+        <div>
+          <h4>Site</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="courses.html">Courses</a></li>
+            <li><a href="index.html#instructors">Instructors</a></li>
+            <li><a href="feedback.html">Feedback</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Dashboards</h4>
+          <ul>
+            <li><a href="student.html">Student portal</a></li>
+            <li><a href="instructor.html">Instructor portal</a></li>
+            <li><a href="admin.html">Admin console</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Get in touch</h4>
+          <ul>
+            <li><a href="index.html#contact">220 Orchard Street, NY</a></li>
+            <li><a href="tel:+15550102466">+1 (555) 010 2466</a></li>
+            <li><a href="mailto:hello@fastlane.academy">hello@fastlane.academy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="small">
+        <span>© 2026 FastLane Academy — All rights reserved.</span>
+        <span>Driving since 1992</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // chip filter
+    document.querySelectorAll('.wall__bar .chip').forEach(c => c.addEventListener('click', () => {
+      document.querySelectorAll('.wall__bar .chip').forEach(x => x.classList.remove('active'));
+      c.classList.add('active');
+    }));
+    // star input
+    const stars = document.querySelectorAll('#ratingInput button');
+    const labels = ['', 'Disappointing', 'Could be better', 'Solid', 'Great', 'Excellent'];
+    stars.forEach((btn, i) => {
+      btn.addEventListener('click', () => {
+        stars.forEach((b, j) => b.classList.toggle('on', j <= i));
+        document.getElementById('ratingLabel').textContent = labels[i+1];
+      });
+    });
+  </script>
+</body>
+</html>

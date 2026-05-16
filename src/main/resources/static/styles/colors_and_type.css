@@ -1,0 +1,281 @@
+/* ============================================================
+   FastLane Academy — Colors & Type
+   The foundational design tokens. Import this everywhere.
+   ============================================================ */
+
+/* ---------- Font face declarations ---------- */
+@font-face {
+  font-family: "Karibu";
+  src: url("./fonts/karibu-bold.ttf") format("truetype"),
+       url("../styles/fonts/karibu-bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* SF Mono and New York are shipped to users as .dmg installers.
+   We cannot bundle those binaries. For web use we substitute:
+     SF Mono     → JetBrains Mono     (geometric mono, similar x-height)
+     New York    → Source Serif 4     (Apple-NY-adjacent transitional serif)
+   Swap to the real Apple fonts once we have licensed .otf/.ttf files. */
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap");
+
+:root {
+  /* ============================================================
+     COLOR — Brand palette
+     ============================================================ */
+
+  /* Brand */
+  --fl-ink:       #161616;   /* near-black, primary surface in dark mode */
+  --fl-void:      #000000;   /* true black, for type on light & deep backgrounds */
+  --fl-paper:     #FFFFFF;   /* pure white */
+  --fl-moss:      #97B154;   /* signature sage / olive green — the only chromatic note */
+
+  /* Moss scale (derived from #97B154 in oklch space) */
+  --fl-moss-50:   #f3f6e9;
+  --fl-moss-100:  #e3ecca;
+  --fl-moss-200:  #cbd9a0;
+  --fl-moss-300:  #b3c578;
+  --fl-moss-400:  #a3b864;
+  --fl-moss-500:  #97B154;   /* base */
+  --fl-moss-600:  #7f973f;
+  --fl-moss-700:  #647a30;
+  --fl-moss-800:  #4b5c25;
+  --fl-moss-900:  #364219;
+
+  /* Ink scale — neutrals warm-cool balanced */
+  --fl-ink-0:     #FFFFFF;
+  --fl-ink-50:    #f7f7f6;
+  --fl-ink-100:   #ededeb;
+  --fl-ink-200:   #d9d9d6;
+  --fl-ink-300:   #b8b8b3;
+  --fl-ink-400:   #8a8a85;
+  --fl-ink-500:   #5f5f5b;
+  --fl-ink-600:   #3a3a37;
+  --fl-ink-700:   #262624;
+  --fl-ink-800:   #1c1c1b;
+  --fl-ink-900:   #161616;
+  --fl-ink-950:   #000000;
+
+  /* ============================================================
+     SEMANTIC — Light mode (default)
+     ============================================================ */
+  --fl-bg:        var(--fl-paper);
+  --fl-bg-elev:   var(--fl-ink-50);
+  --fl-bg-sunk:   var(--fl-ink-100);
+  --fl-fg:        var(--fl-ink-900);
+  --fl-fg-muted: var(--fl-ink-500);
+  --fl-fg-faint:  var(--fl-ink-400);
+  --fl-line:      var(--fl-ink-200);
+  --fl-line-soft: var(--fl-ink-100);
+  --fl-accent:    var(--fl-moss-600);
+  --fl-accent-fg: var(--fl-paper);
+
+  /* Liquid-glass surfaces (light) */
+  --fl-glass-bg:     rgba(255, 255, 255, 0.55);
+  --fl-glass-stroke: rgba(22, 22, 22, 0.08);
+  --fl-glass-shine:  rgba(255, 255, 255, 0.85);
+  --fl-glass-blur:   blur(24px) saturate(180%);
+
+  /* States */
+  --fl-success:   #5e8c2b;
+  --fl-warn:      #c08a1e;
+  --fl-error:     #b3361f;
+  --fl-info:      #3a6e8f;
+
+  /* ============================================================
+     TYPE — Families
+     ============================================================ */
+  --fl-font-display: "Karibu", "Source Serif 4", Georgia, serif;
+  --fl-font-serif:   "Source Serif 4", "New York", Georgia, "Times New Roman", serif;
+  --fl-font-sans:    "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  --fl-font-mono:    "JetBrains Mono", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+
+  /* Type scale — modular, 1.25 minor-third */
+  --fl-text-xs:   12px;
+  --fl-text-sm:   14px;
+  --fl-text-base: 16px;
+  --fl-text-md:   18px;
+  --fl-text-lg:   20px;
+  --fl-text-xl:   24px;
+  --fl-text-2xl:  32px;
+  --fl-text-3xl:  40px;
+  --fl-text-4xl:  56px;
+  --fl-text-5xl:  72px;
+  --fl-text-6xl:  104px;
+
+  /* Line heights */
+  --fl-lh-tight:  1.16;   /* Karibu display needs room */
+  --fl-lh-snug:   1.22;
+  --fl-lh-normal: 1.45;
+  --fl-lh-loose:  1.62;
+
+  /* Tracking */
+  --fl-tr-tight:  -0.02em;
+  --fl-tr-normal: 0;
+  --fl-tr-wide:   0.04em;
+  --fl-tr-allcap: 0.14em;
+
+  /* ============================================================
+     SPACE — 4px base
+     ============================================================ */
+  --fl-sp-0:  0;
+  --fl-sp-1:  4px;
+  --fl-sp-2:  8px;
+  --fl-sp-3:  12px;
+  --fl-sp-4:  16px;
+  --fl-sp-5:  20px;
+  --fl-sp-6:  24px;
+  --fl-sp-8:  32px;
+  --fl-sp-10: 40px;
+  --fl-sp-12: 48px;
+  --fl-sp-16: 64px;
+  --fl-sp-20: 80px;
+  --fl-sp-24: 96px;
+
+  /* ============================================================
+     RADIUS — generous, rounded but not pill-everywhere
+     ============================================================ */
+  --fl-r-xs:   6px;
+  --fl-r-sm:   10px;
+  --fl-r-md:   14px;
+  --fl-r-lg:   20px;
+  --fl-r-xl:   28px;
+  --fl-r-2xl:  36px;
+  --fl-r-pill: 999px;
+
+  /* ============================================================
+     SHADOW — soft, layered, never harsh
+     ============================================================ */
+  --fl-shadow-xs:  0 1px 2px rgba(22,22,22,0.04);
+  --fl-shadow-sm:  0 2px 6px rgba(22,22,22,0.05), 0 1px 2px rgba(22,22,22,0.04);
+  --fl-shadow-md:  0 6px 18px rgba(22,22,22,0.07), 0 2px 6px rgba(22,22,22,0.04);
+  --fl-shadow-lg:  0 18px 40px rgba(22,22,22,0.10), 0 6px 14px rgba(22,22,22,0.05);
+  --fl-shadow-xl:  0 32px 70px rgba(22,22,22,0.14), 0 10px 24px rgba(22,22,22,0.06);
+  --fl-shadow-glow: 0 0 0 6px rgba(151,177,84,0.18);
+  --fl-shadow-inner: inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -1px 0 rgba(22,22,22,0.04);
+
+  /* ============================================================
+     MOTION
+     ============================================================ */
+  --fl-ease:        cubic-bezier(0.22, 1, 0.36, 1);   /* iOS-style snap */
+  --fl-ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --fl-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --fl-dur-quick:   140ms;
+  --fl-dur-base:    220ms;
+  --fl-dur-slow:    420ms;
+}
+
+/* ============================================================
+   DARK MODE — invert semantics, keep moss anchor
+   ============================================================ */
+:root[data-theme="dark"],
+.fl-dark {
+  --fl-bg:        var(--fl-ink-900);
+  --fl-bg-elev:   var(--fl-ink-800);
+  --fl-bg-sunk:   var(--fl-ink-950);
+  --fl-fg:        var(--fl-paper);
+  --fl-fg-muted:  var(--fl-ink-300);
+  --fl-fg-faint:  var(--fl-ink-400);
+  --fl-line:      rgba(255,255,255,0.10);
+  --fl-line-soft: rgba(255,255,255,0.06);
+  --fl-accent:    var(--fl-moss-400);
+  --fl-accent-fg: var(--fl-ink-900);
+
+  --fl-glass-bg:     rgba(28, 28, 27, 0.55);
+  --fl-glass-stroke: rgba(255, 255, 255, 0.10);
+  --fl-glass-shine:  rgba(255, 255, 255, 0.10);
+
+  --fl-shadow-xs:  0 1px 2px rgba(0,0,0,0.4);
+  --fl-shadow-sm:  0 2px 8px rgba(0,0,0,0.45);
+  --fl-shadow-md:  0 8px 22px rgba(0,0,0,0.5);
+  --fl-shadow-lg:  0 22px 50px rgba(0,0,0,0.55);
+  --fl-shadow-xl:  0 36px 80px rgba(0,0,0,0.6);
+}
+
+/* ============================================================
+   ELEMENT DEFAULTS — apply to plain HTML
+   ============================================================ */
+.fl-root, .fl-body {
+  font-family: var(--fl-font-sans);
+  font-size: var(--fl-text-base);
+  line-height: var(--fl-lh-normal);
+  color: var(--fl-fg);
+  background: var(--fl-bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.fl-h1, h1.fl {
+  font-family: var(--fl-font-display);
+  font-weight: 700;
+  font-size: var(--fl-text-6xl);
+  line-height: 1.16;
+  letter-spacing: var(--fl-tr-tight);
+}
+.fl-h2, h2.fl {
+  font-family: var(--fl-font-display);
+  font-weight: 700;
+  font-size: var(--fl-text-4xl);
+  line-height: 1.16;
+  letter-spacing: var(--fl-tr-tight);
+}
+.fl-h3, h3.fl {
+  font-family: var(--fl-font-serif);
+  font-weight: 600;
+  font-size: var(--fl-text-3xl);
+  line-height: var(--fl-lh-snug);
+  letter-spacing: var(--fl-tr-tight);
+}
+.fl-h4, h4.fl {
+  font-family: var(--fl-font-sans);
+  font-weight: 600;
+  font-size: var(--fl-text-xl);
+  line-height: var(--fl-lh-snug);
+}
+.fl-eyebrow {
+  font-family: var(--fl-font-mono);
+  font-weight: 500;
+  font-size: var(--fl-text-xs);
+  letter-spacing: var(--fl-tr-allcap);
+  text-transform: uppercase;
+  color: var(--fl-fg-muted);
+}
+.fl-lede {
+  font-family: var(--fl-font-serif);
+  font-weight: 400;
+  font-size: var(--fl-text-xl);
+  line-height: var(--fl-lh-snug);
+  color: var(--fl-fg-muted);
+}
+.fl-p, p.fl {
+  font-family: var(--fl-font-sans);
+  font-size: var(--fl-text-base);
+  line-height: var(--fl-lh-normal);
+}
+.fl-small {
+  font-size: var(--fl-text-sm);
+  color: var(--fl-fg-muted);
+}
+.fl-code, code.fl {
+  font-family: var(--fl-font-mono);
+  font-size: 0.92em;
+  background: var(--fl-bg-sunk);
+  border: 1px solid var(--fl-line);
+  border-radius: var(--fl-r-xs);
+  padding: 0.1em 0.4em;
+}
+
+/* ============================================================
+   LIQUID GLASS — utility class
+   ============================================================ */
+.fl-glass {
+  background: var(--fl-glass-bg);
+  -webkit-backdrop-filter: var(--fl-glass-blur);
+  backdrop-filter: var(--fl-glass-blur);
+  border: 1px solid var(--fl-glass-stroke);
+  box-shadow:
+    inset 0 1px 0 var(--fl-glass-shine),
+    var(--fl-shadow-md);
+  border-radius: var(--fl-r-lg);
+}

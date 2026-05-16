@@ -1,0 +1,6 @@
+<svg width="240" height="56" viewBox="0 0 240 56" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="28" cy="28" r="26" fill="#161616"></circle>
+  <path d="M31 12 L17 30 L26 30 L23 44 L38 25 L29 25 Z" fill="#97B154" stroke-linejoin="round"></path>
+  <text x="64" y="36" font-family="Georgia, &#39;Source Serif 4&#39;, serif" font-weight="700" font-size="26" fill="#161616" letter-spacing="-0.5">FastLane</text>
+  <text x="64" y="50" font-family="ui-monospace, &#39;JetBrains Mono&#39;, monospace" font-weight="500" font-size="10" fill="#5f5f5b" letter-spacing="2.4">ACADEMY</text>
+</svg>
