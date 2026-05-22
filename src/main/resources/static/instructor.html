@@ -2,715 +2,1044 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Instructor dashboard — FastLane Academy</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Instructor — FastLane Academy</title>
   <link rel="stylesheet" href="styles/app.css">
   <style>
-    .hero-card {
-      background:
-        radial-gradient(50% 70% at 90% 0%, rgba(151,177,84,0.25), transparent 60%),
-        var(--fl-ink-900);
-      color: var(--fl-paper);
-      border-radius: var(--fl-r-xl);
-      padding: 36px 40px;
-      display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center;
-      position: relative; overflow: hidden;
-    }
-    .hero-card .lbl { font-family: var(--fl-font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fl-moss-400); }
-    .hero-card h2 { font-family: var(--fl-font-display); font-size: 40px; letter-spacing: -0.02em; line-height: 1.1; margin: 12px 0 8px; }
-    .hero-card p { font-family: var(--fl-font-serif); color: var(--fl-ink-200); font-size: 17px; line-height: 1.5; margin: 0; max-width: 500px; }
-    .hero-card .next-block {
-      background: var(--fl-glass-bg);
-      backdrop-filter: var(--fl-glass-blur);
-      -webkit-backdrop-filter: var(--fl-glass-blur);
-      border: 1px solid rgba(255,255,255,0.16);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.18);
-      border-radius: var(--fl-r-lg);
-      padding: 20px 24px;
-      color: var(--fl-paper);
-      min-width: 280px;
-    }
-    .hero-card .next-block .time { font-family: var(--fl-font-display); font-size: 56px; line-height: 1; letter-spacing: -0.02em; margin: 8px 0 4px; }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .hero{background:radial-gradient(50% 70% at 90% 0%,rgba(151,177,84,.25),transparent 60%),var(--fl-ink-900);color:var(--fl-paper);border-radius:var(--fl-r-xl);padding:32px 36px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center;position:relative;overflow:hidden;margin-bottom:24px}
+    .hero .lbl{font-family:var(--fl-font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--fl-moss-400)}
+    .hero h2{font-family:var(--fl-font-display);font-size:32px;letter-spacing:-.02em;line-height:1.1;margin:10px 0 8px}
+    .hero .nxt{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:var(--fl-r-lg);padding:18px 22px;min-width:220px}
+    .hero .nxt .big{font-family:var(--fl-font-display);font-size:44px;line-height:1;letter-spacing:-.02em;margin:6px 0 4px}
+    /* slots grid */
+    .slots-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+    .slot-card{background:var(--fl-paper);border:1.5px solid var(--fl-line-soft);border-radius:var(--fl-r-lg);padding:18px;display:flex;flex-direction:column;gap:12px;transition:box-shadow 180ms}
+    .slot-card:hover{box-shadow:var(--fl-shadow-md)}
+    .slot-card.taken{border-color:var(--fl-moss-400);background:var(--fl-moss-50,#f6f9f0)}
+    .slot-card .dt{font-family:var(--fl-font-display);font-size:26px;letter-spacing:-.01em;line-height:1}
+    .slot-card .info{font-family:var(--fl-font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--fl-fg-muted)}
+    .slot-card .student-chip{display:flex;align-items:center;gap:8px;background:var(--fl-ink-50);border-radius:8px;padding:8px 10px;font-size:13px}
+    /* student rows in lessons pane */
+    .srow{display:grid;grid-template-columns:auto 1fr auto auto;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid var(--fl-line-soft)}
+    .srow:last-child{border-bottom:none}
+    /* modal */
+    .modal-backdrop{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.48);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:24px}
+    .modal-backdrop.open{display:flex}
+    .modal{background:var(--fl-bg);border:1px solid var(--fl-line-soft);border-radius:var(--fl-r-xl);width:100%;max-width:520px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.22);animation:mIn 220ms ease both}
+    @keyframes mIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+    .mhead{display:flex;align-items:center;justify-content:space-between;padding:22px 26px 18px;border-bottom:1px solid var(--fl-line-soft);flex-shrink:0}
+    .mhead h2{font-family:var(--fl-font-display);font-size:21px;letter-spacing:-.015em;margin:0}
+    .mhead .ey{font-family:var(--fl-font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--fl-moss-600);margin-bottom:4px}
+    .mcls{width:30px;height:30px;border-radius:50%;border:1px solid var(--fl-line);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--fl-fg-muted)}
+    .mcls:hover{background:var(--fl-bg-elev)}
+    .mcls svg{width:15px;height:15px;stroke-width:2}
+    .mbody{padding:22px 26px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+    .mfoot{padding:18px 26px;border-top:1px solid var(--fl-line-soft);display:flex;justify-content:flex-end;gap:10px;flex-shrink:0}
+    .mf{display:flex;flex-direction:column;gap:5px}
+    .mf label{font-size:13px;font-weight:600}
+    .mfr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .mal{padding:9px 13px;border-radius:8px;font-size:13px;line-height:1.5;display:none}
+    .mal.err{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;display:block}
+    .mal.ok{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;display:block}
+    .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;gap:10px;color:var(--fl-fg-faint);text-align:center}
+    .empty svg{width:34px;height:34px;stroke:var(--fl-ink-200)}
+    .empty p{font-family:var(--fl-font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin:0}
 
-    .day-strip {
-      display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px;
-      background: var(--fl-paper);
-      border: 1px solid var(--fl-line-soft);
-      border-radius: var(--fl-r-lg);
-      padding: 8px;
-    }
-    .day-strip .d {
-      padding: 14px 8px; text-align: center; border-radius: 10px;
-      cursor: pointer; transition: all 160ms;
-    }
-    .day-strip .d:hover { background: var(--fl-ink-50); }
-    .day-strip .d.active { background: var(--fl-ink-900); color: var(--fl-paper); }
-    .day-strip .d.active .num { color: var(--fl-paper); }
-    .day-strip .d .dow { font-family: var(--fl-font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fl-fg-muted); display: block; }
-    .day-strip .d.active .dow { color: var(--fl-ink-300); }
-    .day-strip .d .num { font-family: var(--fl-font-display); font-size: 28px; letter-spacing: -0.02em; line-height: 1.1; margin-top: 4px; display: block; }
-    .day-strip .d .pill { display: inline-block; margin-top: 6px; padding: 2px 7px; border-radius: 999px; font-family: var(--fl-font-mono); font-size: 9px; letter-spacing: 0.08em; background: var(--fl-moss-100); color: var(--fl-moss-800); }
-    .day-strip .d.active .pill { background: var(--fl-moss-500); color: var(--fl-ink-900); }
-
-    /* timeline view */
-    .timeline {
-      background: var(--fl-paper); border: 1px solid var(--fl-line-soft);
-      border-radius: var(--fl-r-lg); overflow: hidden;
-    }
-    .tl-row {
-      display: grid; grid-template-columns: 88px 1fr;
-      border-bottom: 1px solid var(--fl-line-soft);
-      min-height: 80px;
-    }
-    .tl-row:last-child { border-bottom: none; }
-    .tl-time {
-      padding: 14px 14px;
-      font-family: var(--fl-font-mono); font-size: 11px; letter-spacing: 0.08em;
-      color: var(--fl-fg-muted);
-      background: var(--fl-ink-50);
-      display: flex; align-items: flex-start; justify-content: center;
-    }
-    .tl-slot { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
-    .tl-lesson {
-      background: var(--fl-ink-900); color: var(--fl-paper);
-      border-radius: 12px;
-      padding: 14px 16px;
-      display: grid; grid-template-columns: 1fr auto auto; gap: 16px; align-items: center;
-    }
-    .tl-lesson.moss { background: var(--fl-moss-500); color: var(--fl-ink-900); }
-    .tl-lesson.moss .who span { color: var(--fl-moss-800); }
-    .tl-lesson.outline {
-      background: var(--fl-paper); color: var(--fl-fg);
-      border: 1.5px dashed var(--fl-ink-300);
-    }
-    .tl-lesson .who h4 { font-family: var(--fl-font-serif); font-size: 17px; font-weight: 600; margin: 0 0 2px; line-height: 1.2; }
-    .tl-lesson .who span { font-family: var(--fl-font-mono); font-size: 11px; letter-spacing: 0.06em; color: var(--fl-ink-300); text-transform: uppercase; }
-    .tl-lesson .duration { font-family: var(--fl-font-mono); font-size: 11px; letter-spacing: 0.06em; }
-    .tl-lesson .actions { display: flex; gap: 6px; }
-    .tl-lesson .actions .icon-btn { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.16); color: var(--fl-paper); }
-    .tl-lesson.moss .actions .icon-btn { background: rgba(22,22,22,0.08); border-color: rgba(22,22,22,0.16); color: var(--fl-ink-900); }
-    .tl-lesson.outline .actions .icon-btn { background: transparent; color: var(--fl-fg); border-color: var(--fl-line); }
-    .tl-empty {
-      flex: 1;
-      border: 1.5px dashed var(--fl-ink-200);
-      border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      color: var(--fl-fg-faint);
-      font-family: var(--fl-font-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
-      padding: 18px;
-    }
-
-    /* student list */
-    .student-row { display: grid; grid-template-columns: auto 1fr auto auto; gap: 16px; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--fl-line-soft); }
-    .student-row:last-child { border-bottom: none; }
-    .student-row h4 { font-family: var(--fl-font-serif); font-size: 17px; font-weight: 600; margin: 0; }
-    .student-row .meta { font-family: var(--fl-font-mono); font-size: 11px; letter-spacing: 0.06em; color: var(--fl-fg-muted); }
-    .student-row .progress-mini { width: 100px; }
-
-    /* earnings */
-    .earn {
-      background: var(--fl-moss-500); color: var(--fl-ink-900);
-      border-radius: var(--fl-r-xl);
-      padding: 28px;
-    }
-    .earn .lbl { font-family: var(--fl-font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fl-moss-800); }
-    .earn .amt { font-family: var(--fl-font-display); font-size: 56px; line-height: 1.04; letter-spacing: -0.02em; margin: 8px 0 12px; }
-    .earn .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 18px; padding-top: 18px; border-top: 1px solid rgba(22,22,22,0.16); }
-    .earn .grid b { font-family: var(--fl-font-display); font-size: 20px; letter-spacing: -0.01em; display: block; }
-    .earn .grid span { font-family: var(--fl-font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fl-moss-800); }
-
-    /* profile pieces */
-    .profile-cover {
-      height: 240px;
-      border-top-left-radius: var(--fl-r-xl); border-top-right-radius: var(--fl-r-xl);
-      background:
-        radial-gradient(70% 100% at 80% 20%, var(--fl-moss-500), transparent 60%),
-        linear-gradient(135deg, var(--fl-ink-800), var(--fl-ink-900));
-      position: relative;
-      overflow: hidden;
-    }
-    .profile-cover .roadlines {
-      position: absolute; inset: -20% -10% auto auto;
-      width: 60%; height: 200%;
-      background-image:
-        repeating-linear-gradient(90deg, transparent 0, transparent 70px, rgba(255,255,255,0.1) 70px, rgba(255,255,255,0.1) 100px);
-      transform: rotate(-12deg);
-      mask-image: radial-gradient(ellipse at 50% 50%, #000 30%, transparent 70%);
-    }
-    .profile-card {
-      background: var(--fl-paper);
-      border: 1px solid var(--fl-line-soft);
-      border-radius: var(--fl-r-xl);
-      overflow: hidden;
-    }
-    .profile-row {
-      display: grid; grid-template-columns: auto 1fr auto; gap: 32px; align-items: end;
-      padding: 0 36px 32px;
-      margin-top: -56px;
-      position: relative;
-      z-index: 1;
-    }
-    .profile-row .avatar-circle.xl {
-      width: 128px; height: 128px; font-size: 44px;
-      border: 6px solid var(--fl-paper);
-    }
-    .profile-row h2 { font-family: var(--fl-font-display); font-size: 44px; letter-spacing: -0.02em; line-height: 1.05; margin: 0; }
-    .profile-row .role { font-family: var(--fl-font-mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fl-fg-muted); margin-top: 6px; }
-    .profile-bar {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px;
-      padding: 32px 36px;
-      border-top: 1px solid var(--fl-line-soft);
-    }
-    .profile-bar .s b { font-family: var(--fl-font-display); font-size: 32px; letter-spacing: -0.02em; line-height: 1.1; display: block; }
-    .profile-bar .s span { font-family: var(--fl-font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fl-fg-muted); }
+    .profile-hero-card{background:var(--fl-paper);}
+    .status-info-box{background:var(--fl-ink-50);}
+    [data-theme=dark] .profile-hero-card{background:var(--fl-ink-800);border-color:rgba(255,255,255,.07)!important;}
+    [data-theme=dark] .status-info-box{background:var(--fl-ink-700);color:var(--fl-fg);}
+    [data-theme=dark] .slot-card{background:var(--fl-ink-800);border-color:rgba(255,255,255,.07)}
+    [data-theme=dark] .slot-card.taken{background:rgba(151,177,84,.08);border-color:var(--fl-moss-600)}
+    [data-theme=dark] .slot-card .student-chip{background:var(--fl-ink-700)}
+    [data-theme=dark] .modal{background:var(--fl-ink-800);border-color:rgba(255,255,255,.08)}
+    [data-theme=dark] .mhead,[data-theme=dark] .mfoot{border-color:rgba(255,255,255,.07)}
   </style>
 </head>
-
 <script src="js/api.js"></script>
-
 <body class="fl-body">
-
 <div class="dash">
 
-  <!-- ================== SIDE ================== -->
   <aside class="dash__side">
-    <a href="index.html" class="brand">
-      <span class="bolt">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-      </span>
-      FastLane
-    </a>
-
+    <a href="index.html" class="brand"><span class="bolt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></span>FastLane</a>
     <nav class="dash__nav">
       <div class="group">Instructor</div>
-      <a href="#" data-pane="lessons" class="active">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        Lessons
-        <span class="pill">5</span>
+      <a href="#" data-pane="slots" class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        My lesson slots <span class="pill" id="nav-slots-pill">—</span>
+      </a>
+      <a href="#" data-pane="courses">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        Courses
+      </a>
+      <a href="#" data-pane="students">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        Enrolled students
       </a>
       <a href="#" data-pane="profile">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         Profile
       </a>
-
-      <div class="group" style="margin-top:16px;">Quick links</div>
-      <a href="index.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3l9 9"/><path d="M5 10v10h14V10"/></svg>
-        Visit site
-      </a>
-      <a href="student.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-        Student view
-      </a>
-      <a href="admin.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        Admin console
+      <a href="#" data-pane="reviews">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Reviews <span class="pill" id="nav-reviews-pill">—</span>
       </a>
     </nav>
-
     <div class="dash__profile">
-      <span class="avatar-circle ink">RM</span>
-      <div class="who"><b>Rogan Massey</b><span>Practical · Cat. B, C</span></div>
-      <button class="icon-btn" title="Toggle dark mode" onclick="toggleThemeNav()" style="margin-right:2px;">
-        <svg id="dashMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-        <svg id="dashSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line></svg>
+      <span class="avatar-circle ink" id="inst-av">?</span>
+      <div class="who"><b id="inst-nm">Loading…</b><span id="inst-sub">Instructor</span></div>
+      <button class="icon-btn" title="Dark mode" onclick="toggleThemeNav()" style="margin-right:2px;">
+        <svg id="dashMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg id="dashSun" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/></svg>
       </button>
-      <a href="auth.html" class="icon-btn" title="Sign out">
+      <button class="icon-btn" title="Sign out" onclick="instructorLogout()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      </a>
+      </button>
     </div>
   </aside>
 
-  <!-- ================== MAIN ================== -->
   <main class="dash__main">
-
-    <!-- ===== top bar ===== -->
     <div class="dash__bar">
-      <div>
-        <div class="crumbs" id="crumbs">Thursday 14 May · Cohort 24</div>
-        <h1 id="pageTitle">Good morning, Rogan.</h1>
-      </div>
+      <div><div class="crumbs" id="crumbs">Instructor · Lesson slots</div><h1 id="pageTitle">My lesson slots</h1></div>
       <div class="right">
-        <div class="search" style="width:240px;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input class="input" type="search" placeholder="Find a student or lesson…">
-        </div>
-        <button class="icon-btn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        </button>
-        <button class="btn btn--primary">
+        <button class="btn btn--primary" onclick="openModal('modal-add-slot')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Mark availability
+          Add lesson slot
         </button>
       </div>
     </div>
 
-    <!-- =========================================================
-         PANE: LESSONS
-         ========================================================= -->
-    <section class="pane active" id="pane-lessons">
-
-      <div class="hero-card mb-8">
+    <!-- PANE: SLOTS -->
+    <section class="pane active" id="pane-slots">
+      <div class="hero" id="inst-hero">
         <div>
-          <span class="lbl">Today · Thursday 14 May</span>
-          <h2>Five lessons. One mock exam.</h2>
-          <p>Jordan Reeves is up for her first highway session at 2pm — pickup from Astor Pl, school car #14. The afternoon mock with Sam Park is in the Brooklyn yard.</p>
-          <div class="gap-2 mt-4">
-            <button class="btn btn--primary">Start day</button>
-            <button class="btn" style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.16);color:var(--fl-paper);">Print run sheet
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          <span class="lbl" id="hero-lbl">Loading…</span>
+          <h2 id="hero-name">—</h2>
+          <p style="font-family:var(--fl-font-serif);color:var(--fl-ink-200);font-size:15px;margin:0;" id="hero-desc">—</p>
+          <div style="margin-top:16px;">
+            <button class="btn btn--primary" onclick="openModal('modal-add-slot')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add lesson slot
             </button>
           </div>
         </div>
-        <div class="next-block">
-          <span class="lbl" style="color:var(--fl-moss-400);">Up next · in 38 min</span>
-          <div class="time">14:00</div>
-          <p style="font-family:var(--fl-font-serif);margin:0 0 12px;font-size:15px;color:var(--fl-ink-200);">Junctions & city driving<br><b style="color:var(--fl-paper);">Jordan Reeves</b> — Astor Pl pickup</p>
-          <div class="gap-2">
-            <button class="btn btn--primary btn--sm">Open lesson</button>
-            <button class="btn btn--sm" style="background:transparent;color:var(--fl-paper);border-color:rgba(255,255,255,0.2);">Message</button>
-          </div>
+        <div class="nxt">
+          <span class="lbl" style="color:var(--fl-moss-400);">Today's slots</span>
+          <div class="big" id="hero-today">—</div>
+          <p style="font-family:var(--fl-font-serif);font-size:13px;color:var(--fl-ink-200);margin:0;" id="hero-today-sub">Loading…</p>
         </div>
       </div>
 
-      <!-- stats -->
+
+
       <div class="stat-row">
-        <div class="stat">
-          <div class="lbl">Today</div>
-          <div class="num">5<small style="font-family:var(--fl-font-mono);font-size:14px;color:var(--fl-fg-muted);"> lessons</small></div>
-          <div class="delta">8.5 hours</div>
-        </div>
-        <div class="stat">
-          <div class="lbl">This week</div>
-          <div class="num">28h</div>
-          <div class="delta">+4h vs. last</div>
-        </div>
-        <div class="stat">
-          <div class="lbl">Active students</div>
-          <div class="num">12</div>
-          <div class="delta">2 new this month</div>
-        </div>
-        <div class="stat">
-          <div class="lbl">Avg. rating</div>
-          <div class="num">4.9<small style="font-family:var(--fl-font-mono);font-size:14px;color:var(--fl-fg-muted);">/5</small></div>
-          <div class="delta">From 184 reviews</div>
-        </div>
+        <div class="stat"><div class="lbl">Total slots</div><div class="num" id="st-total">—</div></div>
+        <div class="stat"><div class="lbl">Open (no student)</div><div class="num" id="st-open">—</div></div>
+        <div class="stat"><div class="lbl">Booked</div><div class="num" id="st-booked">—</div></div>
+        <div class="stat"><div class="lbl">Completed</div><div class="num" id="st-done">—</div></div>
       </div>
 
-      <!-- day picker -->
-      <div class="row-between mb-4">
-        <h3 style="font-family:var(--fl-font-serif);font-size:20px;font-weight:600;margin:0;">Week of 12 — 18 May</h3>
-        <div class="gap-2">
-          <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-          <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
-          <div class="tabs">
-            <button>Day</button>
-            <button class="active">Week</button>
-            <button>Month</button>
-          </div>
-        </div>
+      <!-- course filter tabs -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;" id="course-tabs"></div>
+
+      <div class="slots-grid" id="slots-grid">
+        <div class="empty" style="grid-column:1/-1;padding:60px;"><p>Loading slots…</p></div>
       </div>
-
-      <div class="day-strip mb-8">
-        <div class="d"><span class="dow">Mon</span><span class="num">12</span><span class="pill">3</span></div>
-        <div class="d"><span class="dow">Tue</span><span class="num">13</span><span class="pill">5</span></div>
-        <div class="d"><span class="dow">Wed</span><span class="num">14</span><span class="pill">4</span></div>
-        <div class="d active"><span class="dow">Thu</span><span class="num">15</span><span class="pill">5</span></div>
-        <div class="d"><span class="dow">Fri</span><span class="num">16</span><span class="pill">4</span></div>
-        <div class="d"><span class="dow">Sat</span><span class="num">17</span><span class="pill">6</span></div>
-        <div class="d"><span class="dow">Sun</span><span class="num">18</span><span class="pill">Off</span></div>
-      </div>
-
-      <div class="grid-12 mb-8">
-        <!-- timeline -->
-        <div class="timeline">
-          <div class="tl-row">
-            <div class="tl-time">08:00</div>
-            <div class="tl-slot">
-              <div class="tl-lesson moss">
-                <div class="who"><h4>Cockpit drill — first day</h4><span>Sam Park · Cat. B · Cohort 24</span></div>
-                <span class="duration">1h · 08:00–09:00</span>
-                <div class="actions">
-                  <button class="icon-btn" title="Open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
-                  <button class="icon-btn" title="Message"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="tl-row">
-            <div class="tl-time">10:00</div>
-            <div class="tl-slot">
-              <div class="tl-lesson">
-                <div class="who"><h4>Highway practice — 2h block</h4><span>Devon Khoury · Cat. C · Cohort 22</span></div>
-                <span class="duration">2h · 10:00–12:00</span>
-                <div class="actions">
-                  <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
-                  <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="tl-row">
-            <div class="tl-time">12:00</div>
-            <div class="tl-slot">
-              <div class="tl-empty">Lunch · 12:00–13:30</div>
-            </div>
-          </div>
-          <div class="tl-row">
-            <div class="tl-time">14:00</div>
-            <div class="tl-slot">
-              <div class="tl-lesson">
-                <div class="who"><h4>Junctions & city driving</h4><span>Jordan Reeves · Cat. B · Cohort 24</span></div>
-                <span class="duration">2h · 14:00–16:00</span>
-                <div class="actions">
-                  <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
-                  <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="tl-row">
-            <div class="tl-time">16:00</div>
-            <div class="tl-slot">
-              <div class="tl-lesson outline">
-                <div class="who"><h4>Available — open for booking</h4><span>16:30 — 18:00 · Brooklyn yard</span></div>
-                <span class="duration">1.5h</span>
-                <div class="actions">
-                  <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="tl-row">
-            <div class="tl-time">18:00</div>
-            <div class="tl-slot">
-              <div class="tl-lesson">
-                <div class="who"><h4>Mock exam — internal</h4><span>Sam Park · Cat. B · Cohort 24</span></div>
-                <span class="duration">1.5h · 18:00–19:30</span>
-                <div class="actions">
-                  <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col">
-          <div class="earn">
-            <span class="lbl">This month · gross</span>
-            <div class="amt">$4,820</div>
-            <p style="margin:0;font-family:var(--fl-font-serif);font-size:14px;color:var(--fl-moss-800);line-height:1.4;">Paid out every other Friday. Next pay run: <b>23 May</b>.</p>
-            <div class="grid">
-              <div><b>112h</b><span>Hours taught</span></div>
-              <div><b>$43</b><span>Per hour avg.</span></div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card__head"><h3>Run sheet — Thu 15 May</h3><span class="meta">School car #14</span></div>
-            <div class="col" style="gap:12px;font-size:14px;">
-              <div class="row-between"><span class="muted mono" style="font-size:11px;letter-spacing:0.08em;">08:00</span><span>Sam Park · Astor Pl</span></div>
-              <div class="row-between"><span class="muted mono" style="font-size:11px;letter-spacing:0.08em;">10:00</span><span>Devon Khoury · 14th St</span></div>
-              <div class="row-between"><span class="muted mono" style="font-size:11px;letter-spacing:0.08em;">14:00</span><span>Jordan Reeves · Astor Pl</span></div>
-              <div class="row-between"><span class="muted mono" style="font-size:11px;letter-spacing:0.08em;">18:00</span><span>Sam Park · Brooklyn yard</span></div>
-            </div>
-            <button class="btn btn--secondary btn--block mt-4">Open route in Maps
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- active students -->
-      <div class="card">
-        <div class="card__head">
-          <h3>Your students</h3>
-          <div class="gap-2">
-            <span class="badge badge--moss"><span class="dot"></span>12 active</span>
-            <button class="btn btn--ghost btn--sm">View all →</button>
-          </div>
-        </div>
-
-        <div class="student-row">
-          <span class="avatar-circle">JR</span>
-          <div>
-            <h4>Jordan Reeves</h4>
-            <div class="meta">Cat. B · Cohort 24 · Week 3</div>
-          </div>
-          <div class="progress-mini">
-            <div class="row-between" style="margin-bottom:4px;font-size:11px;font-family:var(--fl-font-mono);color:var(--fl-fg-muted);letter-spacing:0.06em;"><span>52%</span><b style="color:var(--fl-fg);">84/100</b></div>
-            <div class="progress"><span style="width:52%;"></span></div>
-          </div>
-          <div class="gap-2">
-            <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
-            <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-          </div>
-        </div>
-
-        <div class="student-row">
-          <span class="avatar-circle tone-b">SP</span>
-          <div>
-            <h4>Sam Park</h4>
-            <div class="meta">Cat. B · Cohort 24 · Week 1</div>
-          </div>
-          <div class="progress-mini">
-            <div class="row-between" style="margin-bottom:4px;font-size:11px;font-family:var(--fl-font-mono);color:var(--fl-fg-muted);letter-spacing:0.06em;"><span>14%</span><b style="color:var(--fl-fg);">68/100</b></div>
-            <div class="progress"><span style="width:14%;"></span></div>
-          </div>
-          <div class="gap-2">
-            <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
-            <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-          </div>
-        </div>
-
-        <div class="student-row">
-          <span class="avatar-circle tone-c">DK</span>
-          <div>
-            <h4>Devon Khoury</h4>
-            <div class="meta">Cat. C · Cohort 22 · Week 5</div>
-          </div>
-          <div class="progress-mini">
-            <div class="row-between" style="margin-bottom:4px;font-size:11px;font-family:var(--fl-font-mono);color:var(--fl-fg-muted);letter-spacing:0.06em;"><span>78%</span><b style="color:var(--fl-fg);">91/100</b></div>
-            <div class="progress"><span style="width:78%;"></span></div>
-          </div>
-          <div class="gap-2">
-            <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
-            <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-          </div>
-        </div>
-
-        <div class="student-row">
-          <span class="avatar-circle tone-d">AL</span>
-          <div>
-            <h4>Alex Liang</h4>
-            <div class="meta">Cat. B · Cohort 23 · Final week</div>
-          </div>
-          <div class="progress-mini">
-            <div class="row-between" style="margin-bottom:4px;font-size:11px;font-family:var(--fl-font-mono);color:var(--fl-fg-muted);letter-spacing:0.06em;"><span>96%</span><b style="color:var(--fl-fg);">88/100</b></div>
-            <div class="progress"><span style="width:96%;"></span></div>
-          </div>
-          <div class="gap-2">
-            <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
-            <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-          </div>
-        </div>
-
-        <div class="student-row">
-          <span class="avatar-circle tone-e">EH</span>
-          <div>
-            <h4>Erin Halpern</h4>
-            <div class="meta">Cat. B · Cohort 23 · Week 4</div>
-          </div>
-          <div class="progress-mini">
-            <div class="row-between" style="margin-bottom:4px;font-size:11px;font-family:var(--fl-font-mono);color:var(--fl-fg-muted);letter-spacing:0.06em;"><span>64%</span><b style="color:var(--fl-fg);">79/100</b></div>
-            <div class="progress"><span style="width:64%;"></span></div>
-          </div>
-          <div class="gap-2">
-            <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
-            <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-          </div>
-        </div>
-
-      </div>
-
     </section>
 
-    <!-- =========================================================
-         PANE: PROFILE
-         ========================================================= -->
+    <!-- PANE: STUDENTS (enrolled in my lessons) -->
+    <section class="pane" id="pane-students">
+      <div class="row-between mb-4">
+        <h2 style="font-family:var(--fl-font-display);font-size:28px;letter-spacing:-.02em;margin:0;">Enrolled students</h2>
+        <span class="badge badge--neutral" id="students-count">—</span>
+      </div>
+
+      <!-- filter by course -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;" id="student-course-tabs"></div>
+
+      <div class="card" id="students-wrap">
+        <div class="empty" style="padding:60px;"><p>Loading…</p></div>
+      </div>
+    </section>
+
+    <!-- PANE: COURSES — read-only view of all courses and their slots -->
+    <section class="pane" id="pane-courses">
+      <div class="row-between mb-4">
+        <div>
+          <h2 style="font-family:var(--fl-font-display);font-size:32px;letter-spacing:-0.02em;margin:0 0 6px;">Course catalogue</h2>
+          <p class="muted" style="margin:0;">All active courses. Click a course to view its lesson slots and add your own.</p>
+        </div>
+      </div>
+      <div id="inst-courses-wrap">
+        <div class="empty" style="padding:60px;"><p>Loading courses…</p></div>
+      </div>
+    </section>
+
+    <!-- PANE: PROFILE -->
     <section class="pane" id="pane-profile">
-
-      <div class="profile-card mb-8">
-        <div class="profile-cover">
-          <div class="roadlines"></div>
+      <!-- Profile header -->
+      <div class="profile-hero-card" style="border:1px solid var(--fl-line-soft);border-radius:var(--fl-r-xl);padding:32px;display:grid;grid-template-columns:auto 1fr auto;gap:28px;align-items:center;margin-bottom:24px;">
+        <span class="avatar-circle xl" id="inst-av-xl">?</span>
+        <div>
+          <span style="font-family:var(--fl-font-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--fl-fg-muted);" id="prof-inst-id">—</span>
+          <h2 style="font-family:var(--fl-font-display);font-size:36px;letter-spacing:-.02em;margin:4px 0 6px;" id="prof-inst-name">—</h2>
+          <div style="display:flex;gap:16px;font-family:var(--fl-font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--fl-fg-muted);">
+            <span id="prof-inst-vehicle">—</span>
+            <span id="prof-inst-exp">—</span>
+          </div>
         </div>
-        <div class="profile-row">
-          <span class="avatar-circle xl ink">RM</span>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+          <button class="btn btn--primary" onclick="openModal('modal-edit-inst-profile')">Edit profile</button>
+        </div>
+      </div>
+
+      <!-- Read-only details -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
+        <div class="card">
+          <div class="card__head"><h3>Professional details</h3></div>
+          <div class="grid-2" style="gap:14px 24px;">
+            <div><div style="font-family:var(--fl-font-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--fl-fg-muted);margin-bottom:3px;">Full name</div><div id="disp-inst-name" style="font-size:15px;font-weight:500;">—</div></div>
+            <div><div style="font-family:var(--fl-font-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--fl-fg-muted);margin-bottom:3px;">Email</div><div id="disp-inst-email" style="font-size:15px;">—</div></div>
+            <div><div style="font-family:var(--fl-font-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--fl-fg-muted);margin-bottom:3px;">Phone</div><div id="disp-inst-phone" style="font-size:15px;">—</div></div>
+            <div><div style="font-family:var(--fl-font-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--fl-fg-muted);margin-bottom:3px;">Licence ID</div><div id="disp-inst-license" style="font-size:15px;">—</div></div>
+            <div><div style="font-family:var(--fl-font-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--fl-fg-muted);margin-bottom:3px;">Vehicle type</div><div id="disp-inst-vehicle" style="font-size:15px;">—</div></div>
+            <div><div style="font-family:var(--fl-font-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--fl-fg-muted);margin-bottom:3px;">Experience</div><div id="disp-inst-exp" style="font-size:15px;">—</div></div>
+          </div>
+        </div>
+        <div class="col" style="gap:20px;">
+          <div class="card">
+            <div class="card__head"><h3>Working days</h3></div>
+            <div id="disp-working-days" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+          </div>
+          <div class="card">
+            <div class="card__head"><h3>Account</h3></div>
+            <div class="col" style="gap:10px;">
+              <button class="btn btn--secondary btn--block" onclick="openModal('modal-edit-inst-profile')">Edit profile</button>
+              <button class="btn btn--danger btn--block" onclick="instructorLogout()">Sign out</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODAL: EDIT INSTRUCTOR PROFILE -->
+    <div id="modal-edit-inst-profile" onclick="if(event.target===this)closeModal('modal-edit-inst-profile')" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.48);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:24px;">
+      <div style="background:var(--fl-bg);border:1px solid var(--fl-line-soft);border-radius:var(--fl-r-xl);width:100%;max-width:560px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.22);animation:mIn 220ms ease both;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:22px 26px 18px;border-bottom:1px solid var(--fl-line-soft);">
+          <div><div style="font-family:var(--fl-font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--fl-moss-600);margin-bottom:4px;">Account · Profile</div><h2 style="font-family:var(--fl-font-display);font-size:21px;letter-spacing:-.015em;margin:0;">Edit profile</h2></div>
+          <button onclick="closeModal('modal-edit-inst-profile')" style="width:30px;height:30px;border-radius:50%;border:1px solid var(--fl-line);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--fl-fg-muted);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        </div>
+        <div style="padding:22px 26px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;">
+          <div id="edit-inst-profile-alert" style="display:none;padding:9px 13px;border-radius:8px;font-size:13px;"></div>
+          <div class="field"><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px;">Display name</label><input class="input" id="p-name"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="field"><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px;">Contact number</label><input class="input" id="p-phone"></div>
+            <div class="field"><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px;">Vehicle type</label><input class="input" id="p-vehicle"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="field"><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px;">Experience (years)</label><input class="input" type="number" id="p-exp" min="0"></div>
+            <div class="field"><label style="font-size:13px;font-weight:600;display:block;margin-bottom:5px;">Licence ID</label><input class="input" id="p-license"></div>
+          </div>
+          <input type="hidden" id="p-email">
           <div>
-            <h2>Rogan Massey</h2>
-            <div class="role">Practical instructor · Cat. B, C · Since 2018</div>
-          </div>
-          <div class="gap-2">
-            <button class="btn btn--secondary">Public profile
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-            </button>
-            <button class="btn btn--primary">Save changes</button>
-          </div>
-        </div>
-        <div class="profile-bar">
-          <div class="s"><b>99.7%</b><span>Pass rate</span></div>
-          <div class="s"><b>1.4M km</b><span>Teaching km</span></div>
-          <div class="s"><b>4.9 / 5</b><span>Rating · 184 reviews</span></div>
-          <div class="s"><b>8 years</b><span>At FastLane</span></div>
-        </div>
-      </div>
-
-      <div class="grid-12 mb-8">
-        <div class="card">
-          <div class="card__head"><h3>About you</h3><span class="meta">Shown to students choosing an instructor</span></div>
-
-          <div class="grid-2" style="gap:18px;margin-bottom:18px;">
-            <div class="field"><label>Display name</label><input class="input" value="Rogan Massey"></div>
-            <div class="field"><label>Headline</label><input class="input" value="Practical instructor · Cat. B, C"></div>
-          </div>
-
-          <div class="field mb-4">
-            <label>Bio (visible on the public site)</label>
-            <textarea class="textarea">Calm, methodical, partial to early-morning slots. I drove buses for nine years before teaching — I'll be honest with you about the road, and I'll keep my voice down while doing it. Anxiety-friendly. Happy to teach in either auto or manual cars.</textarea>
-          </div>
-
-          <div class="grid-2" style="gap:18px;">
-            <div class="field"><label>Vehicle type</label><select class="select"><option>Manual & automatic</option><option>Manual only</option><option>Automatic only</option></select></div>
-            <div class="field"><label>Primary car</label><select class="select"><option>School car #14 · Toyota Yaris</option><option>School car #03 · Hyundai i30</option></select></div>
-          </div>
-        </div>
-
-        <div class="col">
-          <div class="card">
-            <div class="card__head"><h3>Specialties</h3><span class="meta">Up to 6</span></div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-              <span class="badge badge--ink"><span class="dot"></span>Anxiety-friendly</span>
-              <span class="badge badge--ink"><span class="dot"></span>Refresher</span>
-              <span class="badge badge--ink"><span class="dot"></span>Highway</span>
-              <span class="badge badge--moss"><span class="dot"></span>Manoeuvres</span>
-              <span class="badge badge--moss"><span class="dot"></span>Night driving</span>
-              <span class="badge badge--outline">+ Add tag</span>
+            <label style="font-size:13px;font-weight:600;display:block;margin-bottom:8px;">Working days</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;" id="wd-picker">
+              <div class="pref-cell" data-day="MONDAY"    style="padding:10px 16px;border:1.5px solid var(--fl-line);border-radius:999px;cursor:pointer;font-family:var(--fl-font-mono);font-size:11px;letter-spacing:.06em;transition:all 180ms;">Mon</div>
+              <div class="pref-cell" data-day="TUESDAY"   style="padding:10px 16px;border:1.5px solid var(--fl-line);border-radius:999px;cursor:pointer;font-family:var(--fl-font-mono);font-size:11px;letter-spacing:.06em;transition:all 180ms;">Tue</div>
+              <div class="pref-cell" data-day="WEDNESDAY" style="padding:10px 16px;border:1.5px solid var(--fl-line);border-radius:999px;cursor:pointer;font-family:var(--fl-font-mono);font-size:11px;letter-spacing:.06em;transition:all 180ms;">Wed</div>
+              <div class="pref-cell" data-day="THURSDAY"  style="padding:10px 16px;border:1.5px solid var(--fl-line);border-radius:999px;cursor:pointer;font-family:var(--fl-font-mono);font-size:11px;letter-spacing:.06em;transition:all 180ms;">Thu</div>
+              <div class="pref-cell" data-day="FRIDAY"    style="padding:10px 16px;border:1.5px solid var(--fl-line);border-radius:999px;cursor:pointer;font-family:var(--fl-font-mono);font-size:11px;letter-spacing:.06em;transition:all 180ms;">Fri</div>
+              <div class="pref-cell" data-day="SATURDAY"  style="padding:10px 16px;border:1.5px solid var(--fl-line);border-radius:999px;cursor:pointer;font-family:var(--fl-font-mono);font-size:11px;letter-spacing:.06em;transition:all 180ms;">Sat</div>
+              <div class="pref-cell" data-day="SUNDAY"    style="padding:10px 16px;border:1.5px solid var(--fl-line);border-radius:999px;cursor:pointer;font-family:var(--fl-font-mono);font-size:11px;letter-spacing:.06em;transition:all 180ms;">Sun</div>
             </div>
-            <p class="muted mt-4" style="font-size:13px;margin-bottom:0;">Black tags appear in your sidebar bio. Moss tags appear on filter buttons in the catalogue.</p>
           </div>
-
-          <div class="card">
-            <div class="card__head"><h3>Languages</h3></div>
-            <div class="col" style="gap:8px;font-size:14px;">
-              <div class="row-between"><span>English</span><b>Native</b></div>
-              <div class="row-between"><span>Spanish</span><b>Conversational</b></div>
-              <div class="row-between"><span>Portuguese</span><b>Basic</b></div>
-            </div>
-            <button class="btn btn--ghost btn--sm mt-4">+ Add language</button>
-          </div>
+        </div>
+        <div style="padding:18px 26px;border-top:1px solid var(--fl-line-soft);display:flex;justify-content:flex-end;gap:10px;">
+          <button class="btn btn--ghost" onclick="closeModal('modal-edit-inst-profile')">Cancel</button>
+          <button class="btn btn--primary" id="save-inst-profile-btn" onclick="saveProfile()">Save changes</button>
         </div>
       </div>
+    </div>
 
-      <div class="grid-12 mb-8">
-        <div class="card">
-          <div class="card__head"><h3>Availability</h3><span class="meta">Default weekly hours</span></div>
-          <div class="col" style="gap:10px;">
-            <div class="row-between" style="font-size:14px;"><b style="width:80px;">Mon</b><span style="font-family:var(--fl-font-mono);font-size:13px;letter-spacing:0.04em;">09:00 — 17:00</span><span class="text-moss mono" style="font-size:11px;">Available</span></div>
-            <div class="row-between" style="font-size:14px;"><b style="width:80px;">Tue</b><span style="font-family:var(--fl-font-mono);font-size:13px;letter-spacing:0.04em;">09:00 — 17:00</span><span class="text-moss mono" style="font-size:11px;">Available</span></div>
-            <div class="row-between" style="font-size:14px;"><b style="width:80px;">Wed</b><span style="font-family:var(--fl-font-mono);font-size:13px;letter-spacing:0.04em;">09:00 — 17:00</span><span class="text-moss mono" style="font-size:11px;">Available</span></div>
-            <div class="row-between" style="font-size:14px;"><b style="width:80px;">Thu</b><span style="font-family:var(--fl-font-mono);font-size:13px;letter-spacing:0.04em;">07:00 — 20:00</span><span class="text-moss mono" style="font-size:11px;">Extended</span></div>
-            <div class="row-between" style="font-size:14px;"><b style="width:80px;">Fri</b><span style="font-family:var(--fl-font-mono);font-size:13px;letter-spacing:0.04em;">09:00 — 14:00</span><span class="text-moss mono" style="font-size:11px;">Available</span></div>
-            <div class="row-between" style="font-size:14px;"><b style="width:80px;">Sat</b><span style="font-family:var(--fl-font-mono);font-size:13px;letter-spacing:0.04em;">08:00 — 14:00</span><span class="text-moss mono" style="font-size:11px;">Available</span></div>
-            <div class="row-between" style="font-size:14px;"><b style="width:80px;">Sun</b><span style="font-family:var(--fl-font-mono);font-size:13px;letter-spacing:0.04em;">Off</span><span class="muted mono" style="font-size:11px;">—</span></div>
-          </div>
-          <button class="btn btn--secondary btn--block mt-4">Edit availability</button>
+    <!-- PANE: REVIEWS — feedback received from students -->
+    <section class="pane" id="pane-reviews">
+      <div class="row-between mb-8">
+        <div>
+          <h2 style="font-family:var(--fl-font-display);font-size:32px;letter-spacing:-0.02em;margin:0 0 6px;">My reviews</h2>
+          <p class="muted" style="margin:0;">Feedback submitted by students for your lessons.</p>
         </div>
+        <span class="badge badge--neutral" id="reviews-count-label">—</span>
+      </div>
 
-        <div class="card">
-          <div class="card__head"><h3>Certifications</h3><span class="badge badge--success"><span class="dot"></span>All current</span></div>
-          <div class="col" style="gap:14px;">
-            <div class="row-between" style="padding-bottom:14px;border-bottom:1px solid var(--fl-line-soft);">
-              <div><b>State instructor licence</b><div class="muted mono" style="font-size:11px;letter-spacing:0.08em;margin-top:2px;">CAT-B-INS-118-022</div></div>
-              <span class="muted" style="font-size:13px;">Exp. 14 Mar 2028</span>
-            </div>
-            <div class="row-between" style="padding-bottom:14px;border-bottom:1px solid var(--fl-line-soft);">
-              <div><b>Light truck endorsement</b><div class="muted mono" style="font-size:11px;letter-spacing:0.08em;margin-top:2px;">CAT-C-INS-118-022</div></div>
-              <span class="muted" style="font-size:13px;">Exp. 14 Mar 2028</span>
-            </div>
-            <div class="row-between" style="padding-bottom:14px;border-bottom:1px solid var(--fl-line-soft);">
-              <div><b>First aid (advanced)</b><div class="muted mono" style="font-size:11px;letter-spacing:0.08em;margin-top:2px;">Red Cross · Level 3</div></div>
-              <span class="muted" style="font-size:13px;">Exp. 09 Sep 2026</span>
-            </div>
-            <div class="row-between">
-              <div><b>Internal examiner</b><div class="muted mono" style="font-size:11px;letter-spacing:0.08em;margin-top:2px;">FastLane internal</div></div>
-              <span class="muted" style="font-size:13px;">No expiry</span>
-            </div>
-          </div>
-        </div>
+      <div class="stat-row" style="margin-bottom:24px;">
+        <div class="stat"><div class="lbl">Total reviews</div><div class="num" id="rv-total">—</div></div>
+        <div class="stat"><div class="lbl">Avg rating</div><div class="num" id="rv-avg">—</div></div>
+        <div class="stat"><div class="lbl">5-star</div><div class="num" id="rv-5star">—</div></div>
+        <div class="stat"><div class="lbl">1-star</div><div class="num" id="rv-1star">—</div></div>
       </div>
 
       <div class="card">
-        <div class="card__head"><h3>Recent reviews</h3><a href="feedback.html" target="_blank" class="text-moss" style="font-family:var(--fl-font-mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;">See all on public wall →</a></div>
-        <div class="grid-3" style="gap:18px;">
-          <div style="background:var(--fl-ink-50);border-radius:14px;padding:20px;">
-            <div class="stars mb-2">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="#97B154" stroke="#97B154"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="#97B154" stroke="#97B154"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="#97B154" stroke="#97B154"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="#97B154" stroke="#97B154"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="#97B154" stroke="#97B154"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
-            </div>
-            <p class="serif" style="font-size:14px;line-height:1.5;margin:0 0 12px;">"Booking system is genuinely good. Reschedule a lesson at 6am, get a confirmation back before 7am."</p>
-            <div class="muted mono" style="font-size:11px;letter-spacing:0.08em;">— Erin H. · 11 Apr</div>
-          </div>
-          <div style="background:var(--fl-ink-50);border-radius:14px;padding:20px;">
-            <div class="stars mb-2">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="#97B154" stroke="#97B154"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="#97B154" stroke="#97B154"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="#97B154" stroke="#97B154"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="#97B154" stroke="#97B154"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="#97B154" stroke="#97B154"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
-            </div>
-            <p class="serif" style="font-size:14px;line-height:1.5;margin:0 0 12px;">"My anxiety made me put this off for years. Rogan was matter-of-fact about it on day one and that's the highest compliment I can give."</p>
-            <div class="muted mono" style="font-size:11px;letter-spacing:0.08em;">— Rina J. · 4 Apr</div>
-          </div>
-          <div style="background:var(--fl-ink-50);border-radius:14px;padding:20px;">
-            <div class="stars mb-2">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="#97B154" stroke="#97B154"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="#97B154" stroke="#97B154"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="#97B154" stroke="#97B154"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="#97B154" stroke="#97B154"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="#97B154" stroke="#97B154"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>
-            </div>
-            <p class="serif" style="font-size:14px;line-height:1.5;margin:0 0 12px;">"Hadn't driven in eleven years. By the third lesson with Rogan I was on a two-lane highway."</p>
-            <div class="muted mono" style="font-size:11px;letter-spacing:0.08em;">— Priya T. · 28 Apr</div>
-          </div>
-        </div>
+        <div id="reviews-list"><div class="empty" style="padding:60px;"><p>Loading reviews…</p></div></div>
       </div>
-
     </section>
 
   </main>
 </div>
 
+<!-- MODAL: ADD LESSON SLOT -->
+<div class="modal-backdrop" id="modal-add-slot" onclick="if(event.target===this)closeModal('modal-add-slot')">
+  <div class="modal">
+    <div class="mhead">
+      <div><div class="ey">Lessons · Schedule</div><h2>Add lesson slot</h2></div>
+      <button class="mcls" onclick="closeModal('modal-add-slot')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="mbody">
+      <div class="mal" id="slot-alert"></div>
+      <p style="font-size:13px;color:var(--fl-fg-muted);margin:0 0 16px;">Create a recurring availability slot for a course. Students will see and request specific dates. Enable the slot when you are ready to accept bookings.</p>
+      <div class="mf">
+        <label>Course <span style="color:var(--fl-error)">*</span></label>
+        <select class="select" id="sl-course"><option value="">Loading courses…</option></select>
+      </div>
+      <div class="mfr">
+        <div class="mf">
+          <label>Day of week <span style="color:var(--fl-error)">*</span></label>
+          <select class="select" id="sl-day">
+            <option value="">Select day…</option>
+            <option value="MONDAY">Monday</option>
+            <option value="TUESDAY">Tuesday</option>
+            <option value="WEDNESDAY">Wednesday</option>
+            <option value="THURSDAY">Thursday</option>
+            <option value="FRIDAY">Friday</option>
+            <option value="SATURDAY">Saturday</option>
+          </select>
+        </div>
+        <div class="mf">
+          <label>Time slot <span style="color:var(--fl-error)">*</span></label>
+          <select class="select" id="sl-time">
+            <option value="">Select…</option>
+            <option value="08:00:00">08:00</option>
+            <option value="09:30:00">09:30</option>
+            <option value="11:00:00">11:00</option>
+            <option value="13:00:00">13:00</option>
+            <option value="14:30:00">14:30</option>
+          </select>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--fl-fg-faint);margin:8px 0 0;">Slot is created as disabled. Use "Enable + run FIFO" on the slot card to open it to students.</p>
+    </div>
+    <div class="mfoot">
+      <button class="btn btn--ghost" onclick="closeModal('modal-add-slot')">Cancel</button>
+      <button class="btn btn--primary" id="add-slot-btn" onclick="submitAddSlot()">Add slot</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: UPDATE LESSON STATUS -->
+<div class="modal-backdrop" id="modal-update-status" onclick="if(event.target===this)closeModal('modal-update-status')">
+  <div class="modal">
+    <div class="mhead">
+      <div><div class="ey">Lesson · Status</div><h2>Update lesson status</h2></div>
+      <button class="mcls" onclick="closeModal('modal-update-status')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="mbody">
+      <div class="mal" id="status-alert"></div>
+      <div id="status-lesson-info" class="status-info-box" style="border-radius:10px;padding:14px;font-size:13px;line-height:1.6;"></div>
+      <div class="mf">
+        <label>New status <span style="color:var(--fl-error)">*</span></label>
+        <select class="select" id="status-select">
+          <option value="COMPLETED">Completed</option>
+          <option value="CANCELLED">Cancelled</option>
+        </select>
+      </div>
+      <input type="hidden" id="status-lesson-id">
+    </div>
+    <div class="mfoot">
+      <button class="btn btn--ghost" onclick="closeModal('modal-update-status')">Cancel</button>
+      <button class="btn btn--primary" id="status-btn" onclick="submitUpdateStatus()">Update status</button>
+    </div>
+  </div>
+</div>
+
 <script>
-  const paneTitles = {
-    lessons: { crumbs: 'Thursday 14 May · Cohort 24', title: 'Good morning, Rogan.' },
-    profile: { crumbs: 'Your public listing', title: 'Profile & settings' }
-  };
-  document.querySelectorAll('[data-pane]').forEach(a => a.addEventListener('click', e => {
-    e.preventDefault();
-    const name = a.dataset.pane;
-    document.querySelectorAll('.dash__nav a[data-pane]').forEach(x => x.classList.toggle('active', x.dataset.pane === name));
-    document.querySelectorAll('.pane').forEach(p => p.classList.toggle('active', p.id === 'pane-' + name));
-    document.querySelector('.dash__bar .crumbs').textContent = paneTitles[name].crumbs;
-    document.getElementById('pageTitle').textContent = paneTitles[name].title;
-    window.scrollTo({top:0, behavior:'smooth'});
-  }));
-  // day strip
-  document.querySelectorAll('.day-strip .d').forEach(d => d.addEventListener('click', () => {
-    document.querySelectorAll('.day-strip .d').forEach(x => x.classList.remove('active'));
-    d.classList.add('active');
-  }));
-</script>
-<script>
-  (function(){
+  /* ── Boot ───────────────────────────────────────────── */
+  document.addEventListener('DOMContentLoaded', () => {
     const t = localStorage.getItem('fl-theme') || 'light';
-    document.documentElement.dataset.theme = t;
-    if(t==='dark'){
-      document.getElementById('dashMoon').style.display='none';
-      document.getElementById('dashSun').style.display='block';
-    }
-  })();
-  function toggleThemeNav(){
-    const html = document.documentElement;
-    const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
-    html.dataset.theme = next;
-    localStorage.setItem('fl-theme', next);
-    document.getElementById('dashMoon').style.display = next==='dark'?'none':'block';
-    document.getElementById('dashSun').style.display  = next==='dark'?'block':'none';
+    applyTheme(t);
+
+    const userId = localStorage.getItem('fl-userId');
+    const role   = localStorage.getItem('fl-role');
+    if (!userId || role !== 'INSTRUCTOR') { window.location.href='auth.html'; return; }
+
+    document.querySelectorAll('[data-pane]').forEach(a => a.addEventListener('click', e => {
+      e.preventDefault();
+      switchPane(a.dataset.pane);
+      ({ slots: ()=>loadSlots(userId), students: ()=>loadStudents(userId), profile: ()=>loadProfile(userId), courses: ()=>loadInstCourses(), reviews: ()=>loadReviews(userId) })[a.dataset.pane]?.();
+    }));
+
+    document.querySelectorAll('#wd-picker .pref-cell').forEach(c =>
+            c.addEventListener('click', () => toggleDay(c))
+    );
+
+    loadProfile(userId);
+    loadSlots(userId);
+    loadCoursesDropdown();
+  });
+
+  /* ── Pane switch ─────────────────────────────────────── */
+  const paneMeta = {
+    slots:    { crumbs:'Instructor · Lesson slots', title:'My lesson slots' },
+    courses:  { crumbs:'Instructor · Courses',      title:'Course catalogue' },
+    students: { crumbs:'Instructor · Students',     title:'Enrolled students' },
+    profile:  { crumbs:'Instructor · Profile',      title:'Profile & settings' },
+    reviews:  { crumbs:'Instructor · Reviews',      title:'My reviews' },
+  };
+  function switchPane(name) {
+    document.querySelectorAll('[data-pane]').forEach(x => x.classList.toggle('active', x.dataset.pane===name));
+    document.querySelectorAll('.pane').forEach(p => p.classList.toggle('active', p.id==='pane-'+name));
+    const m=paneMeta[name]; if(m){setText('crumbs',m.crumbs);setText('pageTitle',m.title);}
+    window.scrollTo({top:0,behavior:'smooth'});
   }
-  document.addEventListener('keydown', e => { if(e.altKey && e.key==='d') toggleThemeNav(); });
+
+  /* ── Profile ─────────────────────────────────────────── */
+  async function loadProfile(userId) {
+    try {
+      const d = await apiJson(`/instructors/getInstructor/${userId}`);
+      const i = d.content || d;
+      if (!i) return;
+      const inits = initials(i.instructorName);
+
+      // Sidebar
+      setText('inst-av',  inits);
+      setText('inst-nm',  i.instructorName || '—');
+      setText('inst-sub', `${i.vehicleType||'—'} · ${i.experienceYears||0}yr exp`);
+
+      // Hero card
+      setText('hero-lbl',  `${i.vehicleType||'—'} · Licence ${i.licenseId||'—'}`);
+      setText('hero-name', `Good day, ${(i.instructorName||'').split(' ')[0]}.`);
+      setText('hero-desc', `${i.experienceYears||0} years experience · Working: ${fmtDays(i.workingDays)}`);
+      setText('pageTitle', `Good day, ${(i.instructorName||'').split(' ')[0]}.`);
+
+      // Profile pane header
+      const instId = i.instructorId || userId;
+      setText('inst-av-xl',       inits);
+      setText('prof-inst-id',     instId);
+      setText('prof-inst-name',   i.instructorName || '—');
+      setText('prof-inst-vehicle',i.vehicleType    || '—');
+      setText('prof-inst-exp',    `${i.experienceYears||0}yr exp`);
+
+      // Read-only display fields
+      setText('disp-inst-name',    i.instructorName || '—');
+      setText('disp-inst-email',   i.email          || '—');
+      setText('disp-inst-phone',   i.contactNumber  || '—');
+      setText('disp-inst-license', i.licenseId      || '—');
+      setText('disp-inst-vehicle', i.vehicleType    || '—');
+      setText('disp-inst-exp',     i.experienceYears ? `${i.experienceYears} years` : '—');
+
+      // Working days read-only chips
+      const dispDays = document.getElementById('disp-working-days');
+      if (dispDays) {
+        const days = i.workingDays || [];
+        dispDays.innerHTML = days.length
+                ? days.map(d => `<span style="padding:6px 14px;border-radius:999px;border:1.5px solid var(--fl-moss-400);background:var(--fl-moss-50,#f6f9f0);font-family:var(--fl-font-mono);font-size:11px;color:var(--fl-moss-700);">${d[0]+d.slice(1).toLowerCase()}</span>`).join('')
+                : '<span style="color:var(--fl-fg-faint);font-size:13px;">No working days set</span>';
+      }
+
+      // Edit modal inputs — pre-filled
+      setVal('p-name',    i.instructorName);
+      setVal('p-phone',   i.contactNumber);
+      setVal('p-vehicle', i.vehicleType);
+      setVal('p-exp',     i.experienceYears);
+      setVal('p-license', i.licenseId);
+      setVal('p-email',   i.email);
+
+      const dayList = (i.workingDays||[]).map(day=>day.toUpperCase());
+      document.querySelectorAll('#wd-picker .pref-cell').forEach(c =>
+              setDayActive(c, dayList.includes(c.dataset.day))
+      );
+    } catch(e) { console.warn(e); }
+  }
+
+  async function saveProfile() {
+    const userId  = localStorage.getItem('fl-userId');
+    const alertEl = document.getElementById('edit-inst-profile-alert');
+    const btn     = document.getElementById('save-inst-profile-btn');
+    const days    = [...document.querySelectorAll('#wd-picker .pref-cell.on')].map(c=>c.dataset.day);
+    if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+    try {
+      await apiJson(`/instructors/update/${userId}`, { method:'PUT', body: JSON.stringify({
+          instructorId:userId, instructorName:gv('p-name'), email:gv('p-email'),
+          contactNumber:gv('p-phone'), licenseId:gv('p-license'),
+          experienceYears:parseInt(gv('p-exp')||'0'), vehicleType:gv('p-vehicle'), workingDays:days
+        })});
+      showToast('Profile saved.');
+      closeModal('modal-edit-inst-profile');
+      loadProfile(userId);
+    } catch(e) {
+      if (alertEl) showAlert(alertEl, e.message||'Failed', 'err');
+      else showToast(e.message||'Failed', false);
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = 'Save changes'; }
+    }
+  }
+
+  /* ── Load courses dropdown ───────────────────────────── */
+  let _courses = [];
+  async function loadCoursesDropdown() {
+    const sel = document.getElementById('sl-course');
+    if (!sel) return;
+    try {
+      const d = await apiJson('/courses/getAllCourses');
+      const courses = (d.content || d || []).filter(c => c.status === 'ACTIVE');
+      sel.innerHTML = '<option value="">Select a course…</option>' +
+              courses.map(c => `<option value="${c.courseId}">${c.courseTitle} (${c.courseId})</option>`).join('');
+    } catch(e) { sel.innerHTML = '<option value="">Could not load courses</option>'; }
+  }
+
+  /* ── Load slots ──────────────────────────────────────── */
+  let _allSlots = [];
+  async function loadSlots(userId) {
+    const grid = document.getElementById('slots-grid');
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1;padding:60px;"><p>Loading…</p></div>`;
+    try {
+      const d = await apiJson('/slots/mySlots');
+      _allSlots = d.content || d || [];
+
+      const enabled = _allSlots.filter(s => s.enabled).length;
+      const waiting = _allSlots.reduce((sum, s) => sum + (s.activeRequestCount || 0), 0);
+      setText('hero-today', enabled || '0');
+      setText('hero-today-sub', `${_allSlots.length} slot${_allSlots.length !== 1 ? 's' : ''} configured`);
+      setText('st-total',  _allSlots.length);
+      setText('st-open',   enabled);
+      setText('st-booked', waiting + ' waiting');
+      setText('st-done',   '—');
+      setText('nav-slots-pill', _allSlots.length);
+
+      renderSlots(_allSlots);
+    } catch(e) {
+      grid.innerHTML = `<div class="empty" style="grid-column:1/-1;">${emptyHtml('Could not load slots')}</div>`;
+    }
+  }
+
+  function renderSlots(slots) {
+    const grid = document.getElementById('slots-grid');
+    if (!slots.length) {
+      grid.innerHTML = `<div class="empty" style="grid-column:1/-1;">${emptyHtml('No slots yet — add one above')}</div>`;
+      return;
+    }
+    const dayOrder = ['MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY','SUNDAY'];
+    const sorted = [...slots].sort((a, b) => {
+      const di = dayOrder.indexOf(a.dayOfWeek) - dayOrder.indexOf(b.dayOfWeek);
+      return di !== 0 ? di : (a.time||'').localeCompare(b.time||'');
+    });
+    grid.innerHTML = sorted.map(s => {
+      const hasQueue = (s.activeRequestCount || 0) > 0;
+      const fmtTime = t => { try { const [h,m]=t.split(':'); const d=new Date(); d.setHours(+h,+m); return d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}); } catch{ return t; } };
+      return `<div class="slot-card ${s.enabled ? 'taken' : ''}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div class="info">${s.courseId ? s.courseId + ' · ' : ''}${s.dayOfWeek}</div>
+          <div class="dt">${fmtTime(s.time||'')}</div>
+          <div class="info">${s.slotId}</div>
+        </div>
+        <span class="badge ${s.enabled ? 'badge--moss' : 'badge--neutral'}">
+          <span class="dot"></span>${s.enabled ? 'Enabled' : 'Disabled'}
+        </span>
+      </div>
+      ${hasQueue
+              ? `<div class="student-chip">
+             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+             <span><b>${s.activeRequestCount}</b> student${s.activeRequestCount !== 1 ? 's' : ''} waiting</span>
+           </div>`
+              : `<div style="font-family:var(--fl-font-mono);font-size:11px;letter-spacing:.08em;color:var(--fl-fg-faint);text-transform:uppercase;">No students queued</div>`}
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
+        ${s.enabled
+              ? `<button class="btn btn--ghost btn--sm" onclick="toggleSlot('${s.slotId}', false)">Disable</button>`
+              : `<button class="btn btn--primary btn--sm" onclick="toggleSlot('${s.slotId}', true)">Enable + FIFO</button>`}
+        <button class="btn btn--ghost btn--sm" onclick="viewQueue('${s.slotId}','${s.dayOfWeek}','${s.time||''}')">View queue</button>
+        ${!hasQueue ? `<button class="btn btn--ghost btn--sm" style="color:var(--fl-error);" onclick="deleteSlotInline('${s.slotId}')">Delete</button>` : ''}
+      </div>
+    </div>`;
+    }).join('');
+  }
+
+  function renderCourseTabs(slots, containerId, onSelect) { /* tabs removed — slots now organised by day/time */ }
+  function renderSlotsProxy(courseId) { renderSlots(_allSlots); }
+  function selectTab(el, courseId, containerId, fn) { fn(courseId); }
+
+  /* ── Load students (enrolled in my lessons) ──────────── */
+  async function loadStudents(userId) {
+    const wrap  = document.getElementById('students-wrap');
+    const count = document.getElementById('students-count');
+    wrap.innerHTML = `<div class="empty" style="padding:60px;"><p>Loading…</p></div>`;
+    try {
+      const d = await apiJson(`/lessons/getLessonsByInstructorId/${userId}`);
+      const lessons = d.content || d || [];
+      const withStudents = lessons.filter(l=>l.studentId&&l.studentId!=='');
+      if (count) count.textContent = `${withStudents.length} lesson${withStudents.length!==1?'s':''} with students`;
+
+      // Build course tabs for students pane
+      renderCourseTabs(withStudents, 'student-course-tabs', (cid) => renderStudentRows(withStudents, cid));
+      renderStudentRows(withStudents, null);
+    } catch(e) {
+      wrap.innerHTML = `<div class="empty" style="padding:60px;">${emptyHtml('Could not load')}</div>`;
+    }
+  }
+
+  function renderStudentRows(lessons, courseFilter) {
+    const wrap = document.getElementById('students-wrap');
+    const filtered = courseFilter ? lessons.filter(l=>l.courseId===courseFilter) : lessons;
+    if (!filtered.length) { wrap.innerHTML = `<div class="empty" style="padding:60px;">${emptyHtml('No enrolled students yet')}</div>`; return; }
+
+    const sorted = [...filtered].sort((a,b)=>((a.date||'')+(a.time||'')).localeCompare((b.date||'')+(b.time||'')));
+    wrap.innerHTML = sorted.map((l,i) => `
+    <div class="srow">
+      <span class="avatar-circle ${toneClass(i)}" style="width:36px;height:36px;font-size:12px;">${l.studentId?.slice(0,2).toUpperCase()||'??'}</span>
+      <div>
+        <b>Student ${l.studentId}</b>
+        <div class="meta" style="font-family:var(--fl-font-mono);font-size:11px;margin-top:2px;">${l.courseId} · ${l.date||'—'} ${(l.time||'').slice(0,5)} · ${l.lessonId}</div>
+      </div>
+      ${slotStatusBadge(l.status, true)}
+      <div style="display:flex;gap:6px;">
+        ${(l.status==='SCHEDULED'||l.status==='PENDING') ? `
+          <button class="btn btn--primary btn--sm" onclick="openStatusModal('${l.lessonId}','${l.courseId}','${l.date||''}','${(l.time||'').slice(0,5)}','${l.studentId||''}','${l.status}')">
+            Update status
+          </button>` : `<span class="meta" style="font-size:12px;">${l.status}</span>`}
+      </div>
+    </div>`).join('');
+  }
+
+  /* ── Submit: Add slot ────────────────────────────────── */
+  async function submitAddSlot() {
+    const btn     = document.getElementById('add-slot-btn');
+    const alertEl = document.getElementById('slot-alert');
+    const userId  = localStorage.getItem('fl-userId');
+    const courseId  = gv('sl-course');
+    const dayOfWeek = gv('sl-day');
+    const time      = gv('sl-time');
+
+    clearAlert(alertEl);
+    if (!courseId || !dayOfWeek || !time) return showAlert(alertEl, 'Please select a course, day and time.', 'err');
+
+    btn.disabled = true; btn.textContent = 'Creating…';
+    try {
+      await apiJson('/slots/create', {
+        method: 'POST',
+        body: JSON.stringify({ courseId, dayOfWeek, time, instructorId: userId })
+      });
+      showAlert(alertEl, 'Slot created. Enable it when you\'re ready to accept bookings.', 'ok');
+      setVal('sl-course', ''); setVal('sl-day', ''); setVal('sl-time', '');
+      loadSlots(userId);
+      setTimeout(() => closeModal('modal-add-slot'), 1600);
+    } catch(e) {
+      showAlert(alertEl, e.message || 'Failed.', 'err');
+    } finally { btn.disabled = false; btn.textContent = 'Add slot'; }
+  }
+
+  /* ── Enable / Disable slot ───────────────────────────── */
+  async function toggleSlot(slotId, enable) {
+    const userId = localStorage.getItem('fl-userId');
+    try {
+      await apiJson(`/slots/${enable ? 'enable' : 'disable'}/${slotId}`, { method: 'PUT' });
+      showToast(enable ? 'Slot enabled — FIFO selection ran.' : 'Slot disabled.');
+      loadSlots(userId);
+    } catch(e) { showToast(e.message || 'Could not update slot.', false); }
+  }
+
+  /* ── Delete slot ─────────────────────────────────────── */
+  async function deleteSlotInline(slotId) {
+    if (!confirm('Delete this slot? This cannot be undone.')) return;
+    const userId = localStorage.getItem('fl-userId');
+    try {
+      await apiJson(`/slots/delete/${slotId}`, { method: 'DELETE' });
+      showToast('Slot deleted.');
+      loadSlots(userId);
+    } catch(e) { showToast(e.message || 'Could not delete slot.', false); }
+  }
+
+  /* ── View queue modal ────────────────────────────────── */
+  async function viewQueue(slotId, day, time) {
+    const fmtTime = t => { try { const [h,m]=t.split(':'); const d=new Date(); d.setHours(+h,+m); return d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}); } catch{ return t; } };
+    const fmtDate = d => { try { return new Date(d+'T00:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'}); } catch{ return d; } };
+    const fmtQueued = dt => { try { return new Date(dt).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); } catch{ return dt; } };
+    const statusLabel = { SELECTED:'Selected', IN_QUEUE:'In queue', PENDING:'Pending', CANCELLED:'Cancelled', COMPLETED:'Completed' };
+    const statusClass = { SELECTED:'badge--moss', IN_QUEUE:'badge--neutral', PENDING:'badge--warn', CANCELLED:'badge--danger', COMPLETED:'badge--moss' };
+    const statusOrder = { SELECTED:0, IN_QUEUE:1, PENDING:2, CANCELLED:3, COMPLETED:4 };
+
+    // Store slot context on the modal for re-open after Complete
+    const modalEl = document.getElementById('modal-queue');
+    if (modalEl) { modalEl._slotId = slotId; modalEl._day = day; modalEl._time = time; }
+
+    try {
+      const data = await apiJson(`/slots/${slotId}/requests`);
+      const requests = data.content || [];
+      const titleEl = document.getElementById('queue-modal-title');
+      if (titleEl) titleEl.textContent = `${day} — ${fmtTime(time)}`;
+      const listEl = document.getElementById('queue-list');
+      if (!listEl) return;
+
+      if (!requests.length) {
+        listEl.innerHTML = '<p class="muted" style="padding:12px 0;">No requests for this slot.</p>';
+        openModal('modal-queue');
+        return;
+      }
+
+      // --- FIX 1: Filter out past dates — only today and future ---
+      const todayStr = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+      const filteredRequests = requests.filter(r => r.date >= todayStr);
+
+      // Group by date, nearest date first
+      const byDate = {};
+      filteredRequests.forEach(r => { if (!byDate[r.date]) byDate[r.date] = []; byDate[r.date].push(r); });
+      const sortedDates = Object.keys(byDate).sort();
+
+      if (!sortedDates.length) {
+        listEl.innerHTML = '<p class="muted" style="padding:12px 0;">No upcoming requests for this slot.</p>';
+        openModal('modal-queue');
+        return;
+      }
+
+      listEl.innerHTML = sortedDates.map(date => {
+        const group = byDate[date].sort((a,b) =>
+                (statusOrder[a.status]??9)-(statusOrder[b.status]??9) || new Date(a.requestedAt)-new Date(b.requestedAt)
+        );
+
+        // --- FIX 2: If any request in this date group has lessonStatus === COMPLETED,
+        //     show "✓ Already Complete" header and hide queue rows ---
+        const hasCompleted = group.some(r => r.lessonStatus === 'COMPLETED');
+        if (hasCompleted) {
+          return `
+        <div style="margin-bottom:22px;">
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--fl-bg-elev,#f9fafb);border-radius:10px;">
+            <span style="font-size:15px;">✅</span>
+            <span style="font-family:var(--fl-font-display);font-size:16px;letter-spacing:-.01em;font-weight:700;">${fmtDate(date)}</span>
+            <span class="badge badge--moss" style="font-size:10px;margin-left:auto;">✓ Already Complete</span>
+          </div>
+        </div>`;
+        }
+
+        const activeCount = group.filter(r => r.status !== 'CANCELLED').length;
+        let qPos = 0;
+
+        const rows = group.map(r => {
+          const isActive = r.status !== 'CANCELLED';
+          if (isActive) qPos++;
+          const posLabel = isActive
+                  ? `<span style="font-size:11px;font-family:var(--fl-font-mono);color:var(--fl-fg-faint);font-weight:700;">#${qPos}</span>`
+                  : `<span style="font-size:11px;color:var(--fl-line);">—</span>`;
+          return `
+        <div style="display:grid;grid-template-columns:28px 1fr auto auto;gap:10px;align-items:center;
+                    padding:10px 0;border-bottom:1px solid var(--fl-line-soft);${isActive?'':'opacity:.4;'}">
+          ${posLabel}
+          <div>
+            <b style="font-size:13px;">${r.studentId}</b>
+            <div style="font-family:var(--fl-font-mono);font-size:11px;color:var(--fl-fg-muted);margin-top:2px;">
+              Queued ${fmtQueued(r.requestedAt)}${r.lessonId ? ` &nbsp;·&nbsp; Lesson <b>${r.lessonId}</b>` : ''}
+            </div>
+          </div>
+          <span class="badge ${statusClass[r.status]||'badge--neutral'}"><span class="dot"></span>${statusLabel[r.status]||r.status}</span>
+          ${r.status==='SELECTED' && r.lessonId ? `
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn--primary btn--sm" onclick="markDone('${r.lessonId}')">Complete</button>
+              <button class="btn btn--ghost btn--sm" onclick="markCancel('${r.lessonId}')">Cancel</button>
+            </div>` : '<div></div>'}
+        </div>`;
+        }).join('');
+
+        return `
+      <div style="margin-bottom:22px;">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--fl-bg-elev,#f9fafb);border-radius:10px;margin-bottom:6px;">
+          <span style="font-size:15px;">📅</span>
+          <span style="font-family:var(--fl-font-display);font-size:16px;letter-spacing:-.01em;font-weight:700;">${fmtDate(date)}</span>
+          <span class="badge ${activeCount>0?'badge--moss':'badge--neutral'}" style="font-size:10px;margin-left:auto;">${activeCount} active</span>
+        </div>
+        ${rows}
+      </div>`;
+      }).join('');
+
+      openModal('modal-queue');
+    } catch(e) { showToast(e.message || 'Could not load queue.', false); }
+  }
+
+  async function markDone(lessonId) {
+    try {
+      await apiJson(`/lessons/updateStatus/${lessonId}?status=COMPLETED`, { method: 'PUT' });
+      showToast('Lesson marked completed.');
+      // --- FIX 3: Close → refresh slots → re-open modal showing updated state ---
+      closeModal('modal-queue');
+      const userId = localStorage.getItem('fl-userId');
+      await loadSlots(userId);
+      // Re-open queue modal for the same slot
+      const modalEl = document.getElementById('modal-queue');
+      if (modalEl && modalEl._slotId) {
+        viewQueue(modalEl._slotId, modalEl._day, modalEl._time);
+      }
+    } catch(e) { showToast(e.message || 'Could not update.', false); }
+  }
+
+  async function markCancel(lessonId) {
+    if (!confirm('Cancel this lesson?')) return;
+    try {
+      await apiJson(`/lessons/updateStatus/${lessonId}?status=CANCELLED`, { method: 'PUT' });
+      showToast('Lesson cancelled.');
+      closeModal('modal-queue');
+      const userId = localStorage.getItem('fl-userId');
+      await loadSlots(userId);
+      // Re-open queue modal for the same slot
+      const modalEl = document.getElementById('modal-queue');
+      if (modalEl && modalEl._slotId) {
+        viewQueue(modalEl._slotId, modalEl._day, modalEl._time);
+      }
+    } catch(e) { showToast(e.message || 'Could not cancel.', false); }
+  }
+
+  /* ── Status modal ────────────────────────────────────── */
+  function openStatusModal(lessonId, courseId, date, time, studentId, currentStatus) {
+    document.getElementById('status-lesson-id').value = lessonId;
+    const info = document.getElementById('status-lesson-info');
+    info.innerHTML = `
+    <b>${courseId}</b> · ${date} ${time}<br>
+    Student: <b>${studentId||'(open slot)'}</b><br>
+    Current status: <b>${currentStatus}</b>`;
+
+    const sel = document.getElementById('status-select');
+    sel.innerHTML = currentStatus==='PENDING'
+            ? '<option value="SCHEDULED">Scheduled</option><option value="REJECTED">Rejected</option>'
+            : '<option value="COMPLETED">Completed</option><option value="CANCELLED">Cancelled</option>';
+
+    clearAlert(document.getElementById('status-alert'));
+    openModal('modal-update-status');
+  }
+
+  async function submitUpdateStatus() {
+    const btn     = document.getElementById('status-btn');
+    const alertEl = document.getElementById('status-alert');
+    const lessonId = document.getElementById('status-lesson-id').value;
+    const status   = document.getElementById('status-select').value;
+
+    clearAlert(alertEl);
+    btn.disabled=true; btn.textContent='Updating…';
+    try {
+      // PUT /lessons/updateStatus/{id}?status= requires ADMIN session currently.
+      // Until backend updated, this will return 403 for instructors.
+      await apiJson(`/lessons/updateStatus/${lessonId}?status=${status}`, { method:'PUT' });
+      showAlert(alertEl,'Status updated.','ok');
+      const userId = localStorage.getItem('fl-userId');
+      loadSlots(userId); loadStudents(userId);
+      setTimeout(()=>closeModal('modal-update-status'),1400);
+    } catch(e) {
+      showAlert(alertEl, e.message||'Failed.', 'err');
+    } finally { btn.disabled=false; btn.textContent='Update status'; }
+  }
+
+  /* ── Courses tab ─────────────────────────────────────── */
+  async function loadInstCourses() {
+    const wrap = document.getElementById('inst-courses-wrap');
+    if (!wrap) return;
+    wrap.innerHTML = `<div class="empty" style="padding:60px;"><p>Loading…</p></div>`;
+
+    const DAY_ORDER = ['MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY','SUNDAY'];
+    const DAY_ABBR  = { MONDAY:'Mon', TUESDAY:'Tue', WEDNESDAY:'Wed', THURSDAY:'Thu', FRIDAY:'Fri', SATURDAY:'Sat', SUNDAY:'Sun' };
+
+    try {
+      const [cRes, sRes] = await Promise.allSettled([
+        apiJson('/courses/getAllCourses'),
+        apiJson('/slots/mySlots')
+      ]);
+
+      const courses  = cRes.status==='fulfilled'
+              ? (cRes.value.content||cRes.value||[]).filter(c=>c.status==='ACTIVE') : [];
+      const mySlots  = sRes.status==='fulfilled'
+              ? (sRes.value.content||sRes.value||[]) : [];
+
+      if (!courses.length) {
+        wrap.innerHTML = `<div class="empty" style="padding:60px;">${emptyHtml('No active courses yet')}</div>`;
+        return;
+      }
+
+      wrap.innerHTML = courses.map(c => {
+        const cSlots   = mySlots.filter(s => s.courseId === c.courseId);
+        const enabled  = cSlots.filter(s => s.enabled).length;
+        const waiting  = cSlots.reduce((sum, s) => sum + (s.activeRequestCount||0), 0);
+
+        // Sort slots: day-of-week order, then time
+        const sorted = [...cSlots].sort((a,b) => {
+          const di = DAY_ORDER.indexOf(a.dayOfWeek) - DAY_ORDER.indexOf(b.dayOfWeek);
+          return di !== 0 ? di : (a.time||'').localeCompare(b.time||'');
+        });
+
+        const slotsHTML = sorted.length ? `
+        <div class="slots-grid" style="grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;">
+          ${sorted.map(s => {
+                  const hasQueue = s.activeRequestCount > 0;
+                  return `<div class="slot-card${s.enabled?' taken':''}" data-slot-id="${s.slotId}">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div>
+                  <div class="info">${DAY_ABBR[s.dayOfWeek]||s.dayOfWeek}</div>
+                  <div class="dt">${(s.time||'').slice(0,5)}</div>
+                </div>
+                <span class="badge ${s.enabled?'badge--moss':'badge--neutral'}">
+                  <span class="dot"></span>${s.enabled?'Enabled':'Disabled'}
+                </span>
+              </div>
+              ${hasQueue ? `
+              <div class="student-chip">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span><b>${s.activeRequestCount}</b> student${s.activeRequestCount!==1?'s':''} waiting</span>
+              </div>` : `<div style="font-size:12px;color:var(--fl-fg-faint);">No students queued</div>`}
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">
+                ${s.enabled
+                          ? `<button class="btn btn--ghost btn--sm" onclick="toggleSlot('${s.slotId}',false);loadInstCourses()">Disable</button>`
+                          : `<button class="btn btn--primary btn--sm" onclick="toggleSlot('${s.slotId}',true);loadInstCourses()">Enable + FIFO</button>`}
+                <button class="btn btn--ghost btn--sm" onclick="viewRequests('${s.slotId}','${s.dayOfWeek}','${s.time}')">View queue</button>
+                ${!hasQueue ? `<button class="btn btn--ghost btn--sm" style="color:var(--fl-error);" onclick="deleteSlot('${s.slotId}');loadInstCourses()">Delete</button>` : ''}
+              </div>
+            </div>`;
+                }).join('')}
+        </div>` :
+                `<p style="font-family:var(--fl-font-mono);font-size:11px;color:var(--fl-fg-faint);letter-spacing:.06em;text-transform:uppercase;margin:0;">No slots added yet for this course</p>`;
+
+        return `<div class="card mb-8" style="overflow:hidden;">
+        <div style="display:grid;grid-template-columns:auto 1fr auto;gap:20px;align-items:center;padding:20px 24px;border-bottom:1px solid var(--fl-line-soft);">
+          <div style="width:52px;height:52px;border-radius:12px;background:var(--fl-moss-500);display:flex;align-items:center;justify-content:center;font-family:var(--fl-font-display);font-size:26px;color:var(--fl-ink-900);">
+            ${(c.courseTitle||'?')[0]}
+          </div>
+          <div>
+            <h3 style="font-family:var(--fl-font-serif);font-size:18px;font-weight:600;margin:0 0 4px;">${c.courseTitle||'—'}</h3>
+            <div style="font-family:var(--fl-font-mono);font-size:11px;letter-spacing:.06em;color:var(--fl-fg-muted);">${c.durationHours||0}h · ${c.difficultyLevel||'—'} · ${c.courseId}</div>
+            <div style="font-size:13px;color:var(--fl-fg-muted);margin-top:4px;">${c.description||''}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+            <button class="btn btn--primary btn--sm" onclick="openModal('modal-add-slot')">+ Add slot</button>
+            <span style="font-family:var(--fl-font-mono);font-size:11px;color:var(--fl-fg-faint);">
+              ${enabled} enabled · ${waiting} waiting · ${cSlots.length} total
+            </span>
+          </div>
+        </div>
+        <div style="padding:16px 24px;">
+          <div style="font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--fl-fg-muted);margin-bottom:12px;font-family:var(--fl-font-mono);">My availability slots</div>
+          ${slotsHTML}
+        </div>
+      </div>`;
+      }).join('');
+
+    } catch(err) {
+      wrap.innerHTML = `<div class="empty" style="padding:60px;">${emptyHtml('Could not load — ' + (err.message||'API error'))}</div>`;
+    }
+  }
+
+  /* ── Helpers ─────────────────────────────────────────── */
+  function slotStatusBadge(status, hasStudent) {
+    if (!hasStudent && (status==='PENDING'||status==='SCHEDULED'))
+      return `<span class="badge badge--neutral"><span class="dot"></span>Open</span>`;
+    const m={SCHEDULED:'badge--moss',COMPLETED:'badge--success',CANCELLED:'badge--danger',PENDING:'badge--warn',REJECTED:'badge--error'};
+    return `<span class="badge ${m[status]||'badge--neutral'}"><span class="dot"></span>${status||'—'}</span>`;
+  }
+  function initials(n){if(!n)return'?';return n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();}
+  function toneClass(i){return['ink','tone-b','tone-c','tone-d','tone-e'][i%5];}
+  function fmtDays(days){if(!days?.length)return'Flexible';return days.map(d=>d[0]+d.slice(1).toLowerCase()).join(', ');}
+  function setText(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
+  function setVal(id,v){const e=document.getElementById(id);if(e)e.value=v||'';}
+  function gv(id){return(document.getElementById(id)?.value||'').trim();}
+  function emptyHtml(msg){return`<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>${msg}</p></div>`;}
+  function showAlert(el,msg,type){if(!el)return;el.textContent=msg;el.className=`mal ${type}`;}
+  function clearAlert(el){if(!el)return;el.textContent='';el.className='mal';}
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-backdrop.open').forEach(m=>closeModal(m.id));});
+  function applyTheme(t){document.documentElement.dataset.theme=t;const m=document.getElementById('dashMoon'),s=document.getElementById('dashSun');if(m)m.style.display=t==='dark'?'none':'block';if(s)s.style.display=t==='dark'?'block':'none';}
+  function toggleThemeNav(){const n=document.documentElement.dataset.theme==='dark'?'light':'dark';localStorage.setItem('fl-theme',n);applyTheme(n);}
+  function setDayActive(c,on){c.classList.toggle('on',on);c.style.background=on?'var(--fl-moss-500)':'';c.style.borderColor=on?'var(--fl-moss-500)':'var(--fl-line)';c.style.color=on?'var(--fl-ink-900)':'var(--fl-fg-muted)';}
+  function toggleDay(c){setDayActive(c,!c.classList.contains('on'));}
+  async function instructorLogout(){try{await apiJson('/auth/logout',{method:'POST'});}catch(_){}['fl-userId','fl-role','fl-email'].forEach(k=>localStorage.removeItem(k));window.location.href='auth.html';}
+  function openModal(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (el.classList.contains('modal-backdrop')) { el.classList.add('open'); }
+    else { el.style.display = 'flex'; }
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (el.classList.contains('modal-backdrop')) { el.classList.remove('open'); }
+    else { el.style.display = 'none'; }
+    document.body.style.overflow = '';
+  }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-backdrop.open, [id^="modal-"][style*="flex"]').forEach(m => closeModal(m.id));
+    }
+  });
+
+  function showToast(msg,ok=true){let t=document.getElementById('fl-toast');if(!t){t=document.createElement('div');t.id='fl-toast';t.style.cssText='position:fixed;bottom:24px;right:24px;z-index:9999;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;box-shadow:0 4px 24px rgba(0,0,0,.18);transition:opacity .3s;';document.body.appendChild(t);}t.textContent=msg;t.style.background=ok?'var(--fl-moss-700)':'#c0392b';t.style.color='#fff';t.style.opacity='1';clearTimeout(t._timer);t._timer=setTimeout(()=>{t.style.opacity='0';},3500);}
+
+  /* ── Reviews ──────────────────────────────────────────── */
+  function instStarsSVG(count) {
+    return Array.from({length:5}, (_,i) => {
+      const on = i < count;
+      return `<svg viewBox="0 0 24 24" width="14" height="14" style="fill:${on?'#f59e0b':'#d1d5db'};stroke:${on?'#f59e0b':'#d1d5db'}"><polygon points="12 2 15 9 22 9.3 17 14 18.5 21 12 17.3 5.5 21 7 14 2 9.3 9 9 12 2"/></svg>`;
+    }).join('');
+  }
+
+  async function loadReviews(userId) {
+    const list  = document.getElementById('reviews-list');
+    const label = document.getElementById('reviews-count-label');
+    if (!list) return;
+    list.innerHTML = '<div class="empty" style="padding:60px;"><p>Loading…</p></div>';
+    try {
+      const data  = await apiJson(`/feedback/byInstructor/${userId}`);
+      const items = data.content || data || [];
+
+      const ratings = items.map(f => +(f.rating||0)).filter(r=>r>0);
+      const avg     = ratings.length ? (ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(1) : '—';
+      setText('rv-total',  items.length);
+      setText('rv-avg',    avg);
+      setText('rv-5star',  ratings.filter(r=>r===5).length);
+      setText('rv-1star',  ratings.filter(r=>r===1).length);
+      if (label) label.textContent = `${items.length} review${items.length!==1?'s':''}`;
+      setText('nav-reviews-pill', items.length);
+
+      if (!items.length) {
+        list.innerHTML = '<div class="empty" style="padding:60px;"><p>No reviews yet</p></div>';
+        return;
+      }
+
+      list.innerHTML = `<div class="tbl-wrap" style="border:none;">
+      <table class="tbl">
+        <thead><tr><th>Student</th><th>Course</th><th>Rating</th><th>Comment</th><th>Date</th></tr></thead>
+        <tbody>${items.map(f=>`
+          <tr>
+            <td class="mono" style="font-size:12px;">${f.studentId||'—'}</td>
+            <td class="meta">${f.courseId||'—'}</td>
+            <td><div style="display:inline-flex;gap:2px;align-items:center;">${instStarsSVG(f.rating)}<span style="margin-left:4px;font-size:12px;font-weight:600;">${f.rating||'—'}/5</span></div></td>
+            <td style="font-family:var(--fl-font-serif);font-size:14px;font-style:italic;max-width:340px;">"${f.comment||'—'}"</td>
+            <td class="meta">${f.feedbackDate||'—'}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table></div>`;
+    } catch(err) {
+      list.innerHTML = '<div class="empty" style="padding:60px;"><p>Could not load reviews</p></div>';
+      if (label) label.textContent = 'Error';
+    }
+  }
 </script>
+
+<!-- MODAL: SLOT QUEUE ─────────────────────────────────────────────────── -->
+<div class="modal-backdrop" id="modal-queue" onclick="if(event.target===this)closeModal('modal-queue')">
+  <div class="modal" style="max-width:640px;">
+    <div class="mhead">
+      <div><div class="ey">Lesson slot · Queue</div><h2 id="queue-modal-title">Queue</h2></div>
+      <button class="mcls" onclick="closeModal('modal-queue')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="mbody" style="overflow-y:auto;max-height:60vh;">
+      <div id="queue-list">
+        <p class="muted">Loading…</p>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="btn btn--ghost" onclick="closeModal('modal-queue')">Close</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

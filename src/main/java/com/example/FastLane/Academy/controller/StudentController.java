@@ -15,7 +15,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/students")
-@CrossOrigin
 public class StudentController {
 
     @Autowired
@@ -51,15 +50,15 @@ public class StudentController {
             @RequestBody StudentDTO dto, HttpSession session
     ) {
         if (!SessionUtil.isRole(session, "ADMIN") &&
-            !SessionUtil.isRole(session, "STUDENT")) {
+                !SessionUtil.isRole(session, "STUDENT")) {
 
-        return ResponseEntity.status(403)
-                .body(new ResponseDTO(
-                        VarList.UNAUTHORIZED,
-                        "Access denied",
-                        null
-                ));
-    }
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(
+                            VarList.UNAUTHORIZED,
+                            "Access denied",
+                            null
+                    ));
+        }
 
         dto.setStudentId(studentId); // ensure ID consistency
         ResponseDTO response = studentService.updateStudent(dto);

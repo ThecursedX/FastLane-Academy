@@ -1,6 +1,7 @@
 package com.example.FastLane.Academy.dto;
 
 import com.example.FastLane.Academy.enums.EnrollmentStatus;
+import com.example.FastLane.Academy.enums.PaymentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,4 +19,5 @@ public class EnrollmentDTO {
     private LocalDate enrolledDate;
     private EnrollmentStatus status;
     private Boolean accessGranted;
+    private PaymentStatus paymentStatus; // visible to admin on enrollment list
 }

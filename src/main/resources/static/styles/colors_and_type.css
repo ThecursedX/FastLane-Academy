@@ -7,7 +7,7 @@
 @font-face {
   font-family: "Karibu";
   src: url("./fonts/karibu-bold.ttf") format("truetype"),
-       url("../styles/fonts/karibu-bold.ttf") format("truetype");
+  url("../styles/fonts/karibu-bold.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -275,7 +275,7 @@
   backdrop-filter: var(--fl-glass-blur);
   border: 1px solid var(--fl-glass-stroke);
   box-shadow:
-    inset 0 1px 0 var(--fl-glass-shine),
-    var(--fl-shadow-md);
+          inset 0 1px 0 var(--fl-glass-shine),
+          var(--fl-shadow-md);
   border-radius: var(--fl-r-lg);
 }

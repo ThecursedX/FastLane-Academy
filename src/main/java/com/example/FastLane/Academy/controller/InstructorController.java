@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/api/instructors")
 public class InstructorController {
@@ -58,24 +57,11 @@ public class InstructorController {
         }
     }
 
+    /** Public endpoint — shown on landing page, no auth required */
     @GetMapping("/studentView")
-    public ResponseEntity<ResponseDTO> getActiveInstructors(HttpSession session)
-    {
-        if (!SessionUtil.isRole(session, "ADMIN") &&
-                !SessionUtil.isRole(session, "STUDENT")) {
-
-            return ResponseEntity.status(403)
-                    .body(new ResponseDTO(
-                            VarList.UNAUTHORIZED,
-                            "Access denied",
-                            null
-                    ));
-        }
-        ResponseDTO response =
-                instructorService.getActiveInstructors();
-
-        return ResponseEntity.status(HttpStatus.ACCEPTED)
-                .body(response);
+    public ResponseEntity<ResponseDTO> getActiveInstructors() {
+        ResponseDTO response = instructorService.getActiveInstructors();
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 
     @GetMapping("/getInstructor/{instructorId}")
@@ -89,7 +75,7 @@ public class InstructorController {
                 .body(response);
     }
 
-    @PutMapping("/updateInstructor/{instructorId}")
+    @PutMapping({"/updateInstructor/{instructorId}", "/update/{instructorId}"})
     public ResponseEntity<ResponseDTO> updateInstructor(
             @PathVariable String instructorId,
             @RequestBody InstructorDTO instructorDTO, HttpSession session) {

@@ -9,7 +9,7 @@
     /* ============== HERO ============== */
     .hero {
       position: relative;
-      padding: 168px 0 56px;
+      padding: 140px 0 56px;
       overflow: hidden;
       background: var(--fl-paper);
     }
@@ -53,17 +53,17 @@
     .hero__art .road {
       position: absolute; inset: 0;
       background:
-        radial-gradient(80% 60% at 70% 30%, rgba(151,177,84,0.18), transparent 60%);
+              radial-gradient(80% 60% at 70% 30%, rgba(151,177,84,0.18), transparent 60%);
     }
     .hero__art .roadlines {
       position: absolute; left: 50%; bottom: -30%; transform: translateX(-50%) rotate(-8deg);
       width: 220%; height: 120%;
       background-image:
-        repeating-linear-gradient(90deg,
-          transparent 0,
-          transparent 80px,
-          rgba(255,255,255,0.18) 80px,
-          rgba(255,255,255,0.18) 120px);
+              repeating-linear-gradient(90deg,
+              transparent 0,
+              transparent 80px,
+              rgba(255,255,255,0.18) 80px,
+              rgba(255,255,255,0.18) 120px);
       mask-image: radial-gradient(ellipse at 50% 70%, #000 30%, transparent 70%);
     }
     .hero__art .marquee {
@@ -88,19 +88,20 @@
     }
     .hero__art .gauge .speedo {
       width: 56px; height: 56px; border-radius: 50%;
-      background: var(--fl-paper);
+      background: var(--fl-bg);
       border: 4px solid var(--fl-moss-500);
       display: flex; align-items: center; justify-content: center;
       font-family: var(--fl-font-display); font-size: 18px;
+      color: var(--fl-fg);
       position: relative;
     }
     .hero__art .gauge .speedo::after {
       content: ""; position: absolute; width: 2px; height: 18px;
-      background: var(--fl-ink-900); top: 8px; left: calc(50% - 1px);
+      background: var(--fl-fg); top: 8px; left: calc(50% - 1px);
       transform-origin: bottom center; transform: rotate(35deg);
     }
-    .hero__art .gauge .info { font-family: var(--fl-font-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--fl-ink-900); }
-    .hero__art .gauge .info b { display: block; font-family: var(--fl-font-display); font-size: 22px; letter-spacing: -0.01em; margin-top: 2px; }
+    .hero__art .gauge .info { font-family: var(--fl-font-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--fl-fg); }
+    .hero__art .gauge .info b { display: block; font-family: var(--fl-font-display); font-size: 22px; letter-spacing: -0.01em; margin-top: 2px; color: var(--fl-fg); }
     .hero__art .car {
       position: absolute;
       right: -40px; top: 32%;
@@ -136,8 +137,8 @@
 
     /* ============== PRICING / COURSES ============== */
     .pricing { background: var(--fl-ink-50); }
-    .price-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-    @media (max-width: 980px) { .price-grid { grid-template-columns: 1fr; } }
+    .home-course-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    @media (max-width: 980px) { .home-course-grid { grid-template-columns: 1fr; } }
     .price {
       background: var(--fl-paper);
       border: 1px solid var(--fl-line-soft);
@@ -150,18 +151,16 @@
     .price.feat { background: var(--fl-ink-900); color: var(--fl-paper); border-color: transparent; }
     .price.feat .price-amt { color: var(--fl-paper); }
     .price.feat .price-amt em { color: var(--fl-moss-400); }
-    .price.feat ul li { color: var(--fl-ink-200); }
     .price.feat .lbl { color: var(--fl-moss-400); }
     .price.feat hr { border-color: rgba(255,255,255,0.08); }
-    .price .badge-strip { display: flex; justify-content: space-between; align-items: center; }
+    .price.feat .cat { color: rgba(255,255,255,0.10); }
+    .price .lbl { font-family: var(--fl-font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fl-fg-muted); }
+    .price h3 { font-family: var(--fl-font-serif); font-size: 22px; font-weight: 600; margin: 0; line-height: 1.2; }
     .price .cat {
       font-family: var(--fl-font-display);
       font-size: 80px; line-height: 1; letter-spacing: -0.04em;
       color: var(--fl-ink-200);
     }
-    .price.feat .cat { color: rgba(255,255,255,0.10); }
-    .price .lbl { font-family: var(--fl-font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fl-fg-muted); }
-    .price h3 { font-family: var(--fl-font-serif); font-size: 22px; font-weight: 600; margin: 0; line-height: 1.2; }
     .price-amt { font-family: var(--fl-font-display); font-size: 56px; line-height: 1.05; letter-spacing: -0.025em; color: var(--fl-fg); }
     .price-amt em { font-style: normal; color: var(--fl-moss-700); }
     .price-amt small { font-family: var(--fl-font-mono); font-size: 12px; letter-spacing: 0.08em; color: var(--fl-fg-muted); display: block; margin-top: 6px; text-transform: uppercase; }
@@ -169,6 +168,7 @@
     .price ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; flex: 1; }
     .price ul li { font-size: 14px; display: flex; align-items: flex-start; gap: 10px; }
     .price ul li svg { width: 16px; height: 16px; color: var(--fl-moss-600); flex-shrink: 0; margin-top: 2px; }
+    .price.feat ul li { color: var(--fl-ink-200); }
     .price.feat ul li svg { color: var(--fl-moss-400); }
 
     /* ============== ABOUT ============== */
@@ -178,8 +178,8 @@
     .about__art {
       aspect-ratio: 4/5; border-radius: var(--fl-r-2xl);
       background:
-        radial-gradient(120% 60% at 30% 20%, var(--fl-moss-300), transparent 60%),
-        var(--fl-ink-900);
+              radial-gradient(120% 60% at 30% 20%, var(--fl-moss-300), transparent 60%),
+              var(--fl-ink-900);
       display: flex; align-items: center; justify-content: center;
       color: var(--fl-paper); position: relative; overflow: hidden;
     }
@@ -294,8 +294,8 @@
     .testimonial {
       padding: 96px 0;
       background:
-        radial-gradient(80% 60% at 80% 20%, rgba(151,177,84,0.15), transparent 60%),
-        var(--fl-ink-900);
+              radial-gradient(80% 60% at 80% 20%, rgba(151,177,84,0.15), transparent 60%),
+              var(--fl-ink-900);
       color: var(--fl-paper);
     }
     .testimonial .container { text-align: center; }
@@ -344,472 +344,479 @@
     .contact__aside .block .lbl { font-family: var(--fl-font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fl-moss-400); margin-bottom: 8px; }
     .contact__aside .block p { margin: 0; font-family: var(--fl-font-serif); font-size: 16px; line-height: 1.5; color: var(--fl-ink-200); }
     .contact__aside .block p b { color: var(--fl-paper); font-weight: 500; }
+
+    /* ============== DARK MODE OVERRIDES ============== */
+    :root[data-theme="dark"] .pricing {
+      background: var(--fl-bg-elev);
+    }
+    :root[data-theme="dark"] .price {
+      background: var(--fl-ink-800);
+      border-color: rgba(255,255,255,0.07);
+      color: var(--fl-fg);
+    }
+    :root[data-theme="dark"] .price h3 {
+      color: var(--fl-fg);
+    }
+    :root[data-theme="dark"] .price .lbl {
+      color: var(--fl-ink-400);
+    }
+    :root[data-theme="dark"] .price .cat {
+      color: rgba(255,255,255,0.08);
+    }
+    :root[data-theme="dark"] .price .price-amt {
+      color: var(--fl-fg);
+    }
+    :root[data-theme="dark"] .price .price-amt em {
+      color: var(--fl-moss-400);
+    }
+    :root[data-theme="dark"] .price .price-amt small {
+      color: var(--fl-ink-400);
+    }
+    :root[data-theme="dark"] .price hr {
+      border-color: rgba(255,255,255,0.07);
+    }
+    :root[data-theme="dark"] .price ul li {
+      color: var(--fl-ink-200);
+    }
+    :root[data-theme="dark"] .price ul li svg {
+      color: var(--fl-moss-400);
+    }
+    :root[data-theme="dark"] .price.feat {
+      background: var(--fl-ink-700);
+      border-color: rgba(255,255,255,0.10);
+    }
+    :root[data-theme="dark"] .contact {
+      background: var(--fl-bg-elev);
+    }
+    :root[data-theme="dark"] .contact__form {
+      background: var(--fl-ink-800);
+      border-color: rgba(255,255,255,0.07);
+    }
   </style>
 </head>
 
 <script src="js/api.js"></script>
+<script src="js/nav.js"></script>
 <script src="js/home.js"></script>
 
 <body class="fl-body">
 
-  <!-- ================= TOP NAV ================= -->
-  <div class="app-topnav-wrap">
-    <nav class="app-topnav">
-      <a href="index.html" class="brand">
+<!-- ================= TOP NAV ================= -->
+<div class="app-topnav-wrap">
+  <nav class="app-topnav">
+    <a href="index.html" class="brand">
         <span class="bolt">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
         </span>
-        FastLane Academy
-        <span class="sub">Driving school</span>
-      </a>
-      <div class="links">
-        <a href="index.html" class="active">Home</a>
-        <a href="courses.html">Courses</a>
-        <a href="index.html#instructors">Instructors</a>
-        <a href="feedback.html">Feedback</a>
-        <a href="index.html#contact">Contact</a>
-      </div>
-      <div class="right">
-        <button id="themeToggleNav" onclick="toggleThemeNav()" aria-label="Toggle dark mode" style="width:36px;height:36px;border-radius:50%;border:1px solid var(--fl-line);background:var(--fl-bg-elev);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--fl-fg-muted);transition:all 160ms;flex-shrink:0;" title="Toggle dark / light (Alt+D)">
-          <svg id="navMoon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-          <svg id="navSun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-        </button>
-        <a href="auth.html" class="btn btn--ghost btn--sm">Sign in</a>
-        <a href="auth.html" class="btn btn--primary btn--sm">Book a lesson</a>
-      </div>
-    </nav>
-  </div>
+      FastLane Academy
+      <span class="sub">Driving school</span>
+    </a>
+    <div class="links">
+      <a href="index.html" class="active">Home</a>
+      <a href="courses.html">Courses</a>
+      <a href="index.html#instructors">Instructors</a>
+      <a href="feedback.html">Feedback</a>
+      <a href="index.html#contact">Contact</a>
+    </div>
+    <div class="right">
+      <button id="themeToggleNav" onclick="toggleThemeNav()" aria-label="Toggle dark mode" style="width:36px;height:36px;border-radius:50%;border:1px solid var(--fl-line);background:var(--fl-bg-elev);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--fl-fg-muted);transition:all 160ms;flex-shrink:0;" title="Toggle dark / light (Alt+D)">
+        <svg id="navMoon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <svg id="navSun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+      </button>
+      <a href="auth.html" class="btn btn--ghost btn--sm" id="nav-signin" style="display:none;">Sign in</a>
+      <a href="auth.html" class="btn btn--primary btn--sm" id="nav-book" style="display:none;">Book a lesson</a>
+      <a href="#" class="btn btn--ghost btn--sm" id="nav-dashboard" style="display:none;">My dashboard</a>
+      <button class="btn btn--primary btn--sm" id="nav-logout" onclick="navLogout()" style="display:none;">Sign out</button>
+    </div>
+  </nav>
+</div>
 
-  <main>
+<main>
 
-    <!-- ================= HERO ================= -->
-    <section class="hero">
-      <div class="container">
-        <div class="hero__grid">
-          <div>
-            <span class="eyebrow">Cohort 24 · Now enrolling</span>
-            <h1>The truest drive comes from <em>doing what you love.</em></h1>
-            <p class="lede">Six weeks behind the wheel with practising instructors. Real roads, real conditions, real road sense — not a script.</p>
-            <ul class="ticks">
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                Training for categories B, C and C+E
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                Refresher courses for drivers returning to the road
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                99.8% first-time pass rate on the state exam
-              </li>
-            </ul>
-            <div class="ctas">
-              <a href="courses.html" class="btn btn--primary btn--lg">
-                Browse courses
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-              </a>
-              <a href="#about" class="btn btn--secondary btn--lg">About us</a>
-            </div>
-          </div>
-
-          <div class="hero__art">
-            <div class="road"></div>
-            <div class="roadlines"></div>
-            <div class="marquee"><span class="blip"></span> Live · Cohort 24 starts Jun 9</div>
-
-            <!-- abstract car -->
-            <svg class="car" viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <linearGradient id="hood" x1="0" x2="0" y1="0" y2="1">
-                  <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.06"/>
-                  <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
-                </linearGradient>
-              </defs>
-              <path d="M30 150 L60 100 Q80 70 130 65 L240 60 Q290 60 320 90 L370 130 L370 168 Q370 178 360 178 L40 178 Q30 178 30 168 Z" fill="#97B154"/>
-              <path d="M30 150 L60 100 Q80 70 130 65 L240 60 Q290 60 320 90 L370 130 L370 168 Q370 178 360 178 L40 178 Q30 178 30 168 Z" fill="url(#hood)"/>
-              <path d="M85 100 L130 75 L235 73 L300 100 L290 110 L100 110 Z" fill="#161616" opacity="0.85"/>
-              <rect x="100" y="78" width="80" height="22" rx="3" fill="#cfe1a4" opacity="0.7"/>
-              <rect x="195" y="78" width="80" height="22" rx="3" fill="#cfe1a4" opacity="0.7"/>
-              <circle cx="115" cy="178" r="26" fill="#161616"/>
-              <circle cx="115" cy="178" r="14" fill="#3a3a37"/>
-              <circle cx="295" cy="178" r="26" fill="#161616"/>
-              <circle cx="295" cy="178" r="14" fill="#3a3a37"/>
-              <rect x="335" y="120" width="36" height="10" rx="3" fill="#FFFFFF" opacity="0.75"/>
-              <rect x="30" y="135" width="22" height="10" rx="3" fill="#cfe1a4"/>
-            </svg>
-
-            <div class="gauge">
-              <div class="speedo">50</div>
-              <div class="info">
-                Today's avg
-                <b>3,472 km</b>
-              </div>
-              <a class="btn btn--ink btn--sm" href="courses.html">
-                Book
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-              </a>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= STATS STRIP ================= -->
-    <section class="stats-strip">
-      <div class="container">
-        <div class="row">
-          <div class="stat-i">
-            <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg></span>
-            <div><b>8,649</b><span>Students trained every year by our instructors</span></div>
-          </div>
-          <div class="stat-i">
-            <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1l-.84 1.66a1.18 1.18 0 0 0-.1.4l-.24 2.51a1 1 0 0 0 1 1.08H3"></path><circle cx="6.5" cy="16.5" r="2.5"></circle><circle cx="16.5" cy="16.5" r="2.5"></circle></svg></span>
-            <div><b>76</b><span>Category B and C vehicles available for students</span></div>
-          </div>
-          <div class="stat-i">
-            <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg></span>
-            <div><b>99.8%</b><span>Of our students pass the state exam first time</span></div>
-          </div>
-          <div class="stat-i">
-            <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 12 8 12 11 5 13 19 16 12 21 12"></polyline></svg></span>
-            <div><b>3,472</b><span>Kilometres driven across our fleet every single day</span></div>
+  <!-- ================= HERO ================= -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero__grid">
+        <div>
+          <span class="eyebrow">Cohort 24 · Now enrolling</span>
+          <h1>The truest drive comes from <em>doing what you love.</em></h1>
+          <p class="lede">Six weeks behind the wheel with practising instructors. Real roads, real conditions, real road sense — not a script.</p>
+          <ul class="ticks">
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              Training for categories B, C and C+E
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              Refresher courses for drivers returning to the road
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              99.8% first-time pass rate on the state exam
+            </li>
+          </ul>
+          <div class="ctas">
+            <a href="courses.html" class="btn btn--primary btn--lg">
+              Browse courses
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </a>
+            <a href="#about" class="btn btn--secondary btn--lg">About us</a>
           </div>
         </div>
-      </div>
-    </section>
 
-    <!-- ================= PRICING / COURSES ================= -->
-    <section class="section pricing" id="courses">
-      <div class="container">
-        <div class="sec-head" style="justify-content: center; text-align: center; flex-direction: column; align-items: center;">
-          <span class="eyebrow">Courses & pricing</span>
-          <h2>Sign up for a course in the category you need.</h2>
-        </div>
+        <div class="hero__art">
+          <div class="road"></div>
+          <div class="roadlines"></div>
+          <div class="marquee"><span class="blip"></span> Live · Cohort 24 starts Jun 9</div>
 
-        <div class="price-grid">
+          <!-- abstract car -->
+          <svg class="car" viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="hood" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.06"/>
+                <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M30 150 L60 100 Q80 70 130 65 L240 60 Q290 60 320 90 L370 130 L370 168 Q370 178 360 178 L40 178 Q30 178 30 168 Z" fill="#97B154"/>
+            <path d="M30 150 L60 100 Q80 70 130 65 L240 60 Q290 60 320 90 L370 130 L370 168 Q370 178 360 178 L40 178 Q30 178 30 168 Z" fill="url(#hood)"/>
+            <path d="M85 100 L130 75 L235 73 L300 100 L290 110 L100 110 Z" fill="#161616" opacity="0.85"/>
+            <rect x="100" y="78" width="80" height="22" rx="3" fill="#cfe1a4" opacity="0.7"/>
+            <rect x="195" y="78" width="80" height="22" rx="3" fill="#cfe1a4" opacity="0.7"/>
+            <circle cx="115" cy="178" r="26" fill="#161616"/>
+            <circle cx="115" cy="178" r="14" fill="#3a3a37"/>
+            <circle cx="295" cy="178" r="26" fill="#161616"/>
+            <circle cx="295" cy="178" r="14" fill="#3a3a37"/>
+            <rect x="335" y="120" width="36" height="10" rx="3" fill="#FFFFFF" opacity="0.75"/>
+            <rect x="30" y="135" width="22" height="10" rx="3" fill="#cfe1a4"/>
+          </svg>
 
-          <div class="price">
-            <div class="badge-strip">
-              <span class="lbl">Cat. B</span>
-              <span class="badge badge--neutral">Most popular</span>
+          <div class="gauge">
+            <div class="speedo">50</div>
+            <div class="info">
+              Today's avg
+              <b>3,472 km</b>
             </div>
-            <div class="cat">B</div>
-            <h3>Standard car licence</h3>
-            <div class="price-amt">$<em>399</em><small>Per full course</small></div>
-            <hr>
-            <ul>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> 30h of theoretical course</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> 60h of practical course</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Teaching materials included</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Internal exam</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> 20% discount on additional hours</li>
-            </ul>
-            <p class="muted" style="font-size:13px;margin:0;">Extra hours: $20 each beyond the course allowance.</p>
-            <a href="courses.html" class="btn btn--ink btn--block">Sign up</a>
-          </div>
-
-          <div class="price feat">
-            <div class="badge-strip">
-              <span class="lbl">Cat. C</span>
-              <span class="badge badge--moss">Recommended</span>
-            </div>
-            <div class="cat">C</div>
-            <h3>Light truck licence</h3>
-            <div class="price-amt">$<em>599</em><small>Per full course</small></div>
-            <hr>
-            <ul>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> 20h of theoretical course</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> 80h of practical course</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Teaching materials included</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Internal exam</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> 20% discount on additional hours</li>
-            </ul>
-            <p class="muted" style="font-size:13px;margin:0;color:var(--fl-ink-300);">Extra hours: $15 each beyond the course allowance.</p>
-            <a href="courses.html" class="btn btn--primary btn--block">Sign up</a>
-          </div>
-
-          <div class="price">
-            <div class="badge-strip">
-              <span class="lbl">Cat. C+E</span>
-              <span class="badge badge--outline">Pro</span>
-            </div>
-            <div class="cat">C+E</div>
-            <h3>Heavy combination licence</h3>
-            <div class="price-amt">$<em>899</em><small>Per full course</small></div>
-            <hr>
-            <ul>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> 20h of theoretical course</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> 90h of practical course</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Teaching materials included</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Internal exam</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> 15% discount on additional hours</li>
-            </ul>
-            <p class="muted" style="font-size:13px;margin:0;">Extra hours: $15 each beyond the course allowance.</p>
-            <a href="courses.html" class="btn btn--ink btn--block">Sign up</a>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= ABOUT ================= -->
-    <section class="section about" id="about">
-      <div class="container">
-        <div class="about__grid">
-          <div class="about__art">
-            <div class="badge-lg">
-              <div class="since-y">Driving since</div>
-              <b>1992</b>
-              <p>Three decades on the road, teaching the next generation.</p>
-            </div>
-            <div class="since">1992</div>
-          </div>
-
-          <div class="about__text">
-            <span class="eyebrow">About us</span>
-            <h2>Our advantage is experience and knowledge.</h2>
-            <div class="body">
-              <p>We opened FastLane in 1992 with a single car and a single classroom. Today we run a fleet of 76 vehicles and one of the highest first-time pass rates in the state — but the lesson plan still starts the same way it always has: a coffee, a calm voice, and a route the student already knows.</p>
-              <p><strong>Every instructor is an active practitioner.</strong> They drive professionally outside of teaching hours, which means what they teach you is what they themselves rely on five days a week.</p>
-              <p>Refreshers, theory-only courses, and category-specific endorsements — if it touches a wheel, we run a course for it.</p>
-              <a href="#instructors" class="btn btn--secondary mt-2" style="align-self: flex-start;">Meet the instructors
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-              </a>
-            </div>
+            <a class="btn btn--ink btn--sm" href="courses.html">
+              Book
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </a>
           </div>
         </div>
+
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ================= INSTRUCTORS ================= -->
-    <section class="section instructors" id="instructors">
-      <div class="container">
-        <div class="sec-head" style="justify-content: center; text-align: center; flex-direction: column; align-items: center;">
-          <span class="eyebrow">Our instructors</span>
-          <h2>You choose who teaches you to drive.</h2>
-          <p class="sub">Every student is paired with a single primary instructor for the full six weeks. Pick by style, schedule, or specialty.</p>
-        </div>
-
-        <div class="inst-grid">
-
-          <article class="inst-card a">
-            <div class="face">
-              <div class="silhouette"></div>
-              <div class="initials">RM</div>
-              <div class="stat-pill"><b>99.7%</b>Pass rate</div>
-            </div>
-            <div class="body">
-              <div class="role">Practical instructor · Cat. B, C</div>
-              <h3>Rogan Massey</h3>
-              <p class="bio">Calm, methodical, partial to early-morning slots. Has logged more than 1.4 million teaching kilometres since 2008.</p>
-              <div class="tags"><span>Highway</span><span>Refresher</span><span>Anxiety-friendly</span></div>
-            </div>
-          </article>
-
-          <article class="inst-card b">
-            <div class="face">
-              <div class="silhouette"></div>
-              <div class="initials">EA</div>
-              <div class="stat-pill"><b>99.9%</b>Pass rate</div>
-            </div>
-            <div class="body">
-              <div class="role">Internal examiner · Cat. B</div>
-              <h3>Elleanor Armstrong</h3>
-              <p class="bio">Runs the internal exam programme. Direct feedback, no padding — students leave knowing what to fix and exactly how.</p>
-              <div class="tags"><span>Exam prep</span><span>Parallel park</span><span>City</span></div>
-            </div>
-          </article>
-
-          <article class="inst-card c">
-            <div class="face">
-              <div class="silhouette"></div>
-              <div class="initials">SM</div>
-              <div class="stat-pill"><b>100%</b>Pass rate</div>
-            </div>
-            <div class="body">
-              <div class="role">Practical instructor · Cat. C, C+E</div>
-              <h3>Shayla Mathews</h3>
-              <p class="bio">Heavy combination specialist. Drove long-haul for nine years before teaching — knows what the road actually asks of a driver.</p>
-              <div class="tags"><span>Heavy</span><span>Highway</span><span>Night</span></div>
-            </div>
-          </article>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= NEWS ================= -->
-    <section class="section news">
-      <div class="container">
-        <div class="news__grid">
-          <div class="news__intro">
-            <span class="eyebrow">News</span>
-            <h2>What's new in the world of drivers.</h2>
-            <p>Regulation changes, internal cohort updates, and the road conditions you should know about before booking your next slot.</p>
-            <a href="#" class="btn btn--secondary">Subscribe</a>
-          </div>
-          <div class="news__list">
-
-            <article class="news-item">
-              <div class="when"><b>23</b><span>May</span></div>
-              <div>
-                <h4>New regulations for category C+E drivers take effect</h4>
-                <p>From June 1st, all heavy-combination candidates must complete an additional eight hours of off-road manoeuvring before the state exam.</p>
-              </div>
-              <a class="read" href="#">Read <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></a>
-            </article>
-
-            <article class="news-item">
-              <div class="when"><b>18</b><span>May</span></div>
-              <div>
-                <h4>15% discount for refresher courses through the summer</h4>
-                <p>Drivers returning to the road after two or more years off can book any refresher course with the SUMMER-26 code.</p>
-              </div>
-              <a class="read" href="#">Read <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></a>
-            </article>
-
-            <article class="news-item">
-              <div class="when"><b>02</b><span>May</span></div>
-              <div>
-                <h4>Cohort 24 enrolment now open</h4>
-                <p>Forty-eight seats opened this morning for our June intake. Sign-ups close once they're filled or on May 30, whichever comes first.</p>
-              </div>
-              <a class="read" href="#">Read <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></a>
-            </article>
-
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= TESTIMONIAL ================= -->
-    <section class="testimonial">
-      <div class="container">
-        <div class="mark">"</div>
-        <blockquote>
-          Only with FastLane was I able to pass my dream driving licence. The instructor's calm, the way she explained every detail, and the cars — they were the real reason I made it through.
-        </blockquote>
-        <cite>
-          <span class="avatar-circle lg">JR</span>
-          <span class="who"><b>Jemma Russo</b><span>Cohort 21 · Cat. B</span></span>
-        </cite>
-      </div>
-    </section>
-
-    <!-- ================= CONTACT ================= -->
-    <section class="section contact" id="contact">
-      <div class="container">
-        <div class="sec-head" style="justify-content: center; text-align: center; flex-direction: column; align-items: center;">
-          <span class="eyebrow">Contact us</span>
-          <h2>If you have any questions, feel free to reach out.</h2>
-        </div>
-
-        <div class="contact__grid">
-
-          <form class="contact__form" onsubmit="event.preventDefault(); this.querySelector('button[type=submit]').textContent='Sent — we\\'ll be in touch';">
-            <div class="row-between mb-4">
-              <h3 style="font-family:var(--fl-font-serif);font-size:22px;margin:0;">Online form</h3>
-              <span class="badge badge--moss"><span class="dot"></span>Reply within 24h</span>
-            </div>
-            <div class="fields">
-              <div class="field"><label>Your name</label><input class="input" type="text" placeholder="Jordan Reeves"></div>
-              <div class="field"><label>Phone number</label><input class="input" type="tel" placeholder="+1 (555) 010 2466"></div>
-              <div class="field"><label>Email address</label><input class="input" type="email" placeholder="you@email.com"></div>
-              <div class="field"><label>I want to sign up for</label>
-                <select class="select">
-                  <option>Category B — Standard car</option>
-                  <option>Category C — Light truck</option>
-                  <option>Category C+E — Heavy combination</option>
-                  <option>Refresher course</option>
-                </select>
-              </div>
-              <div class="field full">
-                <label>Your message</label>
-                <textarea class="textarea" placeholder="Tell us a bit about your driving experience so far."></textarea>
-              </div>
-            </div>
-            <div class="row-between mt-4">
-              <label style="font-size:13px;color:var(--fl-fg-muted);display:flex;gap:8px;align-items:center;">
-                <input type="checkbox" checked> I agree to the <a href="#" style="text-decoration:underline;">privacy policy</a>.
-              </label>
-              <button class="btn btn--primary" type="submit">Send message
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-              </button>
-            </div>
-          </form>
-
-          <aside class="contact__aside">
-            <h3>Our address</h3>
-            <div class="block">
-              <div class="lbl">Studio</div>
-              <p><b>220 Orchard Street</b><br>New York, NY 10002<br>United States</p>
-            </div>
-            <div class="block">
-              <div class="lbl">Monday – Friday</div>
-              <p>08:00 AM – 09:00 PM</p>
-            </div>
-            <div class="block">
-              <div class="lbl">Saturday</div>
-              <p>09:00 AM – 04:00 PM</p>
-            </div>
-            <div class="block">
-              <div class="lbl">Help desk</div>
-              <p><b>+1 (555) 010 2466</b><br>hello@fastlane.academy</p>
-            </div>
-          </aside>
-
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- ================= FOOTER ================= -->
-  <footer class="site-foot">
+  <!-- ================= STATS STRIP ================= -->
+  <section class="stats-strip">
     <div class="container">
       <div class="row">
-        <div>
-          <a href="index.html" class="brand">
+        <div class="stat-i">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg></span>
+          <div><b>8,649</b><span>Students trained every year by our instructors</span></div>
+        </div>
+        <div class="stat-i">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1l-.84 1.66a1.18 1.18 0 0 0-.1.4l-.24 2.51a1 1 0 0 0 1 1.08H3"></path><circle cx="6.5" cy="16.5" r="2.5"></circle><circle cx="16.5" cy="16.5" r="2.5"></circle></svg></span>
+          <div><b>76</b><span>Category B and C vehicles available for students</span></div>
+        </div>
+        <div class="stat-i">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg></span>
+          <div><b>99.8%</b><span>Of our students pass the state exam first time</span></div>
+        </div>
+        <div class="stat-i">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 12 8 12 11 5 13 19 16 12 21 12"></polyline></svg></span>
+          <div><b>3,472</b><span>Kilometres driven across our fleet every single day</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PRICING / COURSES ================= -->
+  <section class="section pricing" id="courses">
+    <div class="container">
+      <div class="sec-head" style="justify-content: center; text-align: center; flex-direction: column; align-items: center;">
+        <span class="eyebrow">Courses & pricing</span>
+        <h2>Sign up for a course in the category you need.</h2>
+      </div>
+
+      <div class="home-course-grid" id="home-course-grid">
+        <!-- Populated from /api/courses/getAllCourses by home.js -->
+        <div class="price" style="opacity:0.4;pointer-events:none;">
+          <div class="cat">…</div>
+          <h3 style="background:var(--fl-ink-100);height:22px;width:180px;border-radius:4px;"></h3>
+        </div>
+        <div class="price feat" style="opacity:0.4;pointer-events:none;">
+          <div class="cat">…</div>
+          <h3 style="background:rgba(255,255,255,0.08);height:22px;width:180px;border-radius:4px;"></h3>
+        </div>
+        <div class="price" style="opacity:0.4;pointer-events:none;">
+          <div class="cat">…</div>
+          <h3 style="background:var(--fl-ink-100);height:22px;width:180px;border-radius:4px;"></h3>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:32px;">
+        <a href="courses.html" class="btn btn--ink">See all courses →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ABOUT ================= -->
+  <section class="section about" id="about">
+    <div class="container">
+      <div class="about__grid">
+        <div class="about__art">
+          <div class="badge-lg">
+            <div class="since-y">Driving since</div>
+            <b>1992</b>
+            <p>Three decades on the road, teaching the next generation.</p>
+          </div>
+          <div class="since">1992</div>
+        </div>
+
+        <div class="about__text">
+          <span class="eyebrow">About us</span>
+          <h2>Our advantage is experience and knowledge.</h2>
+          <div class="body">
+            <p>We opened FastLane in 1992 with a single car and a single classroom. Today we run a fleet of 76 vehicles and one of the highest first-time pass rates in the state — but the lesson plan still starts the same way it always has: a coffee, a calm voice, and a route the student already knows.</p>
+            <p><strong>Every instructor is an active practitioner.</strong> They drive professionally outside of teaching hours, which means what they teach you is what they themselves rely on five days a week.</p>
+            <p>Refreshers, theory-only courses, and category-specific endorsements — if it touches a wheel, we run a course for it.</p>
+            <a href="#instructors" class="btn btn--secondary mt-2" style="align-self: flex-start;">Meet the instructors
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= INSTRUCTORS ================= -->
+  <section class="section instructors" id="instructors">
+    <div class="container">
+      <div class="sec-head" style="justify-content: center; text-align: center; flex-direction: column; align-items: center;">
+        <span class="eyebrow">Our instructors</span>
+        <h2>You choose who teaches you to drive.</h2>
+        <p class="sub">Every student is paired with a single primary instructor for the full six weeks. Pick by style, schedule, or specialty.</p>
+      </div>
+
+      <div class="inst-grid">
+
+        <article class="inst-card a">
+          <div class="face">
+            <div class="silhouette"></div>
+            <div class="initials">RM</div>
+            <div class="stat-pill"><b>99.7%</b>Pass rate</div>
+          </div>
+          <div class="body">
+            <div class="role">Practical instructor · Cat. B, C</div>
+            <h3>Rogan Massey</h3>
+            <p class="bio">Calm, methodical, partial to early-morning slots. Has logged more than 1.4 million teaching kilometres since 2008.</p>
+            <div class="tags"><span>Highway</span><span>Refresher</span><span>Anxiety-friendly</span></div>
+          </div>
+        </article>
+
+        <article class="inst-card b">
+          <div class="face">
+            <div class="silhouette"></div>
+            <div class="initials">EA</div>
+            <div class="stat-pill"><b>99.9%</b>Pass rate</div>
+          </div>
+          <div class="body">
+            <div class="role">Internal examiner · Cat. B</div>
+            <h3>Elleanor Armstrong</h3>
+            <p class="bio">Runs the internal exam programme. Direct feedback, no padding — students leave knowing what to fix and exactly how.</p>
+            <div class="tags"><span>Exam prep</span><span>Parallel park</span><span>City</span></div>
+          </div>
+        </article>
+
+        <article class="inst-card c">
+          <div class="face">
+            <div class="silhouette"></div>
+            <div class="initials">SM</div>
+            <div class="stat-pill"><b>100%</b>Pass rate</div>
+          </div>
+          <div class="body">
+            <div class="role">Practical instructor · Cat. C, C+E</div>
+            <h3>Shayla Mathews</h3>
+            <p class="bio">Heavy combination specialist. Drove long-haul for nine years before teaching — knows what the road actually asks of a driver.</p>
+            <div class="tags"><span>Heavy</span><span>Highway</span><span>Night</span></div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= NEWS ================= -->
+  <section class="section news">
+    <div class="container">
+      <div class="news__grid">
+        <div class="news__intro">
+          <span class="eyebrow">News</span>
+          <h2>What's new in the world of drivers.</h2>
+          <p>Regulation changes, internal cohort updates, and the road conditions you should know about before booking your next slot.</p>
+          <a href="#" class="btn btn--secondary">Subscribe</a>
+        </div>
+        <div class="news__list">
+
+          <article class="news-item">
+            <div class="when"><b>23</b><span>May</span></div>
+            <div>
+              <h4>New regulations for category C+E drivers take effect</h4>
+              <p>From June 1st, all heavy-combination candidates must complete an additional eight hours of off-road manoeuvring before the state exam.</p>
+            </div>
+            <a class="read" href="#">Read <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></a>
+          </article>
+
+          <article class="news-item">
+            <div class="when"><b>18</b><span>May</span></div>
+            <div>
+              <h4>15% discount for refresher courses through the summer</h4>
+              <p>Drivers returning to the road after two or more years off can book any refresher course with the SUMMER-26 code.</p>
+            </div>
+            <a class="read" href="#">Read <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></a>
+          </article>
+
+          <article class="news-item">
+            <div class="when"><b>02</b><span>May</span></div>
+            <div>
+              <h4>Cohort 24 enrolment now open</h4>
+              <p>Forty-eight seats opened this morning for our June intake. Sign-ups close once they're filled or on May 30, whichever comes first.</p>
+            </div>
+            <a class="read" href="#">Read <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></a>
+          </article>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TESTIMONIAL ================= -->
+  <section class="testimonial">
+    <div class="container">
+      <div class="mark">"</div>
+      <blockquote>
+        Only with FastLane was I able to pass my dream driving licence. The instructor's calm, the way she explained every detail, and the cars — they were the real reason I made it through.
+      </blockquote>
+      <cite>
+        <span class="avatar-circle lg">JR</span>
+        <span class="who"><b>Jemma Russo</b><span>Cohort 21 · Cat. B</span></span>
+      </cite>
+    </div>
+  </section>
+
+  <!-- ================= CONTACT ================= -->
+  <section class="section contact" id="contact">
+    <div class="container">
+      <div class="sec-head" style="justify-content: center; text-align: center; flex-direction: column; align-items: center;">
+        <span class="eyebrow">Contact us</span>
+        <h2>If you have any questions, feel free to reach out.</h2>
+      </div>
+
+      <div class="contact__grid">
+
+        <form class="contact__form" onsubmit="event.preventDefault(); this.querySelector('button[type=submit]').textContent='Sent — we\\'ll be in touch';">
+          <div class="row-between mb-4">
+            <h3 style="font-family:var(--fl-font-serif);font-size:22px;margin:0;">Online form</h3>
+            <span class="badge badge--moss"><span class="dot"></span>Reply within 24h</span>
+          </div>
+          <div class="fields">
+            <div class="field"><label>Your name</label><input class="input" type="text" placeholder="Jordan Reeves"></div>
+            <div class="field"><label>Phone number</label><input class="input" type="tel" placeholder="+1 (555) 010 2466"></div>
+            <div class="field"><label>Email address</label><input class="input" type="email" placeholder="you@email.com"></div>
+            <div class="field"><label>I want to sign up for</label>
+              <select class="select">
+                <option>Category B — Standard car</option>
+                <option>Category C — Light truck</option>
+                <option>Category C+E — Heavy combination</option>
+                <option>Refresher course</option>
+              </select>
+            </div>
+            <div class="field full">
+              <label>Your message</label>
+              <textarea class="textarea" placeholder="Tell us a bit about your driving experience so far."></textarea>
+            </div>
+          </div>
+          <div class="row-between mt-4">
+            <label style="font-size:13px;color:var(--fl-fg-muted);display:flex;gap:8px;align-items:center;">
+              <input type="checkbox" checked> I agree to the <a href="#" style="text-decoration:underline;">privacy policy</a>.
+            </label>
+            <button class="btn btn--primary" type="submit">Send message
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+          </div>
+        </form>
+
+        <aside class="contact__aside">
+          <h3>Our address</h3>
+          <div class="block">
+            <div class="lbl">Studio</div>
+            <p><b>220 Orchard Street</b><br>New York, NY 10002<br>United States</p>
+          </div>
+          <div class="block">
+            <div class="lbl">Monday – Friday</div>
+            <p>08:00 AM – 09:00 PM</p>
+          </div>
+          <div class="block">
+            <div class="lbl">Saturday</div>
+            <p>09:00 AM – 04:00 PM</p>
+          </div>
+          <div class="block">
+            <div class="lbl">Help desk</div>
+            <p><b>+1 (555) 010 2466</b><br>hello@fastlane.academy</p>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer class="site-foot">
+  <div class="container">
+    <div class="row">
+      <div>
+        <a href="index.html" class="brand">
             <span class="bolt">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
             </span>
-            FastLane Academy
-          </a>
-          <p class="blurb">The truest drive comes from doing what you love. Six-week tracks, real road time, a cohort that ships.</p>
-        </div>
-        <div>
-          <h4>Site</h4>
-          <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="courses.html">Courses</a></li>
-            <li><a href="index.html#instructors">Instructors</a></li>
-            <li><a href="feedback.html">Feedback</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4>Dashboards</h4>
-          <ul>
-            <li><a href="student.html">Student portal</a></li>
-            <li><a href="instructor.html">Instructor portal</a></li>
-            <li><a href="admin.html">Admin console</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4>Get in touch</h4>
-          <ul>
-            <li><a href="#contact">220 Orchard Street, NY</a></li>
-            <li><a href="tel:+15550102466">+1 (555) 010 2466</a></li>
-            <li><a href="mailto:hello@fastlane.academy">hello@fastlane.academy</a></li>
-          </ul>
-        </div>
+          FastLane Academy
+        </a>
+        <p class="blurb">The truest drive comes from doing what you love. Six-week tracks, real road time, a cohort that ships.</p>
       </div>
-      <div class="small">
-        <span>© 2026 FastLane Academy — All rights reserved.</span>
-        <span>Driving since 1992</span>
+      <div>
+        <h4>Site</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="courses.html">Courses</a></li>
+          <li><a href="index.html#instructors">Instructors</a></li>
+          <li><a href="feedback.html">Feedback</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Dashboards</h4>
+        <ul>
+          <li><a href="student.html">Student portal</a></li>
+          <li><a href="instructor.html">Instructor portal</a></li>
+          <li><a href="admin.html">Admin console</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Get in touch</h4>
+        <ul>
+          <li><a href="#contact">220 Orchard Street, NY</a></li>
+          <li><a href="tel:+15550102466">+1 (555) 010 2466</a></li>
+          <li><a href="mailto:hello@fastlane.academy">hello@fastlane.academy</a></li>
+        </ul>
       </div>
     </div>
-  </footer>
+    <div class="small">
+      <span>© 2026 FastLane Academy — All rights reserved.</span>
+      <span>Driving since 1992</span>
+    </div>
+  </div>
+</footer>
 </body>
 </html>

@@ -15,18 +15,6 @@
     .ph h1 { font-family: var(--fl-font-display); font-size: clamp(48px, 6.5vw, 88px); line-height: 1.06; letter-spacing: -0.025em; margin: 14px 0 16px; max-width: 14ch; }
     .ph h1 em { font-style: normal; color: var(--fl-moss-700); }
     .ph .lede { font-family: var(--fl-font-serif); color: var(--fl-fg-muted); font-size: 20px; max-width: 580px; line-height: 1.45; margin: 0; }
-    .ph__bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 36px; }
-    .ph__bar .left { display: flex; gap: 8px; flex-wrap: wrap; }
-    .ph__bar .chip {
-      font-family: var(--fl-font-sans); font-size: 13px;
-      padding: 9px 14px; border-radius: 999px;
-      border: 1px solid var(--fl-line); background: var(--fl-paper);
-      color: var(--fl-fg); cursor: pointer;
-      transition: all var(--fl-dur-base) var(--fl-ease);
-    }
-    .ph__bar .chip:hover { background: var(--fl-ink-50); }
-    .ph__bar .chip.active { background: var(--fl-ink-900); color: var(--fl-paper); border-color: var(--fl-ink-900); }
-    .ph__bar .right { margin-left: auto; }
 
     /* course grid (4-up cards) */
     .courses { padding: 56px 0 80px; background: var(--fl-bg); }
@@ -62,95 +50,6 @@
     .course .price-tag { font-family: var(--fl-font-display); font-size: 32px; line-height: 1; letter-spacing: -0.02em; }
     .course .price-tag small { font-family: var(--fl-font-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--fl-fg-muted); display: block; }
 
-    /* spotlight course (top of page) */
-    .spotlight {
-      background: var(--fl-ink-900); color: var(--fl-paper);
-      border-radius: var(--fl-r-2xl);
-      padding: 48px;
-      display: grid; grid-template-columns: 1.4fr 1fr; gap: 48px; align-items: center;
-      margin-bottom: 32px;
-      position: relative; overflow: hidden;
-    }
-    @media (max-width: 980px) { .spotlight { grid-template-columns: 1fr; padding: 32px; } }
-    .spotlight::before {
-      content: ""; position: absolute; right: -10%; top: -20%;
-      width: 60%; height: 140%;
-      background: radial-gradient(closest-side, rgba(151,177,84,0.35), transparent);
-    }
-    .spotlight > * { position: relative; z-index: 1; }
-    .spotlight h2 { font-family: var(--fl-font-display); font-size: clamp(36px, 5vw, 64px); line-height: 1.05; letter-spacing: -0.02em; margin: 16px 0 16px; }
-    .spotlight .lede { font-family: var(--fl-font-serif); font-size: 18px; color: var(--fl-ink-200); line-height: 1.5; max-width: 480px; margin: 0 0 28px; }
-    .spotlight .lbl { font-family: var(--fl-font-mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--fl-moss-400); }
-    .spotlight .stats { display: flex; gap: 36px; margin-top: 8px; }
-    .spotlight .stats b { font-family: var(--fl-font-display); font-size: 36px; letter-spacing: -0.02em; display: block; }
-    .spotlight .stats span { font-family: var(--fl-font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fl-ink-300); margin-top: 4px; display: block; }
-    .spotlight__art {
-      aspect-ratio: 4/5;
-      border-radius: var(--fl-r-xl);
-      background: var(--fl-moss-500);
-      position: relative; overflow: hidden;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .spotlight__art .big {
-      font-family: var(--fl-font-display);
-      font-size: 224px; line-height: 0.8;
-      letter-spacing: -0.06em;
-      color: var(--fl-ink-900);
-    }
-    .spotlight__art .stamp {
-      position: absolute; bottom: 18px; left: 18px; right: 18px;
-      background: var(--fl-glass-bg);
-      backdrop-filter: var(--fl-glass-blur);
-      -webkit-backdrop-filter: var(--fl-glass-blur);
-      border: 1px solid rgba(0,0,0,0.08);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
-      border-radius: var(--fl-r-md);
-      padding: 12px 16px;
-      font-family: var(--fl-font-mono);
-      font-size: 11px; letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--fl-ink-900);
-      display: flex; justify-content: space-between; align-items: center;
-    }
-
-    /* detail panel (could expand from card later) */
-    .detail-panel {
-      background: var(--fl-paper);
-      border: 1px solid var(--fl-line-soft);
-      border-radius: var(--fl-r-xl);
-      padding: 40px;
-      margin-top: 48px;
-    }
-    .detail-panel h2 { font-family: var(--fl-font-display); font-size: 40px; letter-spacing: -0.02em; margin: 14px 0 8px; }
-    .detail-panel .grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 56px; margin-top: 36px; }
-    @media (max-width: 980px) { .detail-panel .grid { grid-template-columns: 1fr; gap: 28px; } }
-    .syllabus { display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--fl-line-soft); }
-    .syllabus-row {
-      display: grid; grid-template-columns: 60px 1fr auto; gap: 20px;
-      padding: 20px 0;
-      border-bottom: 1px solid var(--fl-line-soft);
-      align-items: center;
-    }
-    .syllabus-row .wk {
-      font-family: var(--fl-font-display);
-      font-size: 30px; letter-spacing: -0.02em;
-      color: var(--fl-fg-faint);
-      line-height: 1;
-    }
-    .syllabus-row h4 { font-family: var(--fl-font-serif); font-size: 18px; font-weight: 600; margin: 0 0 4px; }
-    .syllabus-row p { margin: 0; font-size: 14px; color: var(--fl-fg-muted); line-height: 1.45; }
-    .syllabus-row .hrs { font-family: var(--fl-font-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fl-fg-muted); }
-    .syllabus-row.done .wk { color: var(--fl-moss-600); }
-    .info-box {
-      background: var(--fl-ink-50);
-      border-radius: var(--fl-r-lg);
-      padding: 28px;
-    }
-    .info-box h4 { font-family: var(--fl-font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fl-fg-muted); margin: 0 0 14px; font-weight: 500; }
-    .info-box .row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--fl-line-soft); font-size: 14px; }
-    .info-box .row:last-child { border-bottom: none; }
-    .info-box .row b { font-weight: 600; }
-
     /* faq */
     .faq { padding: 80px 0; background: var(--fl-ink-50); }
     .faq-grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 56px; }
@@ -179,380 +78,144 @@
 </head>
 
 <script src="js/api.js"></script>
+<script src="js/nav.js"></script>
 <script src="js/courses.js"></script>
 
 <body class="fl-body">
 
-  <!-- ================= TOP NAV ================= -->
-  <div class="app-topnav-wrap">
-    <nav class="app-topnav">
-      <a href="index.html" class="brand">
+<!-- ================= TOP NAV ================= -->
+<div class="app-topnav-wrap">
+  <nav class="app-topnav">
+    <a href="index.html" class="brand">
         <span class="bolt">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
         </span>
-        FastLane Academy
-        <span class="sub">Driving school</span>
-      </a>
-      <div class="links">
-        <a href="index.html">Home</a>
-        <a href="courses.html" class="active">Courses</a>
-        <a href="index.html#instructors">Instructors</a>
-        <a href="feedback.html">Feedback</a>
-        <a href="index.html#contact">Contact</a>
-      </div>
-      <div class="right">
-        <a href="student.html" class="btn btn--ghost btn--sm">Sign in</a>
-        <a href="#" onclick="document.getElementById('cat-b').scrollIntoView({behavior:'smooth'}); return false;" class="btn btn--primary btn--sm">Book a lesson</a>
-      </div>
-    </nav>
-  </div>
+      FastLane Academy
+      <span class="sub">Driving school</span>
+    </a>
+    <div class="links">
+      <a href="index.html">Home</a>
+      <a href="courses.html" class="active">Courses</a>
+      <a href="index.html#instructors">Instructors</a>
+      <a href="feedback.html">Feedback</a>
+      <a href="index.html#contact">Contact</a>
+    </div>
+    <div class="right">
+      <button id="themeToggleNav" onclick="toggleThemeNav()" aria-label="Toggle dark mode" style="width:36px;height:36px;border-radius:50%;border:1px solid var(--fl-line);background:var(--fl-bg-elev);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--fl-fg-muted);transition:all 160ms;flex-shrink:0;" title="Toggle dark / light (Alt+D)">
+        <svg id="navMoon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <svg id="navSun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+      </button>
+      <a href="auth.html" class="btn btn--ghost btn--sm" id="nav-signin" style="display:none;">Sign in</a>
+      <a href="courses.html" class="btn btn--primary btn--sm" id="nav-book" style="display:none;">Book a lesson</a>
+      <a href="#" class="btn btn--ghost btn--sm" id="nav-dashboard" style="display:none;">My dashboard</a>
+      <button class="btn btn--primary btn--sm" id="nav-logout" onclick="navLogout()" style="display:none;">Sign out</button>
+    </div>
+  </nav>
+</div>
 
-  <main>
+<main>
 
-    <!-- ================= PAGE HEADER ================= -->
-    <section class="ph">
-      <div class="container">
-        <span class="eyebrow">Courses · Cohort 24 enrolment open</span>
-        <h1>Pick a category. We'll teach you the <em>road</em>.</h1>
-        <p class="lede">Six weeks, two routes through every course: theory mornings, practical afternoons. Everything below is bookable today.</p>
-
-        <div class="ph__bar">
-          <div class="left">
-            <button class="chip active">All courses</button>
-            <button class="chip">Cat. B — Car</button>
-            <button class="chip">Cat. C — Light truck</button>
-            <button class="chip">Cat. C+E — Heavy</button>
-            <button class="chip">Refresher</button>
-            <button class="chip">Theory only</button>
-          </div>
-          <div class="right">
-            <div class="search" style="width:240px;">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-              <input class="input" type="search" placeholder="Search a course…">
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= COURSE LIST ================= -->
-    <section class="courses">
-      <div class="container">
-
-        <!-- Spotlight: featured course -->
-        <article class="spotlight" id="cat-b">
-          <div>
-            <span class="lbl">Cohort 24 · Starts Jun 9</span>
-            <h2>Standard car licence.</h2>
-            <p class="lede">Our most-booked track. Thirty hours of theory, sixty on the road, three internal mock exams scattered through the back half so the real one feels like the fourth.</p>
-            <div class="gap-2" style="gap:12px;">
-              <a href="student.html" class="btn btn--primary btn--lg">Enrol now — $399</a>
-              <a href="#syllabus-b" class="btn btn--secondary btn--lg" style="background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.16);color:var(--fl-paper);">See syllabus</a>
-            </div>
-            <div class="stats">
-              <div><b>6</b><span>Weeks</span></div>
-              <div><b>90h</b><span>Total</span></div>
-              <div><b>99.8%</b><span>Pass rate</span></div>
-              <div><b>14</b><span>Seats left</span></div>
-            </div>
-          </div>
-          <div class="spotlight__art">
-            <div class="big">B</div>
-            <div class="stamp">
-              <span>Cat. B · Manual & auto</span>
-              <span>$399</span>
-            </div>
-          </div>
-        </article>
-
-        <!-- Regular courses grid -->
-        <div class="course-grid">
-
-          <article class="course">
-            <div>
-              <span class="lbl">Cat. C · 6 weeks</span>
-              <h3>Light truck licence</h3>
-              <p class="one-line">For vehicles up to 7.5 tonnes. Heavier wheel, longer turn, same calm pace.</p>
-              <div class="meta-row">
-                <div class="m"><span>Theory</span><b>20h</b></div>
-                <div class="m"><span>Practice</span><b>80h</b></div>
-                <div class="m"><span>Seats</span><b>6 left</b></div>
-              </div>
-              <div class="foot">
-                <span class="price-tag">$599<small>Full course</small></span>
-                <a href="student.html" class="btn btn--ink btn--sm" style="margin-left:auto;">Enrol</a>
-              </div>
-            </div>
-            <div class="cat-glyph">C</div>
-          </article>
-
-          <article class="course">
-            <div>
-              <span class="lbl">Cat. C+E · 8 weeks</span>
-              <h3>Heavy combination licence</h3>
-              <p class="one-line">Articulated heavy vehicles. Specialist instructors, dedicated off-road yard.</p>
-              <div class="meta-row">
-                <div class="m"><span>Theory</span><b>20h</b></div>
-                <div class="m"><span>Practice</span><b>90h</b></div>
-                <div class="m"><span>Seats</span><b>3 left</b></div>
-              </div>
-              <div class="foot">
-                <span class="price-tag">$899<small>Full course</small></span>
-                <a href="student.html" class="btn btn--ink btn--sm" style="margin-left:auto;">Enrol</a>
-              </div>
-            </div>
-            <div class="cat-glyph">C+E</div>
-          </article>
-
-          <article class="course">
-            <div>
-              <span class="lbl">Refresher · 2 weeks</span>
-              <h3>Back behind the wheel</h3>
-              <p class="one-line">For drivers returning after two or more years off the road. SUMMER-26: 15% off.</p>
-              <div class="meta-row">
-                <div class="m"><span>Theory</span><b>4h</b></div>
-                <div class="m"><span>Practice</span><b>16h</b></div>
-                <div class="m"><span>Seats</span><b>18 left</b></div>
-              </div>
-              <div class="foot">
-                <span class="price-tag">$249<small>Full course</small></span>
-                <a href="student.html" class="btn btn--ink btn--sm" style="margin-left:auto;">Enrol</a>
-              </div>
-            </div>
-            <div class="cat-glyph">R</div>
-          </article>
-
-          <article class="course">
-            <div>
-              <span class="lbl">Theory only · 3 weeks</span>
-              <h3>State theory exam prep</h3>
-              <p class="one-line">Three weeks of evening classes. The same theory book the examiners write from.</p>
-              <div class="meta-row">
-                <div class="m"><span>Theory</span><b>30h</b></div>
-                <div class="m"><span>Practice</span><b>—</b></div>
-                <div class="m"><span>Seats</span><b>22 left</b></div>
-              </div>
-              <div class="foot">
-                <span class="price-tag">$149<small>Full course</small></span>
-                <a href="student.html" class="btn btn--ink btn--sm" style="margin-left:auto;">Enrol</a>
-              </div>
-            </div>
-            <div class="cat-glyph">T</div>
-          </article>
-
-          <article class="course">
-            <div>
-              <span class="lbl">Cat. A · 4 weeks</span>
-              <h3>Motorcycle endorsement</h3>
-              <p class="one-line">Full A licence, off-road yard plus on-road hours. Bikes provided.</p>
-              <div class="meta-row">
-                <div class="m"><span>Theory</span><b>12h</b></div>
-                <div class="m"><span>Practice</span><b>40h</b></div>
-                <div class="m"><span>Seats</span><b>9 left</b></div>
-              </div>
-              <div class="foot">
-                <span class="price-tag">$479<small>Full course</small></span>
-                <a href="student.html" class="btn btn--ink btn--sm" style="margin-left:auto;">Enrol</a>
-              </div>
-            </div>
-            <div class="cat-glyph">A</div>
-          </article>
-
-          <article class="course">
-            <div>
-              <span class="lbl">Defensive · 1 day</span>
-              <h3>Advanced defensive driving</h3>
-              <p class="one-line">One Saturday, eight hours, our top instructor. Insurance discount on completion.</p>
-              <div class="meta-row">
-                <div class="m"><span>Theory</span><b>2h</b></div>
-                <div class="m"><span>Practice</span><b>6h</b></div>
-                <div class="m"><span>Seats</span><b>11 left</b></div>
-              </div>
-              <div class="foot">
-                <span class="price-tag">$129<small>Per session</small></span>
-                <a href="student.html" class="btn btn--ink btn--sm" style="margin-left:auto;">Enrol</a>
-              </div>
-            </div>
-            <div class="cat-glyph">D</div>
-          </article>
-
-        </div>
-
-        <!-- ================= DETAIL: Cat B syllabus ================= -->
-        <div class="detail-panel" id="syllabus-b">
-          <div class="row-between" style="flex-wrap:wrap;">
-            <div>
-              <span class="eyebrow">Inside the course</span>
-              <h2>Cat. B — week by week</h2>
-              <p class="muted" style="margin:8px 0 0;max-width:560px;font-family:var(--fl-font-serif);font-size:17px;line-height:1.5;">Six weeks, two routes: theory mornings (city campus) and practical afternoons (your assigned instructor's car). Every Friday closes with a mini-exam.</p>
-            </div>
-            <a href="student.html" class="btn btn--primary">Start enrolment
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-            </a>
-          </div>
-
-          <div class="grid">
-            <div class="syllabus">
-              <div class="syllabus-row done">
-                <div class="wk">01</div>
-                <div>
-                  <h4>Rules, signs and right-of-way</h4>
-                  <p>Theory week. Building the mental model of the road before you sit in a car.</p>
-                </div>
-                <div class="hrs">15h</div>
-              </div>
-              <div class="syllabus-row done">
-                <div class="wk">02</div>
-                <div>
-                  <h4>Cockpit drill and quiet streets</h4>
-                  <p>First time at the wheel. Empty industrial estates, slow speeds, every control named out loud.</p>
-                </div>
-                <div class="hrs">15h</div>
-              </div>
-              <div class="syllabus-row">
-                <div class="wk">03</div>
-                <div>
-                  <h4>City driving and junctions</h4>
-                  <p>Urban routes during off-peak hours. Reading traffic, lane discipline, indicating with intent.</p>
-                </div>
-                <div class="hrs">15h</div>
-              </div>
-              <div class="syllabus-row">
-                <div class="wk">04</div>
-                <div>
-                  <h4>Manoeuvres and parking</h4>
-                  <p>Parallel, bay, reverse around a corner. The four manoeuvres the state examiner picks from.</p>
-                </div>
-                <div class="hrs">15h</div>
-              </div>
-              <div class="syllabus-row">
-                <div class="wk">05</div>
-                <div>
-                  <h4>Highway and night driving</h4>
-                  <p>Merging, lane changes at 100 km/h, and two evening sessions for confidence in low light.</p>
-                </div>
-                <div class="hrs">15h</div>
-              </div>
-              <div class="syllabus-row">
-                <div class="wk">06</div>
-                <div>
-                  <h4>Mock exam week</h4>
-                  <p>Three full mock state exams across the week with an internal examiner. We'll tell you which day you're ready.</p>
-                </div>
-                <div class="hrs">15h</div>
-              </div>
-            </div>
-
-            <div class="col" style="gap:18px;">
-              <div class="info-box">
-                <h4>Course summary</h4>
-                <div class="row"><span>Duration</span><b>6 weeks</b></div>
-                <div class="row"><span>Theory hours</span><b>30h</b></div>
-                <div class="row"><span>Practical hours</span><b>60h</b></div>
-                <div class="row"><span>Extra hours</span><b>$20 / hour</b></div>
-                <div class="row"><span>Internal exam</span><b>Included</b></div>
-                <div class="row"><span>State exam fee</span><b>Pay direct</b></div>
-              </div>
-
-              <div class="info-box" style="background:var(--fl-ink-900);color:var(--fl-paper);">
-                <h4 style="color:var(--fl-moss-400);">Your instructor will</h4>
-                <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:12px;">
-                  <li style="display:flex;gap:10px;font-size:14px;line-height:1.45;color:var(--fl-ink-200);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#97B154" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px;"><polyline points="20 6 9 17 4 12"></polyline></svg> Pick you up from a meeting point you choose each lesson.</li>
-                  <li style="display:flex;gap:10px;font-size:14px;line-height:1.45;color:var(--fl-ink-200);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#97B154" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px;"><polyline points="20 6 9 17 4 12"></polyline></svg> Send a written summary within an hour of each session.</li>
-                  <li style="display:flex;gap:10px;font-size:14px;line-height:1.45;color:var(--fl-ink-200);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#97B154" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px;"><polyline points="20 6 9 17 4 12"></polyline></svg> Reschedule lessons up to 12h in advance, no fee.</li>
-                  <li style="display:flex;gap:10px;font-size:14px;line-height:1.45;color:var(--fl-ink-200);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#97B154" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px;"><polyline points="20 6 9 17 4 12"></polyline></svg> Be reachable on WhatsApp between 7am and 9pm.</li>
-                </ul>
-              </div>
-
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- ================= FAQ ================= -->
-    <section class="faq">
-      <div class="container">
-        <div class="faq-grid">
-          <div>
-            <span class="eyebrow">Frequently asked</span>
-            <h2 style="font-family:var(--fl-font-display);font-size:clamp(32px,3.5vw,44px);letter-spacing:-0.02em;line-height:1.1;margin:12px 0 16px;">Questions we get the most.</h2>
-            <p class="muted" style="font-family:var(--fl-font-serif);font-size:17px;line-height:1.5;">Still can't find what you need? <a href="index.html#contact" style="color:var(--fl-moss-700);text-decoration:underline;">Drop us a line.</a></p>
-          </div>
-          <div>
-            <details class="qa" open>
-              <summary>Do I need to bring my own car?</summary>
-              <p>No — every practical lesson is in a fully-fitted school car (dual controls, current insurance, fresh dashcam). Refresher students may use their own vehicle on request.</p>
-            </details>
-            <details class="qa">
-              <summary>What if I miss a session?</summary>
-              <p>You can reschedule up to twelve hours before the lesson start time without paying a fee. Cancellations inside that window are charged at half the lesson rate.</p>
-            </details>
-            <details class="qa">
-              <summary>How do payments work?</summary>
-              <p>You can pay the course in full at enrolment, or split it across the six weeks. Both options are visible inside your student dashboard the moment you sign up.</p>
-            </details>
-            <details class="qa">
-              <summary>What's the difference between the internal and state exam?</summary>
-              <p>The internal exam is run by one of our own examiners and mirrors the state format. It's free and included. You book and pay the state exam yourself when we tell you you're ready.</p>
-            </details>
-            <details class="qa">
-              <summary>Can I switch instructors mid-course?</summary>
-              <p>Yes, no questions asked — we just want to know it isn't working. We'll match you to someone else within forty-eight hours.</p>
-            </details>
-          </div>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- ================= FOOTER ================= -->
-  <footer class="site-foot">
+  <!-- ================= PAGE HEADER ================= -->
+  <section class="ph">
     <div class="container">
-      <div class="row">
-        <div>
-          <a href="index.html" class="brand">
+      <span class="eyebrow">Courses · Cohort 24 enrolment open</span>
+      <h1>Pick a category. We'll teach you the <em>road</em>.</h1>
+      <p class="lede">Six weeks, two routes through every course: theory mornings, practical afternoons. Everything below is bookable today.</p>
+
+    </div>
+  </section>
+
+  <!-- ================= COURSE LIST ================= -->
+  <section class="courses">
+    <div class="container">
+
+      <!-- Dynamic course grid — populated from /api/courses/getAllCourses by courses.js -->
+      <div class="course-grid">
+      </div>
+
+
+      <!-- ================= FAQ ================= -->
+      <section class="faq">
+        <div class="container">
+          <div class="faq-grid">
+            <div>
+              <span class="eyebrow">Frequently asked</span>
+              <h2 style="font-family:var(--fl-font-display);font-size:clamp(32px,3.5vw,44px);letter-spacing:-0.02em;line-height:1.1;margin:12px 0 16px;">Questions we get the most.</h2>
+              <p class="muted" style="font-family:var(--fl-font-serif);font-size:17px;line-height:1.5;">Still can't find what you need? <a href="index.html#contact" style="color:var(--fl-moss-700);text-decoration:underline;">Drop us a line.</a></p>
+            </div>
+            <div>
+              <details class="qa" open>
+                <summary>Do I need to bring my own car?</summary>
+                <p>No — every practical lesson is in a fully-fitted school car (dual controls, current insurance, fresh dashcam). Refresher students may use their own vehicle on request.</p>
+              </details>
+              <details class="qa">
+                <summary>What if I miss a session?</summary>
+                <p>You can reschedule up to twelve hours before the lesson start time without paying a fee. Cancellations inside that window are charged at half the lesson rate.</p>
+              </details>
+              <details class="qa">
+                <summary>How do payments work?</summary>
+                <p>You can pay the course in full at enrolment, or split it across the six weeks. Both options are visible inside your student dashboard the moment you sign up.</p>
+              </details>
+              <details class="qa">
+                <summary>What's the difference between the internal and state exam?</summary>
+                <p>The internal exam is run by one of our own examiners and mirrors the state format. It's free and included. You book and pay the state exam yourself when we tell you you're ready.</p>
+              </details>
+              <details class="qa">
+                <summary>Can I switch instructors mid-course?</summary>
+                <p>Yes, no questions asked — we just want to know it isn't working. We'll match you to someone else within forty-eight hours.</p>
+              </details>
+            </div>
+          </div>
+        </div>
+      </section>
+
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer class="site-foot">
+  <div class="container">
+    <div class="row">
+      <div>
+        <a href="index.html" class="brand">
             <span class="bolt">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
             </span>
-            FastLane Academy
-          </a>
-          <p class="blurb">The truest drive comes from doing what you love. Six-week tracks, real road time, a cohort that ships.</p>
-        </div>
-        <div>
-          <h4>Site</h4>
-          <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="courses.html">Courses</a></li>
-            <li><a href="index.html#instructors">Instructors</a></li>
-            <li><a href="feedback.html">Feedback</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4>Dashboards</h4>
-          <ul>
-            <li><a href="student.html">Student portal</a></li>
-            <li><a href="instructor.html">Instructor portal</a></li>
-            <li><a href="admin.html">Admin console</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4>Get in touch</h4>
-          <ul>
-            <li><a href="index.html#contact">220 Orchard Street, NY</a></li>
-            <li><a href="tel:+15550102466">+1 (555) 010 2466</a></li>
-            <li><a href="mailto:hello@fastlane.academy">hello@fastlane.academy</a></li>
-          </ul>
-        </div>
+          FastLane Academy
+        </a>
+        <p class="blurb">The truest drive comes from doing what you love. Six-week tracks, real road time, a cohort that ships.</p>
       </div>
-      <div class="small">
-        <span>© 2026 FastLane Academy — All rights reserved.</span>
-        <span>Driving since 1992</span>
+      <div>
+        <h4>Site</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="courses.html">Courses</a></li>
+          <li><a href="index.html#instructors">Instructors</a></li>
+          <li><a href="feedback.html">Feedback</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Dashboards</h4>
+        <ul>
+          <li><a href="student.html">Student portal</a></li>
+          <li><a href="instructor.html">Instructor portal</a></li>
+          <li><a href="admin.html">Admin console</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Get in touch</h4>
+        <ul>
+          <li><a href="index.html#contact">220 Orchard Street, NY</a></li>
+          <li><a href="tel:+15550102466">+1 (555) 010 2466</a></li>
+          <li><a href="mailto:hello@fastlane.academy">hello@fastlane.academy</a></li>
+        </ul>
       </div>
     </div>
-  </footer>
+    <div class="small">
+      <span>© 2026 FastLane Academy — All rights reserved.</span>
+      <span>Driving since 1992</span>
+    </div>
+  </div>
+</footer>
 
 </body>
 </html>

@@ -556,3 +556,313 @@ button { font-family: inherit; }
 /* page entry */
 main { animation: pageIn 320ms var(--fl-ease-out); }
 @keyframes pageIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* ============================================================
+   DARK MODE — component overrides
+   These patch every hardcoded var(--fl-paper) / var(--fl-ink-50)
+   so all pages look right when data-theme="dark" is set.
+   ============================================================ */
+
+/* ── Nav (top bar on public pages) ─────────────────────────── */
+:root[data-theme="dark"] .app-topnav {
+  background: rgba(22, 22, 21, 0.72);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 6px 18px rgba(0,0,0,0.4);
+}
+:root[data-theme="dark"] .app-topnav .links a:hover {
+  background: rgba(255,255,255,0.07);
+}
+:root[data-theme="dark"] .app-topnav .links a.active {
+  color: var(--fl-moss-400);
+}
+
+/* ── Buttons ────────────────────────────────────────────────── */
+:root[data-theme="dark"] .btn--secondary {
+  background: var(--fl-ink-800);
+  color: var(--fl-fg);
+  border-color: rgba(255,255,255,0.12);
+}
+:root[data-theme="dark"] .btn--secondary:hover {
+  background: var(--fl-ink-700);
+  border-color: rgba(255,255,255,0.2);
+}
+:root[data-theme="dark"] .btn--ghost:hover {
+  background: rgba(255,255,255,0.08);
+}
+:root[data-theme="dark"] .btn--danger {
+  background: var(--fl-ink-800);
+  border-color: rgba(255,255,255,0.12);
+}
+:root[data-theme="dark"] .btn--danger:hover {
+  background: rgba(179,54,31,0.18);
+  border-color: var(--fl-error);
+}
+
+/* ── Badges ─────────────────────────────────────────────────── */
+:root[data-theme="dark"] .badge--moss     { background: rgba(151,177,84,0.2); color: var(--fl-moss-300); }
+:root[data-theme="dark"] .badge--success  { background: rgba(75,92,37,0.3);   color: #a3c96d; }
+:root[data-theme="dark"] .badge--warn     { background: rgba(125,90,19,0.3);  color: #d4a94e; }
+:root[data-theme="dark"] .badge--danger   { background: rgba(142,41,24,0.3);  color: #f08070; }
+:root[data-theme="dark"] .badge--info     { background: rgba(37,80,107,0.3);  color: #7db8d4; }
+:root[data-theme="dark"] .badge--neutral  { background: var(--fl-ink-700);    color: var(--fl-ink-200); }
+:root[data-theme="dark"] .badge--outline  { border-color: rgba(255,255,255,0.15); }
+
+/* ── Cards ──────────────────────────────────────────────────── */
+:root[data-theme="dark"] .card {
+  background: var(--fl-ink-800);
+  border-color: rgba(255,255,255,0.07);
+}
+:root[data-theme="dark"] .card--sunk {
+  background: var(--fl-ink-900);
+}
+:root[data-theme="dark"] .card__head {
+  border-color: rgba(255,255,255,0.07);
+}
+
+/* ── Inputs ─────────────────────────────────────────────────── */
+:root[data-theme="dark"] .input,
+:root[data-theme="dark"] .select,
+:root[data-theme="dark"] .textarea {
+  background: var(--fl-ink-800);
+  border-color: rgba(255,255,255,0.12);
+  color: var(--fl-fg);
+}
+:root[data-theme="dark"] .input::placeholder,
+:root[data-theme="dark"] .textarea::placeholder {
+  color: var(--fl-ink-500);
+}
+:root[data-theme="dark"] .input:focus,
+:root[data-theme="dark"] .select:focus,
+:root[data-theme="dark"] .textarea:focus {
+  border-color: var(--fl-moss-400);
+  background: var(--fl-ink-700);
+}
+
+/* ── Tables ─────────────────────────────────────────────────── */
+:root[data-theme="dark"] .tbl-wrap {
+  background: var(--fl-ink-800);
+  border-color: rgba(255,255,255,0.07);
+}
+:root[data-theme="dark"] .tbl th {
+  background: var(--fl-ink-900);
+  border-color: rgba(255,255,255,0.08);
+}
+:root[data-theme="dark"] .tbl td {
+  border-color: rgba(255,255,255,0.05);
+}
+:root[data-theme="dark"] .tbl tr:hover td {
+  background: rgba(255,255,255,0.04);
+}
+
+/* ── Stat cards ─────────────────────────────────────────────── */
+:root[data-theme="dark"] .stat {
+  background: var(--fl-ink-800);
+  border-color: rgba(255,255,255,0.07);
+}
+:root[data-theme="dark"] .stat .delta {
+  color: var(--fl-moss-400);
+}
+
+/* ── Tabs ───────────────────────────────────────────────────── */
+:root[data-theme="dark"] .tabs {
+  background: var(--fl-ink-800);
+  border-color: rgba(255,255,255,0.10);
+}
+:root[data-theme="dark"] .tabs button.active {
+  background: var(--fl-ink-100);
+  color: var(--fl-ink-900);
+}
+:root[data-theme="dark"] .tabs button:hover {
+  color: var(--fl-fg);
+}
+
+/* ── Dashboard sidebar ──────────────────────────────────────── */
+:root[data-theme="dark"] .dash__side {
+  background: var(--fl-ink-800);
+  border-color: rgba(255,255,255,0.07);
+}
+:root[data-theme="dark"] .dash__nav a:hover {
+  background: rgba(255,255,255,0.06);
+}
+:root[data-theme="dark"] .dash__nav a.active {
+  background: var(--fl-moss-700);
+  color: var(--fl-paper);
+}
+:root[data-theme="dark"] .dash__nav a.active svg {
+  color: var(--fl-moss-200);
+}
+:root[data-theme="dark"] .dash__profile {
+  background: var(--fl-ink-900);
+}
+:root[data-theme="dark"] .dash__bar {
+  border-color: rgba(255,255,255,0.07);
+}
+
+/* ── Progress bar ───────────────────────────────────────────── */
+:root[data-theme="dark"] .progress {
+  background: var(--fl-ink-700);
+}
+
+/* ── Calendar / week grid ───────────────────────────────────── */
+:root[data-theme="dark"] .week-grid {
+  background: var(--fl-ink-800);
+  border-color: rgba(255,255,255,0.07);
+}
+:root[data-theme="dark"] .week-grid .cell {
+  border-color: rgba(255,255,255,0.06);
+}
+:root[data-theme="dark"] .week-grid .cell.head {
+  background: var(--fl-ink-900);
+}
+:root[data-theme="dark"] .week-grid .cell.time {
+  background: var(--fl-ink-800);
+}
+:root[data-theme="dark"] .week-grid .cell.has-lesson {
+  background: rgba(151,177,84,0.10);
+}
+:root[data-theme="dark"] .week-grid .lesson.outline {
+  background: var(--fl-ink-700);
+  border-color: rgba(255,255,255,0.15);
+}
+
+/* ── Icon button ────────────────────────────────────────────── */
+:root[data-theme="dark"] .icon-btn {
+  background: var(--fl-ink-800);
+  border-color: rgba(255,255,255,0.10);
+  color: var(--fl-fg);
+}
+:root[data-theme="dark"] .icon-btn:hover {
+  background: var(--fl-ink-700);
+}
+:root[data-theme="dark"] .icon-btn.danger:hover {
+  background: rgba(179,54,31,0.18);
+  border-color: var(--fl-error);
+}
+
+/* ── Glass utility ──────────────────────────────────────────── */
+:root[data-theme="dark"] .fl-glass {
+  background: var(--fl-glass-bg);
+  border-color: var(--fl-glass-stroke);
+}
+
+/* ── Code inline ─────────────────────────────────────────────── */
+:root[data-theme="dark"] .fl-code,
+:root[data-theme="dark"] code.fl {
+  background: var(--fl-ink-700);
+  border-color: rgba(255,255,255,0.10);
+}
+/* ============================================================
+   DARK MODE — Home page section overrides
+   ============================================================ */
+
+/* Hero & stats */
+:root[data-theme="dark"] .hero {
+  background: var(--fl-bg);
+}
+:root[data-theme="dark"] .stats-strip {
+  background: var(--fl-bg);
+}
+:root[data-theme="dark"] .stats-strip .stat-i .ico {
+  background: rgba(151,177,84,0.12);
+  color: var(--fl-moss-400);
+}
+
+/* Pricing/courses */
+:root[data-theme="dark"] .pricing {
+  background: var(--fl-bg-elev);
+}
+:root[data-theme="dark"] .price {
+  background: var(--fl-ink-800);
+  border-color: rgba(255,255,255,0.07);
+  color: var(--fl-fg);
+}
+:root[data-theme="dark"] .price .price-amt {
+  color: var(--fl-fg);
+}
+:root[data-theme="dark"] .price .price-amt em {
+  color: var(--fl-moss-400);
+}
+:root[data-theme="dark"] .price hr {
+  border-color: rgba(255,255,255,0.07);
+}
+:root[data-theme="dark"] .price ul li svg {
+  color: var(--fl-moss-400);
+}
+
+/* About */
+:root[data-theme="dark"] .about {
+  background: var(--fl-bg);
+}
+
+/* Instructors */
+:root[data-theme="dark"] .instructors {
+  background: var(--fl-bg-elev);
+}
+:root[data-theme="dark"] .inst-card {
+  background: var(--fl-ink-800);
+  border-color: rgba(255,255,255,0.07);
+}
+:root[data-theme="dark"] .inst-card .tags span {
+  background: var(--fl-ink-700);
+  color: var(--fl-ink-200);
+}
+
+/* News */
+:root[data-theme="dark"] .news {
+  background: var(--fl-bg);
+}
+:root[data-theme="dark"] .news-item {
+  border-color: rgba(255,255,255,0.08);
+}
+
+/* Contact */
+:root[data-theme="dark"] .contact {
+  background: var(--fl-bg-elev);
+}
+:root[data-theme="dark"] .contact__form {
+  background: var(--fl-ink-800);
+  border-color: rgba(255,255,255,0.07);
+}
+
+/* Hero emphasis color in dark mode */
+:root[data-theme="dark"] .hero h1 em {
+  color: var(--fl-moss-400);
+}
+
+/* ============================================================
+   DARK MODE — Student dashboard: lesson slot buttons & pref cells
+   ============================================================ */
+:root[data-theme="dark"] .pref-cell {
+  background: var(--fl-ink-800);
+  border-color: rgba(255,255,255,0.10);
+  color: var(--fl-fg-muted);
+}
+:root[data-theme="dark"] .pref-cell.on {
+  background: var(--fl-moss-700);
+  color: var(--fl-paper);
+  border-color: var(--fl-moss-700);
+}
+:root[data-theme="dark"] .slot-pick-btn {
+  color: var(--fl-fg);
+}
+
+/* ============================================================
+   DARK MODE — Instructor dashboard: profile card (middle card)
+   ============================================================ */
+:root[data-theme="dark"] .srow {
+  border-color: rgba(255,255,255,0.06);
+}
+:root[data-theme="dark"] #status-lesson-info {
+  background: var(--fl-ink-700);
+  color: var(--fl-fg);
+}
+:root[data-theme="dark"] .mal.err {
+  background: rgba(255,80,60,0.12);
+  color: #ff7063;
+  border-color: rgba(255,80,60,0.25);
+}
+:root[data-theme="dark"] .mal.ok {
+  background: rgba(46,160,67,0.15);
+  color: #56d364;
+  border-color: rgba(46,160,67,0.30);
+}

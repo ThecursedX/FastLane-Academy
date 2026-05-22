@@ -11,14 +11,16 @@ import java.util.Optional;
 public interface EnrollmentRepo extends JpaRepository<Enrollment, String> {
 
     Optional<Enrollment> findTopByOrderByEnrollmentIdDesc();
+
     boolean existsByStudentIdAndCourseId(String studentId, String courseId);
 
     List<Enrollment> findByStudentId(String studentId);
 
     List<Enrollment> findByCourseId(String courseId);
 
-    boolean existsByStudentIdAndCourseIdAndAccessGrantedTrue(
-            String studentId,
-            String courseId
-    );
+    // Used by LessonService to verify student has approved access before claiming a slot
+    boolean existsByStudentIdAndCourseIdAndAccessGrantedTrue(String studentId, String courseId);
+
+    // Used by PaymentService to sync paymentStatus back onto enrollment
+    Optional<Enrollment> findByStudentIdAndCourseId(String studentId, String courseId);
 }

@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/api/payments")
 public class PaymentController {
@@ -53,14 +52,17 @@ public class PaymentController {
                 .body(response);
     }
 
-    // Student Payment.java History
+    // Student Payment.java History — accessible by both ADMIN and the owning STUDENT
     @GetMapping("/student/{studentId}")
     public ResponseEntity<ResponseDTO> getStudentPayments(
             @PathVariable String studentId, HttpSession session)
     {
-        if (!SessionUtil.isRole(session, "ADMIN")) {
+        // Allow admin or the student themselves
+        boolean isAdmin   = SessionUtil.isRole(session, "ADMIN");
+        boolean isStudent = SessionUtil.isRole(session, "STUDENT");
+        if (!isAdmin && !isStudent) {
             return ResponseEntity.status(403)
-                    .body(new ResponseDTO(VarList.UNAUTHORIZED, "Admin access only", null));
+                    .body(new ResponseDTO(VarList.UNAUTHORIZED, "Access denied", null));
         }
         ResponseDTO response =
                 paymentService.getStudentPayments(studentId);
@@ -161,14 +163,16 @@ public class PaymentController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 
-    // Delete Payment.java
+    // Delete Payment — Admin can delete any; Student can delete their own PENDING payment
     @PutMapping("/delete/{paymentId}")
     public ResponseEntity<ResponseDTO> deletePayment(
             @PathVariable String paymentId, HttpSession session)
     {
-        if (!SessionUtil.isRole(session, "ADMIN")) {
+        boolean isAdmin   = SessionUtil.isRole(session, "ADMIN");
+        boolean isStudent = SessionUtil.isRole(session, "STUDENT");
+        if (!isAdmin && !isStudent) {
             return ResponseEntity.status(403)
-                    .body(new ResponseDTO(VarList.UNAUTHORIZED, "Admin access only", null));
+                    .body(new ResponseDTO(VarList.UNAUTHORIZED, "Access denied", null));
         }
 
         ResponseDTO response =

@@ -4,21 +4,21 @@ import com.example.FastLane.Academy.dto.LessonDTO;
 import com.example.FastLane.Academy.dto.ResponseDTO;
 import com.example.FastLane.Academy.entity.Instructor;
 import com.example.FastLane.Academy.entity.Lesson;
+import com.example.FastLane.Academy.enums.LessonStatus;
 import com.example.FastLane.Academy.enums.WorkingDay;
 import com.example.FastLane.Academy.repo.EnrollmentRepo;
 import com.example.FastLane.Academy.repo.InstructorRepo;
 import com.example.FastLane.Academy.repo.LessonRepo;
-import com.example.FastLane.Academy.enums.LessonStatus;
 import com.example.FastLane.Academy.util.VarList;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,516 +28,13 @@ import java.util.Optional;
 @Transactional
 public class LessonService {
 
-    @Autowired
-    private LessonRepo lessonRepo;
-
-    @Autowired
-    private InstructorRepo instructorRepo;
-    @Autowired
-    private EnrollmentRepo enrollmentRepo;
-
-    @Autowired
-    private ModelMapper modelMapper;
-
-   public ResponseDTO  requestLesson(LessonDTO lessonDTO){
-       boolean hasAccess = enrollmentRepo
-               .existsByStudentIdAndCourseIdAndAccessGrantedTrue(
-                       lessonDTO.getStudentId(),
-                       lessonDTO.getCourseId()   // ← LessonDTO must carry courseId (see Fix 5)
-               );
-
-       if (!hasAccess) {
-           return new ResponseDTO(
-                   VarList.RSP_FAIL,
-                   "Student does not have access. Please complete enrollment and payment first.",
-                   lessonDTO
-           );
-       }
-
-       //date validation
-       String validation = validateLessonDate(lessonDTO.getDate());
-       if (validation != null) {
-           return new ResponseDTO(validation, "Invalid lesson date", lessonDTO);
-       }
-
-       //time slot validation
-       String timeValidation = validateTimeSlot(lessonDTO.getTime());
-       if (timeValidation != null) {
-           return new ResponseDTO(timeValidation, "Invalid time slot selected", lessonDTO);
-       }
-
-       Lesson lesson = modelMapper.map(lessonDTO, Lesson.class);
-
-       String conflict = checkConflict(lesson);
-
-       if (conflict != null) {
-
-           String message = switch (conflict) {
-               case VarList.INSTRUCTOR_CONFLICT -> "Instructor already booked";
-               case VarList.STUDENT_CONFLICT -> "Student already booked";
-               case VarList.INSTRUCTOR_UNAVAILABLE_DAY -> "Instructor not available on selected day";
-               case VarList.INSTRUCTOR_NOT_FOUND -> "Instructor not found";
-               default -> "Scheduling conflict";
-           };
-
-           return new ResponseDTO(
-                   conflict,
-                   message,
-                   lessonDTO
-           );
-       }
-
-       //generate ID
-       String lastId = lessonRepo.findTopByOrderByLessonIdDesc()
-               .map(Lesson::getLessonId)
-               .orElse(null);
-
-       String nextId;
-
-       if (lastId == null) {
-           nextId = "L001";
-       } else {
-
-           int number = Integer.parseInt(lastId.substring(1));
-           nextId = String.format("L%03d", number + 1);
-       }
-
-       lesson.setLessonId(nextId);
-
-       lesson.setStatus(LessonStatus.PENDING);
-       lesson.setRequestedAt(LocalDateTime.now());
-
-       lessonRepo.save(lesson);
-       return new ResponseDTO(VarList.REQUEST_ADDED,"Lesson request added to FIFO queue",lessonDTO);
-
-   }
-    public ResponseDTO processNextLesson(){
-
-        Optional<Lesson> optionalLesson =
-                lessonRepo.findFirstByStatusOrderByRequestedAtAsc(LessonStatus.PENDING);
-
-        if(optionalLesson.isEmpty()){
-            return new ResponseDTO(VarList.NO_PENDING_REQUESTS, "No pending lesson requests",
-                    null);}
-
-        Lesson lesson = optionalLesson.get();
-
-        //Conflict check (includes instructor + student + working days)
-        String conflict = checkConflict(lesson);
-
-        if (conflict != null) {
-            lesson.setStatus(LessonStatus.REJECTED);
-            lessonRepo.save(lesson);
-            String message =  switch (conflict) {
-                case VarList.INSTRUCTOR_CONFLICT -> "Instructor already booked";
-                case VarList.STUDENT_CONFLICT -> "Student already booked";
-                case VarList.INSTRUCTOR_UNAVAILABLE_DAY -> "Instructor not available on this day";
-                case VarList.INSTRUCTOR_NOT_FOUND -> "Instructor not found";
-                default -> "Scheduling conflict";
-            };
-
-            return new ResponseDTO(conflict, message, lesson);
-        }
-
-        // No conflict → schedule
-        lesson.setStatus(LessonStatus.SCHEDULED);
-        lessonRepo.save(lesson);
-
-        return new ResponseDTO(
-                VarList.LESSON_SCHEDULED_SUCCESSFULLY, "Lesson scheduled successfully", lesson);
-    }
-
-
-    public List<LessonDTO> getAllLessons() {
-        return lessonRepo.findAll().stream()
-                .map(lesson -> modelMapper.map(lesson, LessonDTO.class))
-                .toList();
-
-    }
-
-    public ResponseDTO updateLesson(LessonDTO lessonDTO) {
-       //date validation
-        String validation = validateLessonDate(lessonDTO.getDate());
-        if (validation != null) {
-            return new ResponseDTO(validation, "Invalid Date", lessonDTO);}
-
-        //time slot validation
-        String timeValidation = validateTimeSlot(lessonDTO.getTime());
-        if (timeValidation != null) {
-            return new ResponseDTO(timeValidation, "Invalid time slot", lessonDTO);
-        }
-
-        Optional<Lesson> optionalLesson = lessonRepo.findById(lessonDTO.getLessonId());
-        if (optionalLesson.isEmpty()) {
-            return new ResponseDTO(
-                    VarList.LESSON_NOT_FOUND,
-                    "Lesson Not Found",
-                    lessonDTO);
-        }
-        Lesson existingLesson = optionalLesson.get();
-
-        // check instructor working day
-        Optional<Instructor> optionalInstructor =
-                instructorRepo.findById(lessonDTO.getInstructorId());
-
-        if (optionalInstructor.isEmpty()) {
-            return new ResponseDTO(
-                    VarList.INSTRUCTOR_NOT_FOUND, "Instructor Not Found", lessonDTO);
-        }
-        Instructor instructor = optionalInstructor.get();
-        DayOfWeek lessonDay = lessonDTO.getDate().getDayOfWeek();
-
-        if (!instructor.getWorkingDays().contains(
-                WorkingDay.valueOf(lessonDay.name())
-        )) {
-            return new ResponseDTO(
-                    VarList.INSTRUCTOR_UNAVAILABLE_DAY, "Instructor not available on this day", lessonDTO);
-        }
-        // Instructor conflict (exclude current lesson)
-        boolean instructorConflict =
-                lessonRepo.existsByInstructorIdAndDateAndTimeAndStatusAndLessonIdNot(
-                        lessonDTO.getInstructorId(),
-                        lessonDTO.getDate(),
-                        lessonDTO.getTime(),
-                        LessonStatus.SCHEDULED,
-                        lessonDTO.getLessonId()
-                );
-
-        if (instructorConflict) {
-            return new ResponseDTO(
-                    VarList.INSTRUCTOR_CONFLICT, "Instructor Unavailable", lessonDTO);
-        }
-
-
-        // check student conflict (exclude current lesson)
-        boolean studentConflict =
-                lessonRepo.existsByStudentIdAndDateAndTimeAndStatusAndLessonIdNot(
-                        lessonDTO.getStudentId(), lessonDTO.getDate(), lessonDTO.getTime(), LessonStatus.SCHEDULED, lessonDTO.getLessonId());
-
-        if (studentConflict) {
-            return new ResponseDTO(VarList.STUDENT_CONFLICT, "Student Unavailable", lessonDTO);
-        }
-
-        // update fields
-        existingLesson.setInstructorId(lessonDTO.getInstructorId());
-        existingLesson.setStudentId(lessonDTO.getStudentId());
-        existingLesson.setDate(lessonDTO.getDate());
-        existingLesson.setTime(lessonDTO.getTime());
-
-        lessonRepo.save(existingLesson);
-
-        return new ResponseDTO(VarList.UPDATED_SUCCESSFULLY, "Lesson Updated", lessonDTO
-        );
-
-    }
-
-    public ResponseDTO deleteLesson(String lessonId) {
-        if (lessonRepo.existsById(lessonId)) {
-            lessonRepo.deleteById(lessonId);
-            return  new ResponseDTO(
-                    VarList.RSP_SUCCESS, "Lesson deleted successfully", null);
-        } else {
-            return new ResponseDTO(
-                    VarList.RSP_NO_DATA_FOUND, "Lesson not found", null);
-        }
-    }
-    public List<LessonDTO> getLessonsByStudentId(String studentId) {
-        List<Lesson> lessons = lessonRepo.findByStudentId(studentId);
-        if (lessons.isEmpty()) {
-            return new ArrayList<>();
-        }
-        return modelMapper.map(lessons,new TypeToken<ArrayList<LessonDTO>>(){}.getType());
-    }
-    public List<LessonDTO> getLessonsByInstructorId(String instructorId) {
-        List<Lesson> lessons = lessonRepo.findByInstructorId(instructorId);
-        if (lessons.isEmpty()) {
-            return new ArrayList<>();
-        }
-        return modelMapper.map(lessons,new TypeToken<ArrayList<LessonDTO>>(){}.getType());
-    }
-    public ResponseDTO getAvailableTimeSlots(LocalDate date) {
-
-        // validate date first
-        String validation = validateLessonDate(date);
-        if (validation != null) {
-            return new ResponseDTO(validation, "Invalid date", null);}
-
-        // get already booked lessons
-        List<Lesson> bookedLessons =
-                lessonRepo.findByDateAndStatus(date, LessonStatus.SCHEDULED);
-
-        // extract booked times
-        List<LocalTime> bookedTimes = bookedLessons.stream()
-                .map(Lesson::getTime)
-                .toList();
-
-        LocalDate today = LocalDate.now();
-        LocalTime now = LocalTime.now();
-
-        // filter available slots
-        List<LocalTime> availableSlots = ALLOWED_TIME_SLOTS.stream()
-                .filter(slot -> !bookedTimes.contains(slot))//remove booked
-                .filter(slot ->{
-                    if (date.equals(today)){
-                return slot.isAfter(now);
-                    }return  true;
-                })
-                .toList();
-
-        return new ResponseDTO(
-                VarList.RSP_SUCCESS, "Available time slots", availableSlots);
-    }
-
-    public ResponseDTO requestReschedule(String lessonId, LessonDTO newDetails) {
-
-        Optional<Lesson> optionalLesson = lessonRepo.findById(lessonId);
-
-        if (optionalLesson.isEmpty()) {
-            return new ResponseDTO(
-                    VarList.LESSON_NOT_FOUND,
-                    "Lesson not found",
-                    null
-            );
-        }
-
-        Lesson oldLesson = optionalLesson.get();
-
-        // 24-hour checking
-        LocalDateTime lessonDateTime =
-                LocalDateTime.of(oldLesson.getDate(), oldLesson.getTime());
-
-        if (lessonDateTime.isBefore(LocalDateTime.now().plusHours(12))) {
-            return new ResponseDTO(
-                    VarList.RESCHEDULE_NOT_ALLOWED,
-                    "Cannot reschedule within 24 hours of lesson",
-                    oldLesson
-            );
-        }
-
-        // validate date & time
-        String dateValidation = validateLessonDate(newDetails.getDate());
-        if (dateValidation != null) {
-            return new ResponseDTO(dateValidation, "Invalid date", newDetails);
-        }
-
-        String timeValidation = validateTimeSlot(newDetails.getTime());
-        if (timeValidation != null) {
-            return new ResponseDTO(timeValidation, "Invalid time slot", newDetails);
-        }
-
-        // mark old lesson
-        oldLesson.setStatus(LessonStatus.RESHEDULED); // or CANCELLED
-        lessonRepo.save(oldLesson);
-
-        //New ID
-        String lastId = lessonRepo.findTopByOrderByLessonIdDesc()
-                .map(Lesson::getLessonId)
-                .orElse(null);
-
-        String nextId = (lastId == null)
-                ? "L001"
-                : String.format("L%03d", Integer.parseInt(lastId.substring(1)) + 1);
-
-
-        Lesson newLesson = new Lesson();
-        newLesson.setLessonId(nextId);
-        newLesson.setStudentId(oldLesson.getStudentId());
-        newLesson.setInstructorId(newDetails.getInstructorId() != null
-                ? newDetails.getInstructorId()
-                : oldLesson.getInstructorId());
-        newLesson.setDate(newDetails.getDate());
-        newLesson.setTime(newDetails.getTime());
-        newLesson.setStatus(LessonStatus.PENDING);
-        newLesson.setRequestedAt(LocalDateTime.now());
-
-
-        lessonRepo.save(newLesson);
-
-        return new ResponseDTO(
-                VarList.REQUEST_ADDED, "Reschedule request added to queue", newLesson);
-    }
-
-
-    public ResponseDTO cancelLesson(String lessonId) {
-
-        Optional<Lesson> optionalLesson = lessonRepo.findById(lessonId);
-
-        if (optionalLesson.isEmpty()) {
-            return new ResponseDTO(
-                    VarList.LESSON_NOT_FOUND, "Lesson not found", null);
-        }
-
-        Lesson lesson = optionalLesson.get();
-
-        // Only allow cancelling SCHEDULED lessons
-        if (lesson.getStatus()!=LessonStatus.SCHEDULED) {
-            return new ResponseDTO(
-                    VarList.RSP_FAIL, "Only scheduled lessons can be cancelled", lesson);
-        }
-
-        // 24-hour rule
-        LocalDateTime lessonDateTime =
-                LocalDateTime.of(lesson.getDate(), lesson.getTime());
-
-        if (lessonDateTime.isBefore(LocalDateTime.now().plusHours(24))) {
-            return new ResponseDTO(
-                    VarList.CANCELLATION_NOT_ALLOWED, "Cannot cancel within 24 hours of lesson", lesson);
-        }
-
-        // Cancel lesson
-        lesson.setStatus(LessonStatus.CANCELLED);
-        lessonRepo.save(lesson);
-
-        return new ResponseDTO(
-                VarList.RSP_SUCCESS, "Lesson cancelled successfully", lesson);
-    }
-    public ResponseDTO getUpcomingLessons(String studentId) {
-
-        List<LessonDTO> list = lessonRepo
-                .findByStudentIdAndStatusAndDateGreaterThanEqual(
-                        studentId, LessonStatus.SCHEDULED, LocalDate.now()
-                )
-                .stream()
-                .map(l -> modelMapper.map(l, LessonDTO.class))
-                .toList();
-
-        return new ResponseDTO(
-                VarList.RSP_SUCCESS, "Upcoming lessons", list);
-    }
-
-    public ResponseDTO getLessonHistory(String studentId) {
-
-        List<LessonDTO> list = lessonRepo
-                .findByStudentIdAndDateBefore(studentId, LocalDate.now()
-                )
-                .stream()
-                .map(l -> modelMapper.map(l, LessonDTO.class))
-                .toList();
-
-        return new ResponseDTO(
-                VarList.RSP_SUCCESS, "Lesson history", list);
-    }
-    public ResponseDTO getLessonById(String lessonId) {
-
-        Optional<Lesson> optionalLesson = lessonRepo.findById(lessonId);
-
-        if (optionalLesson.isEmpty()) {
-            return new ResponseDTO(
-                    VarList.LESSON_NOT_FOUND, "Lesson not found", null);
-        }
-
-        LessonDTO lessonDTO =
-                modelMapper.map(optionalLesson.get(), LessonDTO.class);
-
-        return new ResponseDTO(
-                VarList.RSP_SUCCESS, "Lesson retrieved successfully", lessonDTO);
-    }
-    public String updateLessonStatus(String lessonId, LessonStatus newStatus) {
-
-        Optional<Lesson> optionalLesson = lessonRepo.findById(lessonId);
-
-        if (optionalLesson.isEmpty()) {
-            return VarList.LESSON_NOT_FOUND;
-        }
-
-        Lesson lesson = optionalLesson.get();
-        LessonStatus currentStatus = lesson.getStatus();
-
-        switch (currentStatus) {
-            case PENDING:
-                if (newStatus == LessonStatus.SCHEDULED || newStatus == LessonStatus.REJECTED) {
-                    lesson.setStatus(newStatus);
-                } else {
-                    return VarList.INVALID_STATUS_CHANGE;
-                }
-                break;
-
-            case SCHEDULED:
-                if (newStatus == LessonStatus.COMPLETED || newStatus == LessonStatus.CANCELLED) {
-                    lesson.setStatus(newStatus);
-                } else {
-                    return VarList.INVALID_STATUS_CHANGE;
-                }
-                break;
-
-            case COMPLETED:
-            case CANCELLED:
-            case REJECTED:
-                return VarList.STATUS_ALREADY_FINAL;
-        }
-
-        lessonRepo.save(lesson);
-        return VarList.RSP_SUCCESS;
-    }
-
-
-    //Validations
-    private String checkConflict(Lesson lesson) {
-        // instructor exists
-        Optional<Instructor> optionalInstructor =
-                instructorRepo.findById(lesson.getInstructorId());
-
-        if (optionalInstructor.isEmpty()) {
-            return VarList.INSTRUCTOR_NOT_FOUND;
-        }
-
-        Instructor instructor = optionalInstructor.get();
-
-        // instructor working day validation
-        DayOfWeek lessonDay = lesson.getDate().getDayOfWeek();
-
-        boolean available = instructor.getWorkingDays().contains(
-                WorkingDay.valueOf(lessonDay.name())
-        );
-
-        if (!available) {
-            return VarList.INSTRUCTOR_UNAVAILABLE_DAY;
-        }
-
-        // 3. Instructor conflict
-        if (lessonRepo.existsByInstructorIdAndDateAndTimeAndStatus(
-                lesson.getInstructorId(),
-                lesson.getDate(),
-                lesson.getTime(),
-                LessonStatus.SCHEDULED)) {
-            return VarList.INSTRUCTOR_CONFLICT;
-        }
-
-        // 4. Student conflict
-        if (lessonRepo.existsByStudentIdAndDateAndTimeAndStatus(
-                lesson.getStudentId(),
-                lesson.getDate(),
-                lesson.getTime(),
-                LessonStatus.SCHEDULED)) {
-            return VarList.STUDENT_CONFLICT;
-        }
-
-        return null;
-    }
-
-    private String validateLessonDate(LocalDate date) {
-
-        // Block Sunday
-        if (date.getDayOfWeek() == DayOfWeek.SUNDAY) {
-            return VarList.INVALID_DAY; // you define this
-        }
-
-        LocalDate today = LocalDate.now();
-
-        // BLOCK past dates
-        if (date.isBefore(today)) {
-            return VarList.INVALID_DAY; // or create PAST_DATE_NOT_ALLOWED
-        }
-
-        // Block > 4 months ahead
-        LocalDate maxDate = LocalDate.now().plusMonths(4);
-
-        if (date.isAfter(maxDate)) {
-            return VarList.DATE_OUT_OF_RANGE;
-        }
-
-        return null; // valid
-    }
+    @Autowired private LessonRepo lessonRepo;
+    @Autowired private InstructorRepo instructorRepo;
+    @Autowired private EnrollmentRepo enrollmentRepo;
+    @Autowired private ModelMapper modelMapper;
+    @Autowired @Lazy private LessonRequestService lessonRequestService;
+
+    // ── Allowed time slots ────────────────────────────────────────────────
     private static final List<LocalTime> ALLOWED_TIME_SLOTS = List.of(
             LocalTime.of(8, 0),
             LocalTime.of(9, 30),
@@ -545,12 +42,308 @@ public class LessonService {
             LocalTime.of(13, 0),
             LocalTime.of(14, 30)
     );
-    private String validateTimeSlot(LocalTime time) {
 
-        if (!ALLOWED_TIME_SLOTS.contains(time)) {
-            return VarList.INVALID_TIME_SLOT; // define this
+    // ─────────────────────────────────────────────────────────────────────
+    // STUDENT: request a lesson
+    // ─────────────────────────────────────────────────────────────────────
+    public ResponseDTO requestLesson(LessonDTO lessonDTO) {
+
+        boolean hasAccess = enrollmentRepo
+                .existsByStudentIdAndCourseIdAndAccessGrantedTrue(
+                        lessonDTO.getStudentId(),
+                        lessonDTO.getCourseId()
+                );
+
+        if (!hasAccess) {
+            return new ResponseDTO(VarList.RSP_FAIL,
+                    "Student does not have access. Complete enrollment and payment first.",
+                    lessonDTO);
         }
 
+        String dateErr = validateLessonDate(lessonDTO.getDate());
+        if (dateErr != null)
+            return new ResponseDTO(dateErr, "Invalid lesson date", lessonDTO);
+
+        String timeErr = validateTimeSlot(lessonDTO.getTime());
+        if (timeErr != null)
+            return new ResponseDTO(timeErr, "Invalid time slot", lessonDTO);
+
+        Lesson lesson = modelMapper.map(lessonDTO, Lesson.class);
+
+        String conflict = checkConflict(lesson);
+        if (conflict != null) {
+            return new ResponseDTO(conflict, conflictMessage(conflict), lessonDTO);
+        }
+
+        lesson.setLessonId(generateNextId());
+        lesson.setStatus(LessonStatus.SCHEDULED);   // adjust if your enum differs
+        lessonRepo.save(lesson);
+
+        return new ResponseDTO(VarList.REQUEST_ADDED, "Lesson request added", lessonDTO);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // ADMIN: process next pending lesson in FIFO queue
+    // ─────────────────────────────────────────────────────────────────────
+    public ResponseDTO processNextLesson() {
+
+        // NOTE: add this method to LessonRepo if not present:
+        // Optional<Lesson> findFirstByStatusOrderByLessonIdAsc(LessonStatus status);
+        Optional<Lesson> opt = lessonRepo.findFirstByStatusOrderByLessonIdAsc(LessonStatus.SCHEDULED);
+
+        if (opt.isEmpty())
+            return new ResponseDTO(VarList.NO_PENDING_REQUESTS, "No pending lesson requests", null);
+
+        Lesson lesson = opt.get();
+        String conflict = checkConflict(lesson);
+
+        if (conflict != null) {
+            // Mark as cancelled/rejected — use whatever status your enum has
+            lesson.setStatus(LessonStatus.CANCELLED);
+            lessonRepo.save(lesson);
+            return new ResponseDTO(conflict, conflictMessage(conflict), lesson);
+        }
+
+        lesson.setStatus(LessonStatus.SCHEDULED);
+        lessonRepo.save(lesson);
+        return new ResponseDTO(VarList.LESSON_SCHEDULED_SUCCESSFULLY, "Lesson scheduled", lesson);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // READ helpers
+    // ─────────────────────────────────────────────────────────────────────
+    public List<LessonDTO> getAllLessons() {
+        return lessonRepo.findAll().stream()
+                .map(l -> modelMapper.map(l, LessonDTO.class))
+                .toList();
+    }
+
+    public ResponseDTO getLessonById(String lessonId) {
+        Optional<Lesson> opt = lessonRepo.findById(lessonId);
+        if (opt.isEmpty())
+            return new ResponseDTO(VarList.LESSON_NOT_FOUND, "Lesson not found", null);
+        return new ResponseDTO(VarList.RSP_SUCCESS, "Success",
+                modelMapper.map(opt.get(), LessonDTO.class));
+    }
+
+    public List<LessonDTO> getLessonsByStudentId(String studentId) {
+        List<Lesson> lessons = lessonRepo.findByStudentId(studentId);
+        if (lessons.isEmpty()) return new ArrayList<>();
+        return modelMapper.map(lessons, new TypeToken<ArrayList<LessonDTO>>(){}.getType());
+    }
+
+    public List<LessonDTO> getLessonsByInstructorId(String instructorId) {
+        List<Lesson> lessons = lessonRepo.findByInstructorId(instructorId);
+        if (lessons.isEmpty()) return new ArrayList<>();
+        return modelMapper.map(lessons, new TypeToken<ArrayList<LessonDTO>>(){}.getType());
+    }
+
+    public ResponseDTO getUpcomingLessons(String studentId) {
+        List<LessonDTO> list = lessonRepo
+                .findByStudentIdAndStatusAndDateGreaterThanEqual(
+                        studentId, LessonStatus.SCHEDULED, LocalDate.now())
+                .stream()
+                .map(l -> modelMapper.map(l, LessonDTO.class))
+                .toList();
+        return new ResponseDTO(VarList.RSP_SUCCESS, "Upcoming lessons", list);
+    }
+
+    public ResponseDTO getLessonHistory(String studentId) {
+        List<LessonDTO> list = lessonRepo
+                .findByStudentIdAndDateBefore(studentId, LocalDate.now())
+                .stream()
+                .map(l -> modelMapper.map(l, LessonDTO.class))
+                .toList();
+        return new ResponseDTO(VarList.RSP_SUCCESS, "Lesson history", list);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // UPDATE / DELETE
+    // ─────────────────────────────────────────────────────────────────────
+    public ResponseDTO updateLesson(LessonDTO lessonDTO) {
+
+        String dateErr = validateLessonDate(lessonDTO.getDate());
+        if (dateErr != null)
+            return new ResponseDTO(dateErr, "Invalid date", lessonDTO);
+
+        String timeErr = validateTimeSlot(lessonDTO.getTime());
+        if (timeErr != null)
+            return new ResponseDTO(timeErr, "Invalid time slot", lessonDTO);
+
+        Optional<Lesson> opt = lessonRepo.findById(lessonDTO.getLessonId());
+        if (opt.isEmpty())
+            return new ResponseDTO(VarList.LESSON_NOT_FOUND, "Lesson not found", lessonDTO);
+
+        Lesson lesson = opt.get();
+
+        Optional<Instructor> instOpt = instructorRepo.findById(lessonDTO.getInstructorId());
+        if (instOpt.isEmpty())
+            return new ResponseDTO(VarList.INSTRUCTOR_NOT_FOUND, "Instructor not found", lessonDTO);
+
+        DayOfWeek day = lessonDTO.getDate().getDayOfWeek();
+        if (!instOpt.get().getWorkingDays().contains(WorkingDay.valueOf(day.name())))
+            return new ResponseDTO(VarList.INSTRUCTOR_UNAVAILABLE_DAY,
+                    "Instructor not available on this day", lessonDTO);
+
+        // NOTE: add these to LessonRepo if not present:
+        // boolean existsByInstructorIdAndDateAndTimeAndStatusAndLessonIdNot(
+        //         String instructorId, LocalDate date, LocalTime time,
+        //         LessonStatus status, String lessonId);
+        // boolean existsByStudentIdAndDateAndTimeAndStatusAndLessonIdNot(
+        //         String studentId, LocalDate date, LocalTime time,
+        //         LessonStatus status, String lessonId);
+        boolean instConflict = lessonRepo
+                .existsByInstructorIdAndDateAndTimeAndStatusAndLessonIdNot(
+                        lessonDTO.getInstructorId(), lessonDTO.getDate(), lessonDTO.getTime(),
+                        LessonStatus.SCHEDULED, lessonDTO.getLessonId());
+        if (instConflict)
+            return new ResponseDTO(VarList.INSTRUCTOR_CONFLICT, "Instructor unavailable", lessonDTO);
+
+        boolean stuConflict = lessonRepo
+                .existsByStudentIdAndDateAndTimeAndStatusAndLessonIdNot(
+                        lessonDTO.getStudentId(), lessonDTO.getDate(), lessonDTO.getTime(),
+                        LessonStatus.SCHEDULED, lessonDTO.getLessonId());
+        if (stuConflict)
+            return new ResponseDTO(VarList.STUDENT_CONFLICT, "Student unavailable", lessonDTO);
+
+        lesson.setInstructorId(lessonDTO.getInstructorId());
+        lesson.setStudentId(lessonDTO.getStudentId());
+        lesson.setDate(lessonDTO.getDate());
+        lesson.setTime(lessonDTO.getTime());
+        lessonRepo.save(lesson);
+
+        return new ResponseDTO(VarList.UPDATED_SUCCESSFULLY, "Lesson updated", lessonDTO);
+    }
+
+    public ResponseDTO deleteLesson(String lessonId) {
+        if (!lessonRepo.existsById(lessonId))
+            return new ResponseDTO(VarList.RSP_NO_DATA_FOUND, "Lesson not found", null);
+        lessonRepo.deleteById(lessonId);
+        return new ResponseDTO(VarList.RSP_SUCCESS, "Lesson deleted", null);
+    }
+
+    public String updateLessonStatus(String lessonId, LessonStatus newStatus, String instructorId) {
+        Optional<Lesson> opt = lessonRepo.findById(lessonId);
+        if (opt.isEmpty()) return VarList.LESSON_NOT_FOUND;
+
+        Lesson lesson = opt.get();
+        LessonStatus current = lesson.getStatus();
+
+        boolean allowed = switch (current) {
+            case SCHEDULED  -> newStatus == LessonStatus.COMPLETED || newStatus == LessonStatus.CANCELLED;
+            case COMPLETED, CANCELLED -> false;
+            default -> false;
+        };
+
+        if (!allowed) return VarList.INVALID_STATUS_CHANGE;
+
+        // COMPLETED: delegate to LessonRequestService so queue cleanup happens
+        if (newStatus == LessonStatus.COMPLETED) {
+            ResponseDTO res = lessonRequestService.completeLesson(instructorId, lessonId);
+            return res.getCode();
+        }
+
+        lesson.setStatus(newStatus);
+        lessonRepo.save(lesson);
+        return VarList.RSP_SUCCESS;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // RESCHEDULE / CANCEL
+    // ─────────────────────────────────────────────────────────────────────
+    public ResponseDTO cancelLesson(String lessonId) {
+        Optional<Lesson> opt = lessonRepo.findById(lessonId);
+        if (opt.isEmpty())
+            return new ResponseDTO(VarList.LESSON_NOT_FOUND, "Lesson not found", null);
+
+        Lesson lesson = opt.get();
+        if (lesson.getStatus() != LessonStatus.SCHEDULED)
+            return new ResponseDTO(VarList.RSP_FAIL, "Only scheduled lessons can be cancelled", lesson);
+
+        lesson.setStatus(LessonStatus.CANCELLED);
+        lessonRepo.save(lesson);
+        return new ResponseDTO(VarList.RSP_SUCCESS, "Lesson cancelled", lesson);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // AVAILABLE SLOTS
+    // ─────────────────────────────────────────────────────────────────────
+    public ResponseDTO getAvailableTimeSlots(LocalDate date) {
+        String err = validateLessonDate(date);
+        if (err != null)
+            return new ResponseDTO(err, "Invalid date", null);
+
+        // NOTE: add this to LessonRepo if not present:
+        // List<Lesson> findByDateAndStatus(LocalDate date, LessonStatus status);
+        List<Lesson> booked = lessonRepo.findByDateAndStatus(date, LessonStatus.SCHEDULED);
+        List<LocalTime> bookedTimes = booked.stream().map(Lesson::getTime).toList();
+
+        LocalDate today = LocalDate.now();
+        LocalTime now = LocalTime.now();
+
+        List<LocalTime> available = ALLOWED_TIME_SLOTS.stream()
+                .filter(s -> !bookedTimes.contains(s))
+                .filter(s -> !date.equals(today) || s.isAfter(now))
+                .toList();
+
+        return new ResponseDTO(VarList.RSP_SUCCESS, "Available slots", available);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // Private helpers
+    // ─────────────────────────────────────────────────────────────────────
+    private String generateNextId() {
+        String lastId = lessonRepo.findTopByOrderByLessonIdDesc()
+                .map(Lesson::getLessonId)
+                .orElse(null);
+        if (lastId == null) return "L001";
+        return String.format("L%03d", Integer.parseInt(lastId.substring(1)) + 1);
+    }
+
+    private String checkConflict(Lesson lesson) {
+        Optional<Instructor> opt = instructorRepo.findById(lesson.getInstructorId());
+        if (opt.isEmpty()) return VarList.INSTRUCTOR_NOT_FOUND;
+
+        DayOfWeek day = lesson.getDate().getDayOfWeek();
+        if (!opt.get().getWorkingDays().contains(WorkingDay.valueOf(day.name())))
+            return VarList.INSTRUCTOR_UNAVAILABLE_DAY;
+
+        // NOTE: add these to LessonRepo if not present:
+        // boolean existsByInstructorIdAndDateAndTimeAndStatus(
+        //         String instructorId, LocalDate date, LocalTime time, LessonStatus status);
+        // boolean existsByStudentIdAndDateAndTimeAndStatus(
+        //         String studentId, LocalDate date, LocalTime time, LessonStatus status);
+        if (lessonRepo.existsByInstructorIdAndDateAndTimeAndStatus(
+                lesson.getInstructorId(), lesson.getDate(), lesson.getTime(), LessonStatus.SCHEDULED))
+            return VarList.INSTRUCTOR_CONFLICT;
+
+        if (lessonRepo.existsByStudentIdAndDateAndTimeAndStatus(
+                lesson.getStudentId(), lesson.getDate(), lesson.getTime(), LessonStatus.SCHEDULED))
+            return VarList.STUDENT_CONFLICT;
+
         return null;
+    }
+
+    private String validateLessonDate(LocalDate date) {
+        if (date == null) return VarList.INVALID_DAY;
+        if (date.getDayOfWeek() == DayOfWeek.SUNDAY) return VarList.INVALID_DAY;
+        if (date.isBefore(LocalDate.now())) return VarList.INVALID_DAY;
+        if (date.isAfter(LocalDate.now().plusMonths(4))) return VarList.DATE_OUT_OF_RANGE;
+        return null;
+    }
+
+    private String validateTimeSlot(LocalTime time) {
+        if (time == null || !ALLOWED_TIME_SLOTS.contains(time)) return VarList.INVALID_TIME_SLOT;
+        return null;
+    }
+
+    private String conflictMessage(String code) {
+        return switch (code) {
+            case VarList.INSTRUCTOR_CONFLICT       -> "Instructor already booked";
+            case VarList.STUDENT_CONFLICT          -> "Student already booked";
+            case VarList.INSTRUCTOR_UNAVAILABLE_DAY -> "Instructor not available on this day";
+            case VarList.INSTRUCTOR_NOT_FOUND      -> "Instructor not found";
+            default -> "Scheduling conflict";
+        };
     }
 }
