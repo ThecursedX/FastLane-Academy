@@ -102,6 +102,12 @@ function switchToAdmin() {
   clearAlert();
   updateFormState();
 }
+function switchToNormal() {
+  currentRole = "student";
+  currentMode = "signin";
+  clearAlert();
+  updateFormState();
+}
 
 function updateFormState() {
   const isSignUp     = currentMode === "signup";
@@ -167,6 +173,14 @@ function updateFormState() {
     inner.classList.remove("mode-switch-anim");
     void inner.offsetWidth;
     inner.classList.add("mode-switch-anim");
+  }
+
+  const adminLink = document.querySelector(".admin-link");
+
+  if(adminLink){
+    adminLink.innerHTML = isAdmin
+        ? "← Back to normal sign in"
+        : "Sign in as admin";
   }
 }
 

@@ -55,8 +55,8 @@ function renderCourses(courses) {
                     <div class="m"><span>Status</span><b>${c.status || "—"}</b></div>
                     <div class="m"><span>ID</span><b style="font-size:14px;">${c.courseId || "—"}</b></div>
                 </div>
-                <a href="auth.html" class="btn btn--primary">Enrol now →</a>
-            </div>
+                    <a href="${localStorage.getItem('fl-role') === 'STUDENT' ? 'student.html#mycourses' : 'auth.html'}" class="btn btn--primary">Enrol now →</a> 
+               </div>
             <div class="cat-glyph">${(c.courseTitle || "?")[0].toUpperCase()}</div>
         </div>
     `).join("");

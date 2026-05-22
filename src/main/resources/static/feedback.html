@@ -195,6 +195,47 @@
       fill: var(--fl-ink-600);
       stroke: var(--fl-ink-500);
     }
+    /* =========================================================
+   FEEDBACK DARK MODE FIX
+========================================================= */
+
+    :root[data-theme="dark"] .rating-wrap,
+    :root[data-theme="dark"] .rating-card,
+    :root[data-theme="dark"] .feedback-card,
+    :root[data-theme="dark"] .feedback-form,
+    :root[data-theme="dark"] .overall-rating {
+      background: var(--fl-ink-900) !important;
+      border-color: rgba(255,255,255,0.08) !important;
+    }
+
+    :root[data-theme="dark"] .overall-rating h3,
+    :root[data-theme="dark"] .overall-rating h4,
+    :root[data-theme="dark"] .rating-wrap h3,
+    :root[data-theme="dark"] .rating-wrap h4,
+    :root[data-theme="dark"] .feedback-form h3,
+    :root[data-theme="dark"] label {
+      color: #ffffff !important;
+    }
+
+    :root[data-theme="dark"] .overall-rating p,
+    :root[data-theme="dark"] .rating-wrap p,
+    :root[data-theme="dark"] .feedback-form p,
+    :root[data-theme="dark"] .muted {
+      color: rgba(255,255,255,0.68) !important;
+    }
+
+    :root[data-theme="dark"] textarea,
+    :root[data-theme="dark"] input,
+    :root[data-theme="dark"] select {
+      background: var(--fl-ink-800) !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255,255,255,0.08) !important;
+    }
+
+    :root[data-theme="dark"] textarea::placeholder,
+    :root[data-theme="dark"] input::placeholder {
+      color: rgba(255,255,255,0.4) !important;
+    }
   </style>
 </head>
 
@@ -288,11 +329,6 @@
 
       <div class="wall__bar">
         <button class="chip active">All reviews</button>
-        <button class="chip">Cat. B</button>
-        <button class="chip">Cat. C</button>
-        <button class="chip">Cat. C+E</button>
-        <button class="chip">Refresher</button>
-        <button class="chip">Featured</button>
         <div class="right">
           <select class="select" style="max-width:200px;font-size:14px;padding:10px 14px;">
             <option>Most recent</option>
