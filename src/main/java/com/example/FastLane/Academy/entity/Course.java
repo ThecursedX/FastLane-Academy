@@ -25,6 +25,8 @@ public class Course {
 
     private int durationHours;
 
+    private java.math.BigDecimal price;
+
     @Enumerated(EnumType.STRING)
     private DifficultyLevel difficultyLevel;
 

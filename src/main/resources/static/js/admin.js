@@ -525,6 +525,7 @@ async function loadCourses() {
           <div class="meta">${c.durationHours || 0}h · ${c.difficultyLevel || "—"}</div>
         </div>
         <div><div class="eyebrow">Difficulty</div>${difficultyBadge(c.difficultyLevel)}</div>
+        <div><div class="eyebrow">Price</div><b>${c.price != null ? `$${parseFloat(c.price).toFixed(2)}` : "—"}</b></div>
         <div><div class="eyebrow">Status</div>${statusBadge(c.status)}</div>
         <div><div class="eyebrow">ID</div><b class="mono" style="font-size:12px;">${c.courseId}</b></div>
         <div style="display:flex;gap:6px;">
@@ -683,6 +684,7 @@ function openEditCourse(c) {
     setVal("ec-title", c.courseTitle);
     setVal("ec-desc",  c.description);
     setVal("ec-hours", c.durationHours);
+    setVal("ec-price", c.price != null ? c.price : "");
     const diffEl = document.getElementById("ec-difficulty");
     if (diffEl) diffEl.value = c.difficultyLevel || "";
     openModal("modal-edit-course");
@@ -696,6 +698,7 @@ async function submitEditCourse() {
     const desc  = gv("ec-desc");
     const hours = parseInt(gv("ec-hours") || "0");
     const diff  = gv("ec-difficulty");
+    const price = parseFloat(gv("ec-price") || "0") || null;
 
     clearAlert(alertEl);
     if (!title || !diff) return showAlert(alertEl, "Title and difficulty are required.", "error");
@@ -704,7 +707,7 @@ async function submitEditCourse() {
     try {
         await apiJson(`/courses/updateCourse/${id}`, {
             method: "PUT",
-            body: JSON.stringify({ courseTitle: title, description: desc, durationHours: hours, difficultyLevel: diff })
+            body: JSON.stringify({ courseTitle: title, description: desc, durationHours: hours, difficultyLevel: diff, price })
         });
         showAlert(alertEl, "Course updated.", "success");
         loadCourses();
@@ -880,20 +883,21 @@ async function submitNewCourse() {
     const courseTitle = gv("nc-title"), description = gv("nc-desc"),
         durationHours = parseInt(gv("nc-hours") || "0"),
         difficultyLevel = gv("nc-difficulty"),
+        price = parseFloat(gv("nc-price") || "0"),
         syllabus = gv("nc-syllabus"), contentStructure = gv("nc-structure");
 
     clearAlert(alertEl);
-    if (!courseTitle || !description || !durationHours || !difficultyLevel)
+    if (!courseTitle || !description || !durationHours || !difficultyLevel || !price)
         return showAlert(alertEl, "Please fill in all required fields.", "error");
 
     btn.disabled = true; btn.textContent = "Creating…";
     try {
         await apiJson("/courses/addCourse", {
             method: "POST",
-            body: JSON.stringify({ courseTitle, description, durationHours, difficultyLevel, syllabus, contentStructure })
+            body: JSON.stringify({ courseTitle, description, durationHours, difficultyLevel, price, syllabus, contentStructure })
         });
         showAlert(alertEl, `"${courseTitle}" created.`, "success");
-        clearInputs(["nc-title","nc-desc","nc-hours","nc-syllabus","nc-structure"]);
+        clearInputs(["nc-title","nc-desc","nc-hours","nc-syllabus","nc-structure","nc-price"]);
         document.getElementById("nc-difficulty").value = "";
         loadCourses(); loadOverview();
         setTimeout(() => closeModal("modal-new-course"), 1600);

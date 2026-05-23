@@ -17,6 +17,7 @@ public class CourseDTO {
     private String courseTitle;
     private String description;
     private int durationHours;
+    private java.math.BigDecimal price;
     private DifficultyLevel difficultyLevel;
     private String syllabus;
     private String contentStructure;

@@ -324,6 +324,7 @@
       <div class="field"><label>Course title <span style="color:var(--fl-error)">*</span></label><input class="input" id="nc-title" placeholder="e.g. Cat. B — Standard car licence"></div>
       <div class="field"><label>Description <span style="color:var(--fl-error)">*</span></label><textarea class="textarea" id="nc-desc" rows="3" placeholder="Short public description…"></textarea></div>
       <div class="field-row"><div class="field"><label>Duration (hours) <span style="color:var(--fl-error)">*</span></label><input class="input" type="number" id="nc-hours" placeholder="90" min="1"></div><div class="field"><label>Difficulty <span style="color:var(--fl-error)">*</span></label><select class="select" id="nc-difficulty"><option value="">Select…</option><option value="BEGINNER">Beginner</option><option value="INTERMEDIATE">Intermediate</option><option value="ADVANCED">Advanced</option></select></div></div>
+      <div class="field"><label>Price (USD) <span style="color:var(--fl-error)">*</span></label><input class="input" type="number" id="nc-price" placeholder="e.g. 299.00" min="0" step="0.01"></div>
       <div class="field"><label>Syllabus <span class="muted" style="font-weight:400;">(optional)</span></label><textarea class="textarea" id="nc-syllabus" rows="4" placeholder="Week 1 — …&#10;Week 2 — …"></textarea></div>
       <div class="field"><label>Content structure <span class="muted" style="font-weight:400;">(optional)</span></label><textarea class="textarea" id="nc-structure" rows="3" placeholder="Modules, assessments…"></textarea></div>
     </div>
@@ -341,6 +342,7 @@
       <div class="field"><label>Course title <span style="color:var(--fl-error)">*</span></label><input class="input" id="ec-title"></div>
       <div class="field"><label>Description</label><textarea class="textarea" id="ec-desc" rows="3"></textarea></div>
       <div class="field-row"><div class="field"><label>Duration (hours)</label><input class="input" type="number" id="ec-hours" min="1"></div><div class="field"><label>Difficulty <span style="color:var(--fl-error)">*</span></label><select class="select" id="ec-difficulty"><option value="">Select…</option><option value="BEGINNER">Beginner</option><option value="INTERMEDIATE">Intermediate</option><option value="ADVANCED">Advanced</option></select></div></div>
+      <div class="field"><label>Price (USD)</label><input class="input" type="number" id="ec-price" placeholder="e.g. 299.00" min="0" step="0.01"></div>
     </div>
     <div class="modal__footer"><button class="btn btn--ghost" onclick="closeModal('modal-edit-course')">Cancel</button><button class="btn btn--primary" id="edit-course-btn" onclick="submitEditCourse()">Save changes</button></div>
   </div>
@@ -379,7 +381,7 @@
   </div>
 </div>
 <style>
-.vp-lbl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--fl-fg-muted);margin-bottom:3px;}
+  .vp-lbl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--fl-fg-muted);margin-bottom:3px;}
 </style>
 
 <script src="js/admin.js"></script>

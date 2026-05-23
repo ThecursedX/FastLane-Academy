@@ -55,7 +55,13 @@ function renderCourses(courses) {
                     <div class="m"><span>Status</span><b>${c.status || "—"}</b></div>
                     <div class="m"><span>ID</span><b style="font-size:14px;">${c.courseId || "—"}</b></div>
                 </div>
-                    <a href="${localStorage.getItem('fl-role') === 'STUDENT' ? 'student.html#mycourses' : 'auth.html'}" class="btn btn--primary">Enrol now →</a> 
+                <div class="foot">
+                    <div class="price-tag">
+                        ${c.price != null ? `$${parseFloat(c.price).toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : "—"}
+                        <small>course fee</small>
+                    </div>
+                    <a href="${localStorage.getItem('fl-role') === 'STUDENT' ? 'student.html#mycourses' : 'auth.html'}" class="btn btn--primary">Enrol now →</a>
+                </div>
                </div>
             <div class="cat-glyph">${(c.courseTitle || "?")[0].toUpperCase()}</div>
         </div>

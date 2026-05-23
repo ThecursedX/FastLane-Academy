@@ -616,6 +616,7 @@
       const enrollments = enrollRes.status==='fulfilled' ? (enrollRes.value.content||enrollRes.value||[]) : [];
       const allCourses  = courseRes.status==='fulfilled'  ? (courseRes.value.content||courseRes.value||[]).filter(c=>c.status==='ACTIVE') : [];
       const enrolledIds = new Set(enrollments.map(e=>e.courseId));
+      const courseMap   = Object.fromEntries(allCourses.map(c=>[c.courseId, c]));
 
       // ── My enrollments strip ──
       if (!enrollments.length) {
@@ -623,15 +624,23 @@
       } else {
         section.innerHTML = `<div class="card">
         <div class="card__head"><h3>My enrollments</h3><span class="meta">${enrollments.length} enrollment${enrollments.length!==1?'s':''}</span></div>
-        ${enrollments.map(e => `
-          <div style="display:grid;grid-template-columns:auto 1fr auto auto;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid var(--fl-line-soft);">
+        ${enrollments.map(e => {
+          const crs = courseMap[e.courseId] || {};
+          const priceStr = crs.price != null ? `<span style="font-family:var(--fl-font-display);font-size:18px;letter-spacing:-0.02em;color:var(--fl-moss-700);">$${parseFloat(crs.price).toFixed(2)}</span>` : '';
+          return `
+          <div style="display:grid;grid-template-columns:auto 1fr auto auto auto;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid var(--fl-line-soft);">
             <div style="width:44px;height:44px;border-radius:12px;background:var(--fl-moss-500);display:flex;align-items:center;justify-content:center;font-family:var(--fl-font-display);font-size:20px;color:var(--fl-ink-900);">${(e.courseId||'?')[0]}</div>
-            <div><b>Course ${e.courseId||'—'}</b><div class="meta" style="font-family:var(--fl-font-mono);font-size:11px;margin-top:2px;">${e.enrollmentId} · ${e.enrolledDate||'—'}</div></div>
+            <div>
+              <b>${crs.courseTitle || ('Course ' + (e.courseId||'—'))}</b>
+              <div class="meta" style="font-family:var(--fl-font-mono);font-size:11px;margin-top:2px;">${e.enrollmentId} · ${e.enrolledDate||'—'}</div>
+            </div>
+            ${priceStr}
             ${enrollStatusBadge(e.status)}
             ${e.accessGranted
-                ? '<span class="badge badge--success">Access granted ✓</span>'
-                : '<span class="badge badge--warn" title="Submit payment and wait for admin approval">Awaiting payment approval</span>'}
-          </div>`).join('')}
+                  ? '<span class="badge badge--success">Access granted ✓</span>'
+                  : '<span class="badge badge--warn" title="Submit payment and wait for admin approval">Awaiting payment approval</span>'}
+          </div>`;
+        }).join('')}
       </div>`;
       }
 
@@ -725,6 +734,7 @@
             <h3 style="font-family:var(--fl-font-serif);font-size:18px;font-weight:600;margin:0 0 4px;">${course.courseTitle||'—'}</h3>
             <div style="font-family:var(--fl-font-mono);font-size:11px;letter-spacing:.06em;color:var(--fl-fg-muted);">${course.durationHours||0}h · ${course.difficultyLevel||'—'} · ${course.courseId}</div>
             <div style="font-size:13px;color:var(--fl-fg-muted);margin-top:4px;">${course.description||''}</div>
+            ${course.price != null ? `<div style="margin-top:6px;font-family:var(--fl-font-display);font-size:22px;letter-spacing:-0.02em;color:var(--fl-moss-700);">$${parseFloat(course.price).toFixed(2)}<span style="font-family:var(--fl-font-mono);font-size:10px;letter-spacing:.06em;color:var(--fl-fg-muted);margin-left:5px;vertical-align:middle;">course fee</span></div>` : ''}
           </div>
           <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
             ${isEnrolled
@@ -1192,6 +1202,8 @@
     const userId = localStorage.getItem('fl-userId');
     // Reset modal
     ['pay-amount','pay-ref'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+    const hintEl = document.getElementById('pay-amount-hint');
+    if(hintEl) hintEl.textContent = '';;
     document.getElementById('pay-method').value='';
     const fileInput = document.getElementById('pay-receipt');
     if(fileInput) fileInput.value='';
@@ -1210,23 +1222,32 @@
       enrollSel.innerHTML = '<option value="">Select enrollment…</option>' +
               unpaid.map(e=>`<option value="${e.enrollmentId}">${e.enrollmentId} — ${e.courseId}</option>`).join('');
 
-      // Auto-fill course when enrollment selected
+      // Load courses to get prices
+      let coursePriceMap = {};
+      try {
+        const cData = await apiJson('/courses/getAllCourses');
+        const courses = cData.content || cData || [];
+        courses.forEach(c => { coursePriceMap[c.courseId] = c; });
+        courseSel.innerHTML = '<option value="">Select course…</option>' +
+                courses.map(c=>`<option value="${c.courseId}">${c.courseTitle||c.courseId}</option>`).join('');
+      } catch(_) {}
+
+      // Auto-fill course + amount when enrollment selected
       enrollSel.onchange = function() {
         const sel = unpaid.find(e=>e.enrollmentId===this.value);
         if(sel) {
           courseSel.innerHTML = `<option value="${sel.courseId}">${sel.courseId}</option>`;
+          const crs = coursePriceMap[sel.courseId];
+          const amountEl = document.getElementById('pay-amount');
+          if(amountEl && crs && crs.price != null) {
+            amountEl.value = parseFloat(crs.price).toFixed(2);
+            const hint = document.getElementById('pay-amount-hint');
+            if(hint) hint.textContent = `Course fee: $${parseFloat(crs.price).toFixed(2)} — you can adjust this amount.`;
+          }
         } else {
           courseSel.innerHTML = '<option value="">Select enrollment first…</option>';
         }
       };
-
-      // Populate courses dropdown independently too
-      try {
-        const cData = await apiJson('/courses/getAllCourses');
-        const courses = cData.content || cData || [];
-        courseSel.innerHTML = '<option value="">Select course…</option>' +
-                courses.map(c=>`<option value="${c.courseId}">${c.courseTitle||c.courseId}</option>`).join('');
-      } catch(_) {}
 
     } catch(err) {
       enrollSel.innerHTML = '<option value="">Could not load — enter manually</option>';
@@ -1697,7 +1718,7 @@
         </div>
       </div>
       <div class="grid-2">
-        <div class="field"><label>Amount ($) <span style="color:var(--fl-error)">*</span></label><input class="input" type="number" id="pay-amount" placeholder="199.00" min="1" step="0.01"></div>
+        <div class="field"><label>Amount ($) <span style="color:var(--fl-error)">*</span></label><input class="input" type="number" id="pay-amount" placeholder="199.00" min="1" step="0.01"><span id="pay-amount-hint" style="font-size:11px;color:var(--fl-fg-muted);margin-top:4px;display:block;font-family:var(--fl-font-mono);"></span></div>
         <div class="field"><label>Payment method <span style="color:var(--fl-error)">*</span></label>
           <select class="select" id="pay-method">
             <option value="">Select…</option>
