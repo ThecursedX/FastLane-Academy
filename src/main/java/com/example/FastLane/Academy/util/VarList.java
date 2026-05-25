@@ -54,6 +54,8 @@ public class VarList {
     public static final String INSTRUCTOR_HAS_ACTIVE_DATA    = "44";
     public static final String DUPLICATE_COURSE        = "50";
     public static final String COURSE_HAS_ENROLLMENTS  = "51";
+    public static final String COURSE_NOT_ARCHIVED     = "52";
+    public static final String COURSE_DELETED          = "53";
     public static final String ALREADY_ENROLLED        = "60";
 
     // ── Payment ───────────────────────────────────────────────────────────

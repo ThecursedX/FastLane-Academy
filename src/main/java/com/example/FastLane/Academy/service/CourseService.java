@@ -186,6 +186,37 @@ public class CourseService {
                 VarList.RSP_SUCCESS, "Course deleted successfully", course);
     }
 
+
+    // Permanently Delete Archived Course
+    public ResponseDTO deleteArchivedCourse(String courseId) {
+
+        Optional<Course> optionalCourse = courseRepo.findById(courseId);
+
+        if (optionalCourse.isEmpty()) {
+            return new ResponseDTO(
+                    VarList.RSP_NO_DATA_FOUND, "Course not found", null);
+        }
+
+        Course course = optionalCourse.get();
+
+        if (course.getStatus() != CourseStatus.INACTIVE) {
+            return new ResponseDTO(
+                    VarList.COURSE_NOT_ARCHIVED, "Only archived courses can be deleted permanently", course);
+        }
+
+        boolean hasEnrollments = !enrollmentRepo.findByCourseId(courseId).isEmpty();
+
+        if (hasEnrollments) {
+            return new ResponseDTO(
+                    VarList.COURSE_HAS_ENROLLMENTS, "Cannot permanently delete course with enrollments", course);
+        }
+
+        courseRepo.delete(course);
+
+        return new ResponseDTO(
+                VarList.COURSE_DELETED, "Archived course deleted permanently", course);
+    }
+
     // Filter By Difficulty Level
     public ResponseDTO getCoursesByDifficulty(
             DifficultyLevel difficultyLevel) {

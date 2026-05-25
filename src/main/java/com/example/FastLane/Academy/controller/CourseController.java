@@ -124,6 +124,26 @@ public class CourseController {
         return ResponseEntity.status(status).body(response);
     }
 
+
+    @DeleteMapping("/deleteArchivedCourse/{courseId}")
+    public ResponseEntity<ResponseDTO> deleteArchivedCourse(
+            @PathVariable String courseId, HttpSession session)
+    {
+        if (!SessionUtil.isRole(session, "ADMIN")) {
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(VarList.UNAUTHORIZED, "Admin access only", null));
+        }
+
+        ResponseDTO response = courseService.deleteArchivedCourse(courseId);
+
+        HttpStatus status =
+                response.getCode().equals(VarList.COURSE_DELETED)
+                        ? HttpStatus.ACCEPTED
+                        : HttpStatus.BAD_REQUEST;
+
+        return ResponseEntity.status(status).body(response);
+    }
+
     @GetMapping("/filterByDifficulty")
     public ResponseEntity<ResponseDTO> filterByDifficulty(
             @RequestParam DifficultyLevel difficultyLevel) {
