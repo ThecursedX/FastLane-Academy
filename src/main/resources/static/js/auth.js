@@ -184,6 +184,15 @@ function updateFormState() {
   }
 }
 
+
+function isValidTenDigitPhone(value) {
+  return /^\d{10}$/.test((value || "").trim());
+}
+
+function phoneValidationMessage(label) {
+  return `${label} must contain exactly 10 digits. Example: 0771234567`;
+}
+
 /* ─── Form submit ────────────────────────────────────────────────────────── */
 
 async function handleAuthSubmit(e) {
@@ -229,6 +238,22 @@ async function handleAuthSubmit(e) {
       }
       if (password !== confirmPassword) {
         showError("Passwords do not match.");
+        return;
+      }
+
+      if (currentRole === "student") {
+        if (!isValidTenDigitPhone(contactNumber)) {
+          showError(phoneValidationMessage("Contact number"));
+          return;
+        }
+        if (emergencyContact && !isValidTenDigitPhone(emergencyContact)) {
+          showError(phoneValidationMessage("Emergency contact"));
+          return;
+        }
+      }
+
+      if (currentRole === "instructor" && !isValidTenDigitPhone(instructorContactNumber)) {
+        showError(phoneValidationMessage("Contact number"));
         return;
       }
 

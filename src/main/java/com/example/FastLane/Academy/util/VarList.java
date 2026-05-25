@@ -50,6 +50,8 @@ public class VarList {
     public static final String DUPLICATE_EMAIL         = "40";
     public static final String DUPLICATE_LICENSE       = "41";
     public static final String INSTRUCTOR_HAS_FUTURE_LESSONS = "42";
+    public static final String INSTRUCTOR_DELETED            = "43";
+    public static final String INSTRUCTOR_HAS_ACTIVE_DATA    = "44";
     public static final String DUPLICATE_COURSE        = "50";
     public static final String COURSE_HAS_ENROLLMENTS  = "51";
     public static final String ALREADY_ENROLLED        = "60";

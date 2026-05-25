@@ -26,8 +26,8 @@
     [data-theme="dark"] .auth-visual { background: var(--fl-ink-950); }
     [data-theme="dark"] .auth-visual::before {
       background:
-        radial-gradient(ellipse 70% 60% at 30% 50%, rgba(151,177,84,0.18), transparent 65%),
-        radial-gradient(ellipse 50% 40% at 80% 20%, rgba(151,177,84,0.08), transparent 60%);
+              radial-gradient(ellipse 70% 60% at 30% 50%, rgba(151,177,84,0.18), transparent 65%),
+              radial-gradient(ellipse 50% 40% at 80% 20%, rgba(151,177,84,0.08), transparent 60%);
     }
     [data-theme="dark"] .role-tab.active {
       background: var(--fl-ink-600);
@@ -106,8 +106,8 @@
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(ellipse 70% 60% at 20% 50%, rgba(151,177,84,0.22), transparent 65%),
-        radial-gradient(ellipse 50% 40% at 80% 20%, rgba(151,177,84,0.10), transparent 60%);
+              radial-gradient(ellipse 70% 60% at 20% 50%, rgba(151,177,84,0.22), transparent 65%),
+              radial-gradient(ellipse 50% 40% at 80% 20%, rgba(151,177,84,0.10), transparent 60%);
       z-index: 0;
     }
     /* Animated road lines */
@@ -123,9 +123,9 @@
       left: 50%; bottom: -20%; transform: translateX(-50%) rotate(-15deg);
       width: 300%; height: 120%;
       background-image: repeating-linear-gradient(
-        90deg,
-        transparent 0, transparent 100px,
-        rgba(255,255,255,0.06) 100px, rgba(255,255,255,0.06) 140px
+              90deg,
+              transparent 0, transparent 100px,
+              rgba(255,255,255,0.06) 100px, rgba(255,255,255,0.06) 140px
       );
       animation: roadsweep 6s linear infinite;
     }
@@ -662,7 +662,7 @@
 
               <div>
                 <label class="field-label" for="contactNumber">Contact number</label>
-                <input type="text" id="contactNumber" class="auth-input" placeholder="0771234567">
+                <input type="text" id="contactNumber" class="auth-input" placeholder="0771234567" inputmode="numeric" maxlength="10" pattern="\d{10}" title="Enter exactly 10 digits">
               </div>
 
               <div>
@@ -677,7 +677,7 @@
 
               <div>
                 <label class="field-label" for="emergencyContact">Emergency contact</label>
-                <input type="text" id="emergencyContact" class="auth-input" placeholder="0779876543">
+                <input type="text" id="emergencyContact" class="auth-input" placeholder="0779876543" inputmode="numeric" maxlength="10" pattern="\d{10}" title="Enter exactly 10 digits">
               </div>
             </div>
 
@@ -700,7 +700,7 @@
             <div class="hidden" id="instructorExtraFields">
               <div>
                 <label class="field-label" for="instructorContactNumber">Contact number</label>
-                <input type="text" id="instructorContactNumber" class="auth-input" placeholder="0771234567">
+                <input type="text" id="instructorContactNumber" class="auth-input" placeholder="0771234567" inputmode="numeric" maxlength="10" pattern="\d{10}" title="Enter exactly 10 digits">
               </div>
 
               <div>
@@ -780,8 +780,8 @@
         <!-- Admin link -->
         <div class="admin-link-wrap">
           <a class="admin-link" href="#" onclick=" if(currentRole === 'admin'){switchToNormal();} else {switchToAdmin(); }  return false; ">           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-            </svg>
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
             Sign in as admin
           </a>
         </div>

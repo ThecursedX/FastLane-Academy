@@ -67,6 +67,7 @@ public class StudentController {
                 : HttpStatus.BAD_REQUEST;
         return ResponseEntity.status(status).body(response);
     }
+
     @PutMapping("/deactivate/{studentId}")
     public ResponseEntity<ResponseDTO> deactivateStudent(@PathVariable String studentId, HttpSession session)
     {
@@ -76,6 +77,20 @@ public class StudentController {
         }
 
         ResponseDTO response = studentService.deactivateStudent(studentId);
+        HttpStatus status = response.getCode().equals(VarList.RSP_SUCCESS)
+                ? HttpStatus.OK
+                : HttpStatus.BAD_REQUEST;
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @DeleteMapping("/delete/{studentId}")
+    public ResponseEntity<ResponseDTO> deleteStudent(@PathVariable String studentId, HttpSession session) {
+        if (!SessionUtil.isRole(session, "ADMIN")) {
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(VarList.UNAUTHORIZED, "Admin access only", null));
+        }
+
+        ResponseDTO response = studentService.deleteStudent(studentId);
         HttpStatus status = response.getCode().equals(VarList.RSP_SUCCESS)
                 ? HttpStatus.OK
                 : HttpStatus.BAD_REQUEST;

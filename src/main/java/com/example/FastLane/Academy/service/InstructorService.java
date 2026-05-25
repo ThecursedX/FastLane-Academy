@@ -186,6 +186,47 @@ public class InstructorService {
         );
     }
 
+
+    // Hard Delete / Remove Instructor
+    public ResponseDTO deleteInstructor(String instructorId) {
+
+        Optional<Instructor> optionalInstructor =
+                instructorRepo.findById(instructorId);
+
+        if (optionalInstructor.isEmpty()) {
+
+            return new ResponseDTO(
+                    VarList.RSP_NO_DATA_FOUND,
+                    "Instructor not found",
+                    null
+            );
+        }
+
+        boolean hasActiveData =
+                lessonRepo.existsByInstructorIdAndDateGreaterThanEqualAndStatus(
+                        instructorId,
+                        LocalDate.now(),
+                        LessonStatus.SCHEDULED
+                );
+
+        if (hasActiveData) {
+
+            return new ResponseDTO(
+                    VarList.INSTRUCTOR_HAS_ACTIVE_DATA,
+                    "Cannot delete instructor because active/future lesson data exists",
+                    optionalInstructor.get()
+            );
+        }
+
+        instructorRepo.delete(optionalInstructor.get());
+
+        return new ResponseDTO(
+                VarList.INSTRUCTOR_DELETED,
+                "Instructor deleted successfully",
+                null
+        );
+    }
+
     // Filter By Vehicle Type
     public ResponseDTO getInstructorsByVehicle(String vehicleType) {
 

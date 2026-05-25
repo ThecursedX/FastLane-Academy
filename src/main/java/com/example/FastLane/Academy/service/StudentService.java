@@ -96,6 +96,37 @@ public class StudentService {
                 .toList();
     }
 
+    public ResponseDTO deleteStudent(String studentId) {
+
+        Optional<Student> optionalStudent = studentRepo.findById(studentId);
+
+        if (optionalStudent.isEmpty()) {
+            return new ResponseDTO(
+                    VarList.RSP_NO_DATA_FOUND,
+                    "Student not found",
+                    null
+            );
+        }
+
+        Student student = optionalStudent.get();
+
+        if (student.getStatus() != StudentStatus.INACTIVE) {
+            return new ResponseDTO(
+                    VarList.RSP_FAIL,
+                    "Only deactivated (INACTIVE) students can be deleted",
+                    null
+            );
+        }
+
+        studentRepo.delete(student);
+
+        return new ResponseDTO(
+                VarList.RSP_SUCCESS,
+                "Student deleted successfully",
+                null
+        );
+    }
+
     public ResponseDTO getStudentById(String studentId) {
         Optional<Student> optionalStudent = studentRepo.findById(studentId);
 

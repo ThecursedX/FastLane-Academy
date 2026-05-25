@@ -284,9 +284,9 @@
       <div class="modal-alert" id="add-student-alert"></div>
       <div class="section-label">Personal info</div>
       <div class="field-row"><div class="field"><label>Full name <span style="color:var(--fl-error)">*</span></label><input class="input" id="as-fullname" placeholder="e.g. Jordan Reeves"></div><div class="field"><label>Date of birth <span style="color:var(--fl-error)">*</span></label><input class="input" type="date" id="as-dob"></div></div>
-      <div class="field-row"><div class="field"><label>NIC <span style="color:var(--fl-error)">*</span></label><input class="input" id="as-nic" placeholder="200012345678V"></div><div class="field"><label>Contact <span style="color:var(--fl-error)">*</span></label><input class="input" id="as-contact" placeholder="0771234567"></div></div>
+      <div class="field-row"><div class="field"><label>NIC <span style="color:var(--fl-error)">*</span></label><input class="input" id="as-nic" placeholder="200012345678V"></div><div class="field"><label>Contact <span style="color:var(--fl-error)">*</span></label><input class="input" id="as-contact" placeholder="0771234567" inputmode="numeric" maxlength="10" pattern="\d{10}" title="Enter exactly 10 digits"></div></div>
       <div class="field"><label>Address</label><input class="input" id="as-address" placeholder="Colombo 05"></div>
-      <div class="field"><label>Emergency contact</label><input class="input" id="as-emergency" placeholder="0779876543"></div>
+      <div class="field"><label>Emergency contact</label><input class="input" id="as-emergency" placeholder="0779876543" inputmode="numeric" maxlength="10" pattern="\d{10}" title="Enter exactly 10 digits"></div>
       <div class="section-label">Account</div>
       <div class="field"><label>Email <span style="color:var(--fl-error)">*</span></label><input class="input" type="email" id="as-email" placeholder="student@example.com"></div>
       <div class="field-row"><div class="field"><label>Password <span style="color:var(--fl-error)">*</span></label><input class="input" type="password" id="as-password" placeholder="Min 6 chars"></div><div class="field"><label>Confirm <span style="color:var(--fl-error)">*</span></label><input class="input" type="password" id="as-confirm" placeholder="Repeat"></div></div>
@@ -304,7 +304,7 @@
       <div class="section-label">Professional info</div>
       <div class="field-row"><div class="field"><label>Full name <span style="color:var(--fl-error)">*</span></label><input class="input" id="ai-fullname" placeholder="e.g. Rogan Massey"></div><div class="field"><label>Licence ID <span style="color:var(--fl-error)">*</span></label><input class="input" id="ai-license" placeholder="ADI-04821"></div></div>
       <div class="field-row"><div class="field"><label>Vehicle type <span style="color:var(--fl-error)">*</span></label><input class="input" id="ai-vehicle" placeholder="Cat. B"></div><div class="field"><label>Experience (yrs) <span style="color:var(--fl-error)">*</span></label><input class="input" type="number" id="ai-exp" placeholder="3" min="0"></div></div>
-      <div class="field"><label>Contact <span style="color:var(--fl-error)">*</span></label><input class="input" id="ai-contact" placeholder="0771234567"></div>
+      <div class="field"><label>Contact <span style="color:var(--fl-error)">*</span></label><input class="input" id="ai-contact" placeholder="0771234567" inputmode="numeric" maxlength="10" pattern="\d{10}" title="Enter exactly 10 digits"></div>
       <div class="section-label">Working days</div>
       <div class="day-picker"><button type="button" class="day-btn" data-day="MONDAY">Mon</button><button type="button" class="day-btn" data-day="TUESDAY">Tue</button><button type="button" class="day-btn" data-day="WEDNESDAY">Wed</button><button type="button" class="day-btn" data-day="THURSDAY">Thu</button><button type="button" class="day-btn" data-day="FRIDAY">Fri</button><button type="button" class="day-btn" data-day="SATURDAY">Sat</button><button type="button" class="day-btn" data-day="SUNDAY">Sun</button></div>
       <div class="section-label">Account</div>

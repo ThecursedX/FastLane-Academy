@@ -121,6 +121,30 @@ public class InstructorController {
         return ResponseEntity.status(status).body(response);
     }
 
+
+    @DeleteMapping({"/deleteInstructor/{instructorId}", "/delete/{instructorId}"})
+    public ResponseEntity<ResponseDTO> deleteInstructor(
+            @PathVariable String instructorId,
+            HttpSession session) {
+
+        if (!SessionUtil.isRole(session, "ADMIN")) {
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(VarList.UNAUTHORIZED, "Admin access only", null));
+        }
+
+        ResponseDTO response =
+                instructorService.deleteInstructor(instructorId);
+
+        HttpStatus status =
+                response.getCode().equals(VarList.INSTRUCTOR_DELETED)
+                        ? HttpStatus.OK
+                        : response.getCode().equals(VarList.RSP_NO_DATA_FOUND)
+                        ? HttpStatus.NOT_FOUND
+                        : HttpStatus.BAD_REQUEST;
+
+        return ResponseEntity.status(status).body(response);
+    }
+
     @GetMapping("/filterByVehicle")
     public ResponseEntity<ResponseDTO> getByVehicle(
             @RequestParam String vehicleType) {

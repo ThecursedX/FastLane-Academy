@@ -274,7 +274,10 @@ async function loadStudents() {
           <td class="meta">${s.nic || "—"}</td>
           <td>${s.contactNumber || "—"}</td>
           <td>${statusBadge(s.status)}</td>
-          <td><button class="icon-btn" title="Deactivate" onclick="deactivateStudent('${s.studentId}')">✕</button></td>
+          <td style="display:flex;gap:4px;align-items:center;">
+            ${s.status !== "INACTIVE" ? `<button class="icon-btn" title="Deactivate" onclick="deactivateStudent('${s.studentId}')">✕</button>` : ""}
+            ${s.status === "INACTIVE" ? `<button class="icon-btn" title="Delete permanently" style="color:#e53935;" onclick="deleteStudent('${s.studentId}', '${(s.fullName||"").replace(/'/g,"\\'")}')">🗑</button>` : ""}
+          </td>
         </tr>`).join("")}
       </tbody></table>`;
     } catch (err) {
@@ -289,6 +292,16 @@ async function deactivateStudent(id) {
         showToast("Student deactivated.");
         loadStudents();
     } catch (err) { showToast(err.message || "Failed", false); }
+}
+
+async function deleteStudent(id, name) {
+    if (!confirm(`Permanently delete deactivated student "${name || id}"?\n\nThis cannot be undone.`)) return;
+    try {
+        await apiJson(`/students/delete/${id}`, { method: "DELETE" });
+        showToast("Student deleted permanently.");
+        loadStudents();
+        loadOverview();
+    } catch (err) { showToast(err.message || "Failed to delete student", false); }
 }
 
 /* ─── Payments ────────────────────────────────────────────────────────── */
@@ -759,9 +772,29 @@ async function loadInstructors() {
           <div><b>${(inst.workingDays || []).length}</b><span>Days/wk</span></div>
         </div>
         <div style="font-size:12px;color:var(--fl-fg-muted);">${inst.contactNumber || ""}</div>
+        <div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end;">
+          <button class="btn btn--ghost btn--sm" onclick="deleteInstructor('${inst.instructorId}', ${JSON.stringify(inst.instructorName || '').replace(/"/g, '&quot;')})">Delete</button>
+        </div>
       </div>`).join("");
     } catch (err) {
         grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">${emptyState("Could not load instructors")}</div>`;
+    }
+}
+
+
+async function deleteInstructor(instructorId, instructorName = "this instructor") {
+    if (!instructorId) return showToast("Instructor ID is missing.", false);
+
+    const ok = confirm(`Delete ${instructorName || instructorId}? This action cannot be undone.`);
+    if (!ok) return;
+
+    try {
+        await apiJson(`/instructors/deleteInstructor/${instructorId}`, { method: "DELETE" });
+        showToast("Instructor deleted successfully.");
+        loadInstructors();
+        loadOverview();
+    } catch (err) {
+        showToast(err.message || "Could not delete instructor. Make sure they have no active lessons/data.", false);
     }
 }
 
@@ -815,6 +848,15 @@ async function deleteFeedback(id) {
     } catch (err) { showToast(err.message || "Failed", false); }
 }
 
+
+function isValidTenDigitPhone(value) {
+    return /^\d{10}$/.test((value || "").trim());
+}
+
+function phoneValidationMessage(label) {
+    return `${label} must contain exactly 10 digits. Example: 0771234567`;
+}
+
 /* ─── Modal: Add Student ──────────────────────────────────────────────── */
 
 async function submitAddStudent() {
@@ -830,6 +872,8 @@ async function submitAddStudent() {
         return showAlert(alertEl, "Please fill in all required fields.", "error");
     if (password !== confirm)  return showAlert(alertEl, "Passwords do not match.", "error");
     if (password.length < 6)   return showAlert(alertEl, "Password must be at least 6 characters.", "error");
+    if (!isValidTenDigitPhone(contactNumber)) return showAlert(alertEl, phoneValidationMessage("Contact number"), "error");
+    if (emergencyContact && !isValidTenDigitPhone(emergencyContact)) return showAlert(alertEl, phoneValidationMessage("Emergency contact"), "error");
 
     btn.disabled = true; btn.textContent = "Adding…";
     try {
@@ -859,6 +903,7 @@ async function submitAddInstructor() {
     if (!fullName || !email || !password || !licenseId || !contactNumber || !vehicleType)
         return showAlert(alertEl, "Please fill in all required fields.", "error");
     if (password !== confirm) return showAlert(alertEl, "Passwords do not match.", "error");
+    if (!isValidTenDigitPhone(contactNumber)) return showAlert(alertEl, phoneValidationMessage("Contact number"), "error");
 
     btn.disabled = true; btn.textContent = "Adding…";
     try {
