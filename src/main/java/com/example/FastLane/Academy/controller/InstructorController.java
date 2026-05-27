@@ -57,12 +57,6 @@ public class InstructorController {
         }
     }
 
-    /** Public endpoint — shown on landing page, no auth required */
-    @GetMapping("/studentView")
-    public ResponseEntity<ResponseDTO> getActiveInstructors() {
-        ResponseDTO response = instructorService.getActiveInstructors();
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
-    }
 
     @GetMapping("/getInstructor/{instructorId}")
     public ResponseEntity<ResponseDTO> getInstructorById(
@@ -102,24 +96,6 @@ public class InstructorController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @PutMapping("/deactivateInstructor/{instructorId}")
-    public ResponseEntity<ResponseDTO> deactivateInstructor(
-            @PathVariable String  instructorId, HttpSession session)
-    {
-        if (!SessionUtil.isRole(session, "ADMIN")) {
-            return ResponseEntity.status(403)
-                    .body(new ResponseDTO(VarList.UNAUTHORIZED, "Admin access only", null));
-        }
-        ResponseDTO response =
-                instructorService.deactivateInstructor(instructorId);
-
-        HttpStatus status =
-                response.getCode().equals(VarList.RSP_SUCCESS)
-                        ? HttpStatus.ACCEPTED
-                        : HttpStatus.BAD_REQUEST;
-
-        return ResponseEntity.status(status).body(response);
-    }
 
 
     @DeleteMapping({"/deleteInstructor/{instructorId}", "/delete/{instructorId}"})
@@ -145,7 +121,7 @@ public class InstructorController {
         return ResponseEntity.status(status).body(response);
     }
 
-    @GetMapping("/filterByVehicle")
+   /* @GetMapping("/filterByVehicle")
     public ResponseEntity<ResponseDTO> getByVehicle(
             @RequestParam String vehicleType) {
 
@@ -154,5 +130,31 @@ public class InstructorController {
 
         return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .body(response);
+    }*/
+     @PutMapping("/deactivateInstructor/{instructorId}")
+    public ResponseEntity<ResponseDTO> deactivateInstructor(
+            @PathVariable String  instructorId, HttpSession session)
+    {
+        if (!SessionUtil.isRole(session, "ADMIN")) {
+            return ResponseEntity.status(403)
+                    .body(new ResponseDTO(VarList.UNAUTHORIZED, "Admin access only", null));
+        }
+        ResponseDTO response =
+                instructorService.deactivateInstructor(instructorId);
+
+        HttpStatus status =
+                response.getCode().equals(VarList.RSP_SUCCESS)
+                        ? HttpStatus.ACCEPTED
+                        : HttpStatus.BAD_REQUEST;
+
+        return ResponseEntity.status(status).body(response);
     }
+
+   // Public endpoint — shown on landing page, no auth required
+    @GetMapping("/studentView")
+    public ResponseEntity<ResponseDTO> getActiveInstructors() {
+        ResponseDTO response = instructorService.getActiveInstructors();
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+    }
+
 }
